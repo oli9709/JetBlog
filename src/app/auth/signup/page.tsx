@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { SupabaseSignUp, SupabaseSignInWithGoogle } from '@/lib/API/Services/supabase/auth';
+import { supabaseBrowser } from '@/lib/API/Services/init/supabase-browser';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { authFormSchema, authFormValues } from '@/lib/types/validations';
 import { useForm } from 'react-hook-form';
@@ -18,11 +18,12 @@ import {
   CardTitle
 } from '@/components/ui/Card';
 import Link from 'next/link';
-import config from '@/lib/config/auth';
 import { Icons } from '@/components/Icons';
 
 export default function AuthForm() {
   const [showPassword, setShowPassword] = useState(false);
+  const [emailSent, setEmailSent] = useState(false);
+  const [sentEmail, setSentEmail] = useState('');
 
   const router = useRouter();
 
@@ -42,46 +43,102 @@ export default function AuthForm() {
   } = form;
 
   const onSubmit = async (values: authFormValues) => {
-    const { error } = await SupabaseSignUp(values.email, values.password);
+    const supabase = supabaseBrowser()
+    const { data, error } = await supabase.auth.signUp({
+      email: values.email,
+      password: values.password,
+      options: {
+        emailRedirectTo: `${window.location.origin}/api/auth-callback`
+      }
+    })
 
     if (error) {
       reset({ email: values.email, password: '' });
       setError('email', {
-        type: '"root.serverError',
+        type: 'root.serverError',
         message: error.message
       });
       setError('password', { type: 'root.serverError', message: '' });
-
       return;
     }
-    router.push(config.redirects.callback);
+
+    if (data?.session) {
+      router.refresh()
+      router.push('/dashboard/main');
+      return;
+    }
+
+    setSentEmail(values.email);
+    setEmailSent(true);
   };
 
   const handleGoogleSignIn = async () => {
-    const { error } = await SupabaseSignInWithGoogle();
+    const supabase = supabaseBrowser()
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo: `${window.location.origin}/api/auth-callback` }
+    })
 
     if (error) {
       setError('email', {
-        type: '"root.serverError',
+        type: 'root.serverError',
         message: error.message
       });
       setError('password', { type: 'root.serverError' });
       return;
     }
-    router.push(config.redirects.callback);
   };
 
   const togglePasswordVisibility = () => {
-    setShowPassword((prevShowPassword) => !prevShowPassword);
+    setShowPassword((prev) => !prev);
   };
+
+  // Email yuborilgandan keyin ko'rsatiladigan holat
+  if (emailSent) {
+    return (
+      <div className="md:w-96">
+        <Card className="bg-background-light dark:bg-background-dark">
+          <CardHeader className="space-y-1">
+            <CardTitle className="text-2xl">Email manzilingizni tasdiqlang</CardTitle>
+            <CardDescription>
+              <span className="font-semibold">{sentEmail}</span> manziliga tasdiqlash xati yuborildi.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p className="text-sm text-muted-foreground">
+              Email xatingizdagi havolani bosing. Havolani bosganingizdan so&apos;ng avtomatik ravishda
+              dashboardga yo&apos;naltirilasiz.
+            </p>
+            <p className="text-xs text-muted-foreground">
+              Xat kelmadimi? Spam papkasini ham tekshirib ko&apos;ring.
+            </p>
+          </CardContent>
+          <CardFooter>
+            <div className="text-center text-sm text-gray-500 w-full">
+              <button
+                onClick={() => { setEmailSent(false); setSentEmail(''); }}
+                className="text-indigo-600 hover:text-indigo-500 underline"
+              >
+                Qayta urinish
+              </button>
+              {' '}&mdash;{' '}
+              <Link href="/auth/login" className="text-indigo-600 hover:text-indigo-500">
+                Kirish sahifasi
+              </Link>
+            </div>
+          </CardFooter>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="md:w-96">
       <Card className="bg-background-light dark:bg-background-dark">
         <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl">Create an account</CardTitle>
+          <CardTitle className="text-2xl">Hisob yaratish</CardTitle>
           <CardDescription>
-            Enter your email and password below to create your account
+            JetBlog ga ro&apos;yxatdan o&apos;tish uchun email va parolingizni kiriting
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -95,7 +152,12 @@ export default function AuthForm() {
                     <FormMessage />
                     <FormLabel>Email</FormLabel>
                     <FormControl>
-                      <Input {...register('email')} placeholder="Email" {...field} className="bg-background-light dark:bg-background-dark"/>
+                      <Input
+                        {...register('email')}
+                        placeholder="Email"
+                        {...field}
+                        className="bg-background-light dark:bg-background-dark"
+                      />
                     </FormControl>
                   </FormItem>
                 )}
@@ -105,22 +167,19 @@ export default function AuthForm() {
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Password</FormLabel>
+                    <FormLabel>Parol</FormLabel>
                     <FormControl>
                       <div className="relative">
                         <Input
                           className="bg-background-light dark:bg-background-dark"
                           {...register('password')}
                           type={showPassword ? 'text' : 'password'}
-                          placeholder="Password"
+                          placeholder="Parol"
                           {...field}
                         />
                         <div className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-600 cursor-pointer">
                           {showPassword ? (
-                            <Icons.EyeOffIcon
-                              className="h-6 w-6"
-                              onClick={togglePasswordVisibility}
-                            />
+                            <Icons.EyeOffIcon className="h-6 w-6" onClick={togglePasswordVisibility} />
                           ) : (
                             <Icons.EyeIcon className="h-6 w-6" onClick={togglePasswordVisibility} />
                           )}
@@ -134,7 +193,7 @@ export default function AuthForm() {
               <Button className="w-full">
                 {isSubmitting && <Icons.Spinner className="mr-2 h-4 w-4 animate-spin" />}
                 <Icons.Lock className="mr-2 h-4 w-4" />
-                Create account
+                Hisob yaratish
               </Button>
             </form>
           </Form>
@@ -144,21 +203,21 @@ export default function AuthForm() {
                 <span className="w-full border-t" />
               </div>
               <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-background px-2 text-muted-foreground">Or continue with</span>
+                <span className="bg-background px-2 text-muted-foreground">yoki</span>
               </div>
             </div>
             <Button onClick={handleGoogleSignIn} variant="outline" className="w-full">
               <Icons.Google />
-              <span className="ml-2 font-semibold">Sign in with Google</span>
+              <span className="ml-2 font-semibold">Google orqali kirish</span>
             </Button>
           </div>
         </CardContent>
         <CardFooter>
-          <div className="flex flex-col">
+          <div className="flex flex-col w-full">
             <div className="text-center text-sm text-gray-500">
-              Already a member?{' '}
+              Hisobingiz bormi?{' '}
               <Link href="/auth/login" className="leading-7 text-indigo-600 hover:text-indigo-500">
-                Login here.
+                Kirish
               </Link>
             </div>
           </div>

@@ -29,7 +29,6 @@ import {
   UpdatePasswordFormValues
 } from '@/lib/types/validations';
 
-import { UpdateStripeCustomerEmail } from '@/lib/API/Services/stripe/customer';
 import { User } from '@supabase/supabase-js';
 
 interface UpdateDisplayNamePropsI {
@@ -122,18 +121,10 @@ export const UpdateEmail = ({ email, customer }: UpdateEmailPropsI) => {
 
     if (error) {
       setError('email', {
-        type: '"root.serverError',
+        type: 'root.serverError',
         message: error.message
       });
       return;
-    }
-
-    try {
-      const props = { customer, email };
-      await UpdateStripeCustomerEmail(props);
-    } catch (e) {
-      toast.error('Stripe Update Failed, please contact support');
-      throw e;
     }
 
     toast.success('Update Email Sent, confirm email to complete Update');

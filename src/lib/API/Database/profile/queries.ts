@@ -7,7 +7,8 @@ import { SupabaseDBError } from '@/lib/utils/error';
 export const GetProfileByUserId = async (
   id: string
 ): Promise<PostgrestSingleResponse<ProfileT[]>> => {
-  const res: PostgrestSingleResponse<ProfileT[]> = await supabase()
+  const client = await supabase();
+  const res: PostgrestSingleResponse<ProfileT[]> = await client
     .from('profiles')
     .select()
     .eq('id', id);

@@ -12,7 +12,17 @@ export const SupabaseProfileUpdate = async ({
   id,
   display_name
 }: ProfileUpdatePropsI): Promise<PostgrestSingleResponse<null>> => {
-  const res = await supabase().from('profiles').upsert({ id, display_name });
+  const client = await supabase();
+  const res = await client.from('profiles').upsert({ id, display_name });
+
+  return res;
+};
+
+export const SupabaseCompleteOnboarding = async (
+  id: string
+): Promise<PostgrestSingleResponse<null>> => {
+  const client = await supabase();
+  const res = await client.from('profiles').update({ onboarding_completed: true }).eq('id', id);
 
   return res;
 };

@@ -1,5 +1,6 @@
 'use client';
 
+import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
 import {
   ComposedChart,
@@ -61,6 +62,23 @@ const data = [
 ];
 
 const Compose = () => {
+  const [mounted, setMounted] = React.useState(false);
+  
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return (
+      <Card className="p-4 bg-background-light dark:bg-background-dark min-h-[450px]">
+        <CardTitle className="mb-6 text-center">Current Sales Growth:</CardTitle>
+        <CardContent className="flex items-center justify-center h-[350px]">
+          <div className="w-full h-full bg-slate-200 dark:bg-slate-800 animate-pulse rounded-md" />
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card className="p-4 bg-background-light dark:bg-background-dark">
       <CardTitle className="mb-6 text-center">Current Sales Growth:</CardTitle>

@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { UserNav } from './UserNav';
-import TeamSwitcher from './TeamSwitcher';
 import { usePathname } from 'next/navigation';
 import configuration from '@/lib/config/dashboard';
 import { MobileNav } from '@/components/MobileNav';
@@ -35,9 +34,6 @@ const Header = ({ display_name, email, avatar_url }: HeaderProps) => {
       <div className="flex h-16 items-center px-4">
         <div className="mr-8">
           <MobileNav items={routes} />
-        </div>
-        <div className="max-[410px]:hidden">
-          <TeamSwitcher />
         </div>
 
         <div className="hidden md:inline-block text-lg ml-3">{headerText}</div>

@@ -4,13 +4,23 @@ import { SupabaseServerClient as supabase } from '@/lib/API/Services/init/supaba
 import { SupabaseAuthError } from '@/lib/utils/error';
 
 export const SupabaseSession = async () => {
-  const res = await supabase().auth.getSession();
-  if (res.error) SupabaseAuthError(res.error);
-  return res;
+  try {
+    const client = await supabase();
+    const userRes = await client.auth.getUser();
+    return { data: { session: userRes.data.user ? { user: userRes.data.user } : null }, error: userRes.error };
+  } catch (err: any) {
+    console.error('SupabaseSession unexpected error:', err);
+    return { data: { session: null }, error: err };
+  }
 };
 
 export const SupabaseUser = async () => {
-  const res = await supabase().auth.getSession();
-  if (res.error) SupabaseAuthError(res.error);
-  return res?.data?.session?.user;
+  try {
+    const client = await supabase();
+    const userRes = await client.auth.getUser();
+    return userRes.data.user || null;
+  } catch (err: any) {
+    console.error('SupabaseUser unexpected error:', err);
+    return null;
+  }
 };

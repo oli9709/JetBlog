@@ -1,23 +1,18 @@
 'use client';
 
 import Hero from './_PageSections/Hero';
-import FeatureList from './_PageSections/FeatureList';
+import LogoMarquee from './_PageSections/LogoMarquee';
 import Feature from './_PageSections/Feature';
-import LogoCloud from './_PageSections/LogoCloud';
+import FeatureList from './_PageSections/FeatureList';
 import CTA from './_PageSections/CTA';
-// have links to FAQ
-
-// link to pricing in CTA
 
 export default function Landing() {
   return (
-    <div>
+    <div className="space-y-4 md:space-y-8">
       <Hero />
-      <LogoCloud />
+      <LogoMarquee />
+      <Feature />
       <FeatureList />
-      <Feature />
-      <Feature isFlipped={true} />
-      <Feature />
       <CTA />
     </div>
   );

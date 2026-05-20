@@ -88,18 +88,27 @@ const data = [
   }
 ];
 
-const monthTickFormatter = (tick) => {
-  let date = new Date(tick);
-  let dateTick = date.getMonth() + 1;
-
-  return dateTick.toString();
+const monthTickFormatter = (tick: string) => {
+  const parts = String(tick).split('-');
+  if (parts.length >= 2) {
+    const month = parseInt(parts[1], 10);
+    if (!isNaN(month)) return month.toString();
+  }
+  return String(tick);
 };
 
 const renderQuarterTick = (tickProps) => {
   const { x, y, payload } = tickProps;
-  const { value, offset } = payload;
+  if (x === undefined || y === undefined || isNaN(x) || isNaN(y)) {
+    return null;
+  }
+  const { value, offset } = payload || {};
+  if (value === undefined || offset === undefined || isNaN(offset)) {
+    return null;
+  }
   const date = new Date(value);
   const month = date.getMonth();
+  if (isNaN(month)) return null;
   const quarterNo = Math.floor(month / 3) + 1;
   const isMidMonth = month % 3 === 1;
 
@@ -111,6 +120,7 @@ const renderQuarterTick = (tickProps) => {
 
   if (month % 3 === 0 || isLast) {
     const pathX = Math.floor(isLast ? x + offset : x - offset) + 0.5;
+    if (isNaN(pathX)) return null;
 
     return <path d={`M${pathX},${y - 4}v${-35}`} stroke="red" />;
   }
@@ -118,6 +128,23 @@ const renderQuarterTick = (tickProps) => {
 };
 
 const BarChartComp = () => {
+  const [mounted, setMounted] = React.useState(false);
+  
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return (
+      <Card className="p-4 bg-background-light dark:bg-background-dark min-h-[450px]">
+        <CardTitle className="mb-6 text-center">Quarterly Revenue:</CardTitle>
+        <CardContent className="flex items-center justify-center h-[350px]">
+          <div className="w-full h-full bg-slate-200 dark:bg-slate-800 animate-pulse rounded-md" />
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card className="p-4 bg-background-light dark:bg-background-dark">
       <CardTitle className="mb-6 text-center">Quarterly Revenue:</CardTitle>

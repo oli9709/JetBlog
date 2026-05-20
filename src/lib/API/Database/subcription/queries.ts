@@ -7,7 +7,8 @@ import { SupabaseDBError } from '@/lib/utils/error';
 export const GetSubscriptionById = async (
   id: string
 ): Promise<PostgrestSingleResponse<SubscriptionT[]>> => {
-  const res: PostgrestSingleResponse<SubscriptionT[]> = await supabase()
+  const client = await supabase();
+  const res: PostgrestSingleResponse<SubscriptionT[]> = await client
     .from('subscriptions')
     .select()
     .eq('id', id);

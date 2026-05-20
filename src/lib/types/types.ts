@@ -5,12 +5,13 @@ import { AuthError, PostgrestError } from '@supabase/supabase-js';
 export type NavItem = {
   title: string;
   link: string;
+  icon?: any;
 };
 
 export type NavItemSidebar = {
   title: string;
   link: string;
-  icon: LucideIcon;
+  icon: any;
 };
 
 export interface LayoutProps {

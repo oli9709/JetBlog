@@ -4,9 +4,9 @@ import Footer from '@/components/Footer';
 
 export default async function MarketingLayout({ children }: LayoutProps) {
   return (
-    <div>
+    <div className="flex flex-col min-h-screen">
       <Header />
-      <main className="grid items-center justify-center">{children}</main>
+      <main className="flex-1 w-full">{children}</main>
       <Footer />
     </div>
   );

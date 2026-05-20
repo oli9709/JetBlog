@@ -1,9 +1,12 @@
 'use client';
 
 import Link from 'next/link';
+import { Home } from 'lucide-react';
 import { MainLogoIcon } from '@/components/MainLogo';
 import { usePathname } from 'next/navigation';
 import { NavItemSidebar } from '@/lib/types/types';
+
+import { Icons } from '@/components/Icons';
 
 interface SideBarNavProps {
   isOpen: boolean;
@@ -17,6 +20,10 @@ interface SidebarNavItemProps {
 
 const SidebarNavItem = ({ item, isOpen }: SidebarNavItemProps) => {
   const pathname = usePathname();
+  const resolved = item.icon && typeof item.icon === 'string'
+    ? Icons[item.icon as keyof typeof Icons]
+    : item.icon;
+  const IconComp = (resolved && typeof resolved !== 'string' ? resolved : null) ?? Home;
 
   return (
     <div className="w-full">
@@ -30,7 +37,7 @@ const SidebarNavItem = ({ item, isOpen }: SidebarNavItemProps) => {
                : 'bg-accent text-accent-foreground'
            }`}
         >
-          <item.icon className="h-4 w-4" />
+          <IconComp className="h-4 w-4" />
           {isOpen && <span className="animate-fadeIn">{item.title}</span>}
         </span>
       </Link>

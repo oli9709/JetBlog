@@ -1,73 +1,83 @@
-import { CloudCog, Camera, Clock2, Code2, DownloadCloudIcon, GitFork } from 'lucide-react';
+import { BentoCard, BentoGrid } from '@/components/magicui/bento-grid';
+import { Bot, Globe, Key, Send, ImageIcon, Calendar } from 'lucide-react';
+import { ScrollReveal } from '@/components/ScrollReveal';
 
-interface FeatureCardI {
-  heading: string;
-  description: string;
-  icon: React.ReactNode;
-}
+const features = [
+  {
+    Icon: Bot,
+    name: "AI Yozuvchi",
+    description: "Sun'iy intellekt orqali to'liq original, SEO-optimallashtirilgan sarlavha va maqola matnlarini noldan yaratish.",
+    href: "/",
+    cta: "Batafsil ma'lumot",
+    background: <div className="absolute inset-0 bg-zinc-950/20 mix-blend-overlay transition-all duration-300 group-hover:bg-indigo-500/10 pointer-events-none" />,
+    className: "lg:row-start-1 lg:row-end-4 lg:col-start-1 lg:col-end-3",
+  },
+  {
+    Icon: Key,
+    name: "Kalit So'zlar",
+    description: "Kalit so'zlarning qidiruv hajmi va raqobat darajasini DataForSEO orqali tahlil qiling.",
+    href: "/",
+    cta: "Batafsil ma'lumot",
+    background: <div className="absolute inset-0 bg-zinc-950/20 mix-blend-overlay transition-all duration-300 group-hover:bg-purple-500/10 pointer-events-none" />,
+    className: "lg:col-start-3 lg:col-end-4 lg:row-start-1 lg:row-end-3",
+  },
+  {
+    Icon: Calendar,
+    name: "Smart Scheduler",
+    description: "Haftaning qaysi kunlari va soatlarida nashr qilish jadvalini oson tanlang.",
+    href: "/",
+    cta: "Batafsil ma'lumot",
+    background: <div className="absolute inset-0 bg-zinc-950/20 mix-blend-overlay transition-all duration-300 group-hover:bg-cyan-500/10 pointer-events-none" />,
+    className: "lg:col-start-3 lg:col-end-4 lg:row-start-3 lg:row-end-4",
+  },
+  {
+    Icon: ImageIcon,
+    name: "DALL-E 3 Cover Art",
+    description: "Har bir maqola uchun mavzuga mos premium sifatli muqova rasmlarini avtomatik yaratish.",
+    href: "/",
+    cta: "Batafsil ma'lumot",
+    background: <div className="absolute inset-0 bg-zinc-950/20 mix-blend-overlay transition-all duration-300 group-hover:bg-emerald-500/10 pointer-events-none" />,
+    className: "lg:col-start-1 lg:col-end-2 lg:row-start-4 lg:row-end-5",
+  },
+  {
+    Icon: Send,
+    name: "Telegram Kanallari",
+    description: "Yangi nashr qilingan maqolani avtomatik rasm va havola bilan Telegramga yo'llang.",
+    href: "/",
+    cta: "Batafsil ma'lumot",
+    background: <div className="absolute inset-0 bg-zinc-950/20 mix-blend-overlay transition-all duration-300 group-hover:bg-rose-500/10 pointer-events-none" />,
+    className: "lg:col-start-2 lg:col-end-4 lg:row-start-4 lg:row-end-5",
+  },
+];
 
-const FeatureCard = ({ heading, description, icon }: FeatureCardI) => {
+export default function FeatureList() {
   return (
-    <div className="rounded-lg border bg-background-light dark:bg-background-dark p-2">
-      <div className="flex h-[180px] flex-col justify-between p-6">
-        <div className="space-y-2">
-          {icon}
-          <h3 className="font-bold">{heading}</h3>
-          <p className="text-sm text-muted-foreground">{description}</p>
+    <section className="space-y-12 py-16 md:py-24 max-w-7xl mx-auto px-4 sm:px-6">
+      
+      {/* Sarlavha qismi */}
+      <ScrollReveal>
+        <div className="mx-auto flex max-w-3xl flex-col items-center space-y-4 text-center">
+          <h2 className="text-3xl md:text-5xl font-extrabold tracking-tight text-white leading-tight">
+            Saytingiz o'sishi uchun{' '}
+            <span className="bg-gradient-to-r from-indigo-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent">
+              Cheksiz Imkoniyatlar
+            </span>
+          </h2>
+          <p className="max-w-2xl text-zinc-400 text-base md:text-lg leading-relaxed">
+            Sizning WordPress saytingiz uchun to'liq yopiq tsiklli (closed-loop) avtomatlashtirilgan SEO va maqola yozish tizimi.
+          </p>
         </div>
-      </div>
-    </div>
-  );
-};
+      </ScrollReveal>
 
-export default async function FeatureList() {
-  return (
-    <section className="space-y-6  py-8 mx-4">
-      <div className="mx-auto flex max-w-[58rem] flex-col items-center space-y-4 text-center">
-        <h2 className="text-3xl leading-4 md:text-6xl">Features</h2>
-        <p className="max-w-[85%] leading-normal text-muted-foreground text-lg">
-          This project is an experiment to see how a modern app, with features like auth,
-          subscriptions, API routes, and static pages would work in Next.js 13 app dir.
-        </p>
-      </div>
-      <div className="mx-auto grid justify-center gap-4 sm:grid-cols-2 md:max-w-[64rem] md:grid-cols-3">
-        <FeatureCard
-          heading={'nextjs'}
-          description={'App dir, Routing, Layouts, Loading UI and API routes.'}
-          icon={<CloudCog size={32} />}
-        />
-        <FeatureCard
-          heading={'nextjs'}
-          description={'App dir, Routing, Layouts, Loading UI and API routes.'}
-          icon={<Camera size={32} />}
-        />
-        <FeatureCard
-          heading={'nextjs'}
-          description={'App dir, Routing, Layouts, Loading UI and API routes.'}
-          icon={<Clock2 size={32} />}
-        />
-        <FeatureCard
-          heading={'nextjs'}
-          description={'App dir, Routing, Layouts, Loading UI and API routes.'}
-          icon={<Code2 size={32} />}
-        />
-        <FeatureCard
-          heading={'nextjs'}
-          description={'App dir, Routing, Layouts, Loading UI and API routes.'}
-          icon={<DownloadCloudIcon size={32} />}
-        />
-        <FeatureCard
-          heading={'nextjs'}
-          description={'App dir, Routing, Layouts, Loading UI and API routes.'}
-          icon={<GitFork size={32} />}
-        />
-      </div>
-      <div className="mx-auto text-center md:max-w-[58rem]">
-        <p className="leading-normal text-muted-foreground sm:text-lg sm:leading-7">
-          Taxonomy also includes a blog and a full-featured documentation site built using
-          Contentlayer and MDX.
-        </p>
-      </div>
+      {/* Bento Grid */}
+      <ScrollReveal delay="200">
+        <BentoGrid className="lg:grid-rows-4 mx-auto max-w-5xl">
+          {features.map((feature) => (
+            <BentoCard key={feature.name} {...feature} />
+          ))}
+        </BentoGrid>
+      </ScrollReveal>
+
     </section>
   );
 }

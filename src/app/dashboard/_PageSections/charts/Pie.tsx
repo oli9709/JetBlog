@@ -25,25 +25,42 @@ const data02 = [
 ];
 
 const PieChartComp = () => {
+  const [mounted, setMounted] = React.useState(false);
+  
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return (
+      <Card className="p-4 bg-background-light dark:bg-background-dark min-h-[450px]">
+        <CardTitle className="mb-6 text-center">Current Usage:</CardTitle>
+        <CardContent className="flex items-center justify-center h-[350px]">
+          <div className="w-full h-full bg-slate-200 dark:bg-slate-800 animate-pulse rounded-md" />
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card className="p-4 bg-background-light dark:bg-background-dark">
       <CardTitle className="mb-6 text-center">Current Usage:</CardTitle>
       <CardContent>
-        <ResponsiveContainer width="100%" height={400}>
+        <div className="w-full flex justify-center">
           <PieChart width={400} height={400}>
-            <Pie data={data01} dataKey="value" cx="50%" cy="50%" outerRadius={60} fill="#8884d8" />
+            <Pie data={data01} dataKey="value" cx={200} cy={200} outerRadius={60} fill="#8884d8" />
             <Pie
               data={data02}
               dataKey="value"
-              cx="50%"
-              cy="50%"
+              cx={200}
+              cy={200}
               innerRadius={70}
               outerRadius={90}
               fill="#82ca9d"
               label
             />
           </PieChart>
-        </ResponsiveContainer>
+        </div>
       </CardContent>
     </Card>
   );

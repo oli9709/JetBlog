@@ -1,13 +1,12 @@
 import { AuthError, PostgrestError } from '@supabase/supabase-js';
 import { AxiosError } from 'axios';
-import Stripe from 'stripe';
 
 export const handleError = (error: any) => {
   //general or custom error handler
   throw error;
 };
 
-export const StripeError = (err: Stripe.errors.StripeError) => {
+export const StripeError = (err: any) => {
   if (err) {
     console.log(err);
     throw err;

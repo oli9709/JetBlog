@@ -1,8 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { SupabaseSignIn, SupabaseSignInWithGoogle } from '@/lib/API/Services/supabase/auth';
+import { supabaseBrowser } from '@/lib/API/Services/init/supabase-browser';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { authFormSchema, authFormValues } from '@/lib/types/validations';
 import { useForm } from 'react-hook-form';
@@ -24,7 +23,6 @@ import config from '@/lib/config/auth';
 
 export default function AuthForm() {
   const [showPassword, setShowPassword] = useState(false);
-  const router = useRouter();
 
   const form = useForm<authFormValues>({
     resolver: zodResolver(authFormSchema),
@@ -42,35 +40,41 @@ export default function AuthForm() {
   } = form;
 
   const onSubmit = async (values: authFormValues) => {
-    const { error } = await SupabaseSignIn(values.email, values.password);
+    const supabase = supabaseBrowser()
+    const { error } = await supabase.auth.signInWithPassword({
+      email: values.email,
+      password: values.password
+    })
 
     if (error) {
       reset({ email: values.email, password: '' });
       setError('email', {
-        type: '"root.serverError',
+        type: 'root.serverError',
         message: error.message
       });
       setError('password', { type: 'root.serverError', message: '' });
-
       return;
     }
 
-    router.push(config.redirects.callback);
+    // Full page reload — server dashboard layout cookie ni ko'radi
+    window.location.href = '/dashboard/main';
   };
 
   const handleGoogleSignIn = async () => {
-    const { error } = await SupabaseSignInWithGoogle();
+    const supabase = supabaseBrowser()
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo: `${window.location.origin}/api/auth-callback` }
+    })
 
     if (error) {
       setError('email', {
-        type: '"root.serverError',
+        type: 'root.serverError',
         message: error.message
       });
       setError('password', { type: 'root.serverError' });
       return;
     }
-
-    router.push(config.redirects.callback);
   };
 
   const togglePasswordVisibility = () => {

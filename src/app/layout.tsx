@@ -1,7 +1,7 @@
 import '../styles/globals.css';
 import { InterFont } from '@/styles/fonts';
 import { ThemeProvider } from '@/styles/ThemeProvider';
-import { ToastContainer } from 'react-toastify';
+import { ToastContainer, Bounce } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.min.css';
 import NextTopLoader from 'nextjs-toploader';
 import config from '@/lib/config/site';
@@ -19,7 +19,7 @@ const RootLayout = ({ children }) => {
           <NextTopLoader color={config.loading_bar_color} />
           {children}
         </ThemeProvider>
-        <ToastContainer position="bottom-right" />
+        <ToastContainer position="bottom-right" transition={Bounce} />
       </body>
     </html>
   );

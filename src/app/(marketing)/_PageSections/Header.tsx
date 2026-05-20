@@ -6,37 +6,42 @@ import config from '@/lib/config/marketing';
 import { MainLogoText } from '@/components/MainLogo';
 import { ThemeDropDownMenu } from '../../../components/ThemeDropdown';
 import { SupabaseSession } from '@/lib/API/Services/supabase/user';
+import { ClientHeader } from './ClientHeader';
 
 export const Header = async () => {
   const { routes } = config;
   const { data } = await SupabaseSession();
 
   return (
-    <header>
-      <div className="flex items-center justify-between p-6">
-        <MainLogoText />
+    <ClientHeader>
+      <div className="flex items-center justify-between">
+        <div className="group cursor-pointer">
+          <div className="transition-transform duration-300 group-hover:scale-105">
+            <MainLogoText />
+          </div>
+        </div>
         <Nav items={routes}/>
-        <div className="flex justify-center items-center">
+        <div className="flex justify-center items-center gap-2">
           <ThemeDropDownMenu />
           <nav>
-            {data?.session && (
+            {data?.session ? (
               <Link
-              href="/dashboard/main"
-              className={cn(buttonVariants({ variant: 'secondary', size: 'sm' }), 'px-6')}
+                href="/dashboard/main"
+                className={cn(buttonVariants({ variant: 'secondary', size: 'sm' }), 'px-6 bg-zinc-800 hover:bg-zinc-700 text-white rounded-full transition-all')}
               >
-              Dashboard
-              </Link>)}
-            
-            {!data?.session && (
+                Dashboard
+              </Link>
+            ) : (
               <Link
-              href="/auth/login"
-              className={cn(buttonVariants({ variant: 'secondary', size: 'sm' }), 'px-6')}
+                href="/auth/login"
+                className={cn(buttonVariants({ variant: 'secondary', size: 'sm' }), 'px-6 bg-indigo-500 hover:bg-indigo-400 text-white font-semibold rounded-full transition-all shadow-md shadow-indigo-500/20')}
               >
-              Login
-              </Link>)}
+                Tizimga kirish
+              </Link>
+            )}
           </nav>
         </div>
       </div>
-    </header>
+    </ClientHeader>
   );
 };

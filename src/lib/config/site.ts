@@ -1,14 +1,14 @@
 const siteConfig = {
-  name: 'Saas Starter Kit',
-  alt_name: 'My SAAS',
-  description: 'An open source Saas boilerplate with Nextjs and Supabase.',
-  url: process.env.NEXT_PUBLIC_DOMAIN,
+  name: 'JetBlog',
+  alt_name: 'JetBlog',
+  description: 'WordPress saytingiz uchun AI SEO Autopilot',
+  url: 'https://jetblog.app',
   ogImage: '',
-  loading_bar_color: '#ADD8E6',
+  loading_bar_color: '#00F2FE', // Futuristic cyan
   links: {
-    twitter: 'https://twitter.com',
-    github: 'https://github.com',
-    linkedin: 'https://linkedin.com'
+    twitter: 'https://twitter.com/jetblog_app',
+    github: 'https://github.com/jetblog-app',
+    linkedin: 'https://linkedin.com/company/jetblog-app'
   }
 };
 

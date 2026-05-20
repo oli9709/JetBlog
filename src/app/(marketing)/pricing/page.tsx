@@ -1,8 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import configuration from '@/lib/config/dashboard';
-import { useRouter } from 'next/navigation';
 import {
   Card,
   CardHeader,
@@ -11,14 +10,15 @@ import {
   CardFooter,
   CardDescription
 } from '@/components/ui/Card';
-import { Icons } from '@/components/Icons';
 import { Switch } from '@/components/ui/Switch';
 import { ProductI } from '@/lib/types/types';
 import { IntervalE } from '@/lib/types/enums';
 import { cn } from '@/lib/utils/helpers';
 import { buttonVariants } from '@/components/ui/Button';
 import Link from 'next/link';
-import { Separator } from '@/components/ui/Separator';
+import { Check, Sparkles } from 'lucide-react';
+import { NumberTicker } from '@/components/magicui/number-ticker';
+import { ScrollReveal } from '@/components/ScrollReveal';
 
 interface PriceCardProps {
   product: ProductI;
@@ -26,145 +26,148 @@ interface PriceCardProps {
 }
 
 const PriceCard = ({ product, timeInterval }: PriceCardProps) => {
-  const [plan, setPlan] = useState({ price: '', isPopular: false });
   const { name, description, features, plans } = product;
-
-  const setProductPlan = () => {
-    if (timeInterval === IntervalE.MONTHLY) {
-      setPlan({
-        price: plans[0].price,
-        isPopular: plans[0].isPopular
-      });
-    } else {
-      setPlan({
-        price: plans[1].price,
-        isPopular: plans[1].isPopular
-      });
-    }
-  };
-
-  useEffect(() => {
-    setProductPlan();
-  }, [timeInterval]);
+  
+  // Maqsadli plan ma'lumotlarini aniqlash
+  const activePlan = plans.find((p) => p.interval === timeInterval) || plans[0];
+  const isPopular = name === 'Pro';
 
   return (
     <Card
-      className={`flex flex-col items-center justify-center w-72 border bg-background-light dark:bg-background-dark ${
-        plan.isPopular && 'border-blue-500 relative'
-      }`}
+      className={cn(
+        "flex flex-col justify-between w-full max-w-sm rounded-3xl border transition-all duration-500 relative p-6 h-full",
+        isPopular 
+          ? "border-indigo-500 bg-zinc-900/60 shadow-[0_0_30px_rgba(99,102,241,0.15)] scale-105 z-10" 
+          : "border-zinc-800 bg-zinc-950/40 hover:border-zinc-700/80 hover:bg-zinc-900/40"
+      )}
     >
-      {plan.isPopular && (
-        <div className="px-3 py-1 text-sm text-white bg-gradient-to-r from-blue-400 to-blue-700 rounded-full inline-block absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-          Popular
+      {isPopular && (
+        <div className="inline-flex items-center gap-1.5 px-4 py-1 text-xs font-bold text-white bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full absolute -top-3 left-1/2 transform -translate-x-1/2 shadow-lg animate-pulse">
+          <Sparkles className="w-3.5 h-3.5" /> Tavsiya Etiladi
         </div>
       )}
-      <CardHeader className="flex flex-col items-center">
-        <CardTitle>{name}</CardTitle>
-        <CardDescription className="text-center">{description}</CardDescription>
-      </CardHeader>
-      <CardContent className="flex flex-col items-center">
-        <div className="flex flex-col items-center mt-2 mb-6">
-          <h4 className="text-5xl font-bold">${plan?.price}</h4>
-          <div className="text-sm font-medium text-muted-foreground">Billed {timeInterval}</div>
-        </div>
-        <ul className="flex flex-col space-y-4">
-          {features.map((feature) => (
-            <li key={feature} className="flex items-center">
-              <Icons.Check className="mr-2" size={20} color="green" /> {feature}
-            </li>
-          ))}
-        </ul>
-      </CardContent>
-      <CardFooter>
-        <Link href="/auth/signup" className={cn(buttonVariants({ size: 'lg' }))}>
-          Get Started
+      
+      <div>
+        <CardHeader className="p-0 space-y-2 text-center sm:text-left">
+          <CardTitle className="text-xl font-extrabold text-white">{name}</CardTitle>
+          <CardDescription className="text-xs text-zinc-400 min-h-[40px] leading-relaxed">
+            {description}
+          </CardDescription>
+        </CardHeader>
+        
+        <CardContent className="p-0 mt-6 space-y-6">
+          <div className="flex items-baseline gap-1 justify-center sm:justify-start">
+            <span className="text-4xl font-extrabold text-white flex items-center">
+              $<NumberTicker value={Number(activePlan.price)} />
+            </span>
+            <span className="text-xs text-zinc-500 font-medium">
+              / {timeInterval === IntervalE.MONTHLY ? 'oy' : 'yil'}
+            </span>
+          </div>
+          
+          <ul className="space-y-3.5 pt-4 border-t border-zinc-900">
+            {features.map((feature) => (
+              <li key={feature} className="flex items-start gap-2.5 text-xs text-zinc-300">
+                <Check className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                <span>{feature}</span>
+              </li>
+            ))}
+          </ul>
+        </CardContent>
+      </div>
+
+      <CardFooter className="p-0 mt-8">
+        <Link 
+          href="/auth/signup" 
+          className={cn(
+            buttonVariants({ size: 'lg' }), 
+            "w-full font-bold text-xs py-3 rounded-xl transition-all duration-300",
+            isPopular 
+              ? "bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-400 hover:to-purple-500 text-white shadow-[0_0_20px_rgba(99,102,241,0.3)]" 
+              : "border border-zinc-800 bg-zinc-900/60 hover:bg-zinc-800 text-zinc-300 hover:text-white"
+          )}
+        >
+          {name === 'Free' ? 'Bepul boshlash' : 'Tarifni tanlash'}
         </Link>
       </CardFooter>
     </Card>
   );
 };
 
-const MainCard = () => {
-  const { products } = configuration;
-  const product: ProductI = products[0];
-
-  const { name, description, features, plans } = product;
-  const { price, interval } = plans[0];
-
-  return (
-    <section className="flex flex-col py-8 mx-4 md:max-w-[64rem] md:py-12 lg:mb-16">
-      <div className="mx-auto flex w-full flex-col gap-4 md:max-w-[58rem] mb-8">
-        <h2 className="font-heading text-3xl leading-[1.1] sm:text-3xl md:text-6xl">
-          Industry Leading Pricing
-        </h2>
-        <p className="max-w-[85%] leading-normal text-muted-foreground sm:text-lg sm:leading-7">
-          Unlock all the features for your project.
-        </p>
-      </div>
-      <Separator />
-      <div className="font-heading text-3xl mt-8 mb-4 md:text-4xl">Our Most Popular Plan:</div>
-      <div className="grid w-full items-start gap-10 rounded-lg border p-10 md:grid-cols-[1fr_200px]">
-        <div className="grid gap-6">
-          <h3 className="text-xl font-bold sm:text-2xl">What&apos;s included in the {name} plan</h3>
-          <ul className="grid gap-3 text-sm text-muted-foreground sm:grid-cols-2">
-            {features.map((feature) => (
-              <li key={feature} className="flex items-center">
-                <Icons.Check className="mr-2" size={20} color="green" /> {feature}
-              </li>
-            ))}
-          </ul>
-        </div>
-        <div className="flex flex-col gap-4 text-center">
-          <div>
-            <h3 className="text-7xl font-bold">${price}</h3>
-            <p className="text-sm font-medium text-muted-foreground">Billed {interval}</p>
-          </div>
-          <Link href="/auth/signup" className={cn(buttonVariants({ size: 'lg' }))}>
-            Get Started
-          </Link>
-        </div>
-      </div>
-      <div className="max-w-[85%] leading-normal text-slate-500 my-4">{description}</div>
-    </section>
-  );
-};
-
 const Pricing = () => {
   const [timeInterval, setTimeInterval] = useState(IntervalE.MONTHLY);
-
   const { products } = configuration;
 
-  const basic: ProductI = products[0];
-  const premium: ProductI = products[1];
-
-  const changeTimeInterval = () => {
-    let intervalSwitch = timeInterval === IntervalE.MONTHLY ? IntervalE.YEARLY : IntervalE.MONTHLY;
-    setTimeInterval(intervalSwitch);
+  const toggleBilling = () => {
+    setTimeInterval((prev) => (prev === IntervalE.MONTHLY ? IntervalE.YEARLY : IntervalE.MONTHLY));
   };
 
   return (
-    <div className="mb-10">
-      <MainCard />
+    <div className="relative overflow-hidden pt-12 pb-24">
+      {/* Background radial glow */}
+      <div className="absolute top-20 left-1/2 -translate-x-1/2 w-full max-w-4xl h-[400px] pointer-events-none opacity-20 blur-[120px] bg-gradient-to-b from-indigo-500 to-purple-500 rounded-full -z-10" />
 
-      <div className="">
-        <div className="font-heading text-3xl mt-8 mb-16 text-center underline underline-offset-8 md:text-4xl">
-          All Plans
-        </div>
-        <div className="flex justify-center mb-12">
-          <div className="text-sm font-bold mr-2">Monthly</div>
-          <Switch onClick={changeTimeInterval} />
-          <div className="text-sm font-bold ml-3">Yearly</div>
-        </div>
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 space-y-16">
+        
+        {/* Title */}
+        <ScrollReveal>
+          <div className="mx-auto flex w-full flex-col gap-4 max-w-3xl text-center">
+            <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight text-white leading-tight">
+              Tarif rejalarimiz va{' '}
+              <span className="bg-gradient-to-r from-indigo-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent">
+                Narxlar
+              </span>
+            </h1>
+            <p className="max-w-2xl mx-auto text-zinc-400 text-sm md:text-base leading-relaxed">
+              Biznesingiz yoki shaxsiy blogingiz uchun eng mos bo'lgan tarifni tanlang. Istalgan vaqtda boshqa tarifga o'tishingiz mumkin.
+            </p>
+          </div>
+        </ScrollReveal>
 
-        <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-          <div className="flex justify-center">
-            <PriceCard product={basic} timeInterval={timeInterval} />
+        {/* Toggle */}
+        <ScrollReveal delay="100">
+          <div className="flex items-center justify-center gap-4">
+            <span className={cn("text-xs font-bold transition-colors", timeInterval === IntervalE.MONTHLY ? "text-white" : "text-zinc-500")}>
+              Oylik To'lov
+            </span>
+            <button 
+              onClick={toggleBilling}
+              className="w-12 h-6 rounded-full bg-zinc-800 p-0.5 transition-colors relative flex items-center shadow-inner focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+            >
+              <div 
+                className={cn(
+                  "w-5 h-5 rounded-full bg-gradient-to-br from-indigo-400 to-purple-500 shadow-md transition-transform duration-300 absolute",
+                  timeInterval === IntervalE.YEARLY ? "translate-x-6" : "translate-x-0"
+                )}
+              />
+            </button>
+            <span className={cn("text-xs font-bold transition-colors flex items-center gap-1.5", timeInterval === IntervalE.YEARLY ? "text-white" : "text-zinc-500")}>
+              Yillik To'lov <span className="text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded-full font-extrabold shadow-[0_0_10px_rgba(16,185,129,0.15)]">Save 20%</span>
+            </span>
           </div>
-          <div className="flex justify-center">
-            <PriceCard product={premium} timeInterval={timeInterval} />
+        </ScrollReveal>
+
+        {/* Pricing Cards Grid */}
+        <ScrollReveal delay="200">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8 max-w-6xl mx-auto justify-center items-center">
+            {products.map((prod, idx) => (
+              <div key={idx} className="flex justify-center h-full w-full">
+                <PriceCard product={prod} timeInterval={timeInterval} />
+              </div>
+            ))}
           </div>
-        </div>
-      </div>
+        </ScrollReveal>
+
+        {/* Info text */}
+        <ScrollReveal delay="300">
+          <div className="max-w-3xl mx-auto text-center bg-zinc-900/20 border border-zinc-800/80 rounded-2xl p-6 backdrop-blur-md">
+            <p className="text-xs text-zinc-500 leading-relaxed">
+              * Barcha to'lovlar manual invoice (hisob-faktura) tizimi orqali amalga oshiriladi. Hisobingiz yaratilgach, siz xohlagan vaqtda balansni to'ldirish paketlarini sotib olishingiz mumkin. Yillik tariflarda qo'shimcha 2 oylik bepul muddat taqdim etiladi.
+            </p>
+          </div>
+        </ScrollReveal>
+
+      </section>
     </div>
   );
 };
