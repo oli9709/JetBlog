@@ -1,32 +1,53 @@
 'use client';
 
+import { useState } from 'react';
 import config from '@/lib/config/marketing';
 import Link from 'next/link';
-import { SocialIcons } from './Icons';
-import configuration from '@/lib/config/site';
-import { Input } from './ui/Input';
-import { Button } from './ui/Button';
+import { MainLogoText } from '@/components/MainLogo';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 
 export default function Footer() {
   const { footer_nav } = config;
+  const [email, setEmail] = useState('');
+  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [errorMsg, setErrorMsg] = useState('');
+
+  const handleSubscribe = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email) return;
+    setStatus('loading');
+
+    const supabase = createClientComponentClient();
+    const { error } = await supabase.from('subscribers').insert({ email });
+
+    if (!error) {
+      setStatus('success');
+      setEmail('');
+    } else if (error.code === '23505') {
+      // unique violation
+      setStatus('error');
+      setErrorMsg('Bu email allaqachon obunada');
+    } else {
+      setStatus('error');
+      setErrorMsg('Xatolik yuz berdi, qayta urinib ko\'ring');
+    }
+  };
 
   return (
-    <footer className="bg-slate-800 mt-8">
-      <div className="mx-auto max-w-7xl px-6 pb-6 pt-16 lg:px-8 ">
+    <footer className="bg-[#000F08] border-t border-white/5 mt-8">
+      <div className="mx-auto max-w-7xl px-6 pb-8 pt-16 lg:px-8">
         <div className="xl:grid xl:grid-cols-3 xl:gap-8">
+
+          {/* Left: Logo + nav columns */}
           <div className="grid grid-cols-2 gap-8 xl:col-span-2">
+            {/* About */}
             <div className="md:grid md:grid-cols-2 md:gap-8">
               <div>
-                <h3 className="text-sm font-semibold leading-6 text-white">
-                  {footer_nav.about.title}
-                </h3>
-                <ul role="list" className="mt-4 space-y-4">
+                <h3 className="text-sm font-semibold text-white/80">{footer_nav.about.title}</h3>
+                <ul className="mt-4 space-y-3">
                   {footer_nav.about.routes.map((item) => (
                     <li key={item.title}>
-                      <Link
-                        href={item.link}
-                        className="text-sm leading-6 text-gray-300 hover:text-white"
-                      >
+                      <Link href={item.link} className="text-sm text-zinc-500 hover:text-white transition-colors">
                         {item.title}
                       </Link>
                     </li>
@@ -34,16 +55,11 @@ export default function Footer() {
                 </ul>
               </div>
               <div className="mt-10 md:mt-0">
-                <h3 className="text-sm font-semibold leading-6 text-white">
-                  {footer_nav.resources.title}
-                </h3>
-                <ul role="list" className="mt-4 space-y-4">
+                <h3 className="text-sm font-semibold text-white/80">{footer_nav.resources.title}</h3>
+                <ul className="mt-4 space-y-3">
                   {footer_nav.resources.routes.map((item) => (
                     <li key={item.title}>
-                      <Link
-                        href={item.link}
-                        className="text-sm leading-6 text-gray-300 hover:text-white"
-                      >
+                      <Link href={item.link} className="text-sm text-zinc-500 hover:text-white transition-colors">
                         {item.title}
                       </Link>
                     </li>
@@ -51,18 +67,15 @@ export default function Footer() {
                 </ul>
               </div>
             </div>
+
+            {/* Legal */}
             <div className="md:grid md:grid-cols-2 md:gap-8">
               <div>
-                <h3 className="text-sm font-semibold leading-6 text-white">
-                  {footer_nav.legal.title}
-                </h3>
-                <ul role="list" className="mt-4 space-y-4">
+                <h3 className="text-sm font-semibold text-white/80">{footer_nav.legal.title}</h3>
+                <ul className="mt-4 space-y-3">
                   {footer_nav.legal.routes.map((item) => (
                     <li key={item.title}>
-                      <Link
-                        href={item.link}
-                        className="text-sm leading-6 text-gray-300 hover:text-white"
-                      >
+                      <Link href={item.link} className="text-sm text-zinc-500 hover:text-white transition-colors">
                         {item.title}
                       </Link>
                     </li>
@@ -71,45 +84,52 @@ export default function Footer() {
               </div>
             </div>
           </div>
-          <div className="mt-8 xl:mt-0">
-            <h3 className="text-sm font-semibold leading-6 text-white">
-              Subscribe to our newsletter
-            </h3>
-            <p className="mt-2 text-sm leading-6 text-gray-300">
-              The latest news, articles, and resources, sent to your inbox weekly.
+
+          {/* Right: Newsletter */}
+          <div className="mt-10 xl:mt-0">
+            <h3 className="text-sm font-semibold text-white/80">Yangiliklar obunasi</h3>
+            <p className="mt-2 text-sm text-zinc-500 leading-relaxed">
+              Har hafta eng yangi SEO va AI marketing maslahatlarini oling.
             </p>
-            <div className="mt-6 sm:flex sm:max-w-md">
-              <Input
-                type="email"
-                name="email-address"
-                autoComplete="email"
-                placeholder="Enter your email"
-              />
-              <div className="mt-4 sm:ml-4 sm:mt-0 sm:flex-shrink-0">
-                <Button variant="secondary" type="submit">
-                  Subscribe
-                </Button>
+
+            {status === 'success' ? (
+              <div className="mt-6 flex items-center gap-2 text-emerald-400 text-sm font-semibold">
+                <span className="w-5 h-5 rounded-full bg-emerald-400/20 border border-emerald-400/40 flex items-center justify-center text-xs">✓</span>
+                Obuna bo'ldingiz!
               </div>
-            </div>
+            ) : (
+              <form onSubmit={handleSubscribe} className="mt-6">
+                <div className="flex gap-2 max-w-sm">
+                  <input
+                    type="email"
+                    required
+                    value={email}
+                    onChange={e => { setEmail(e.target.value); setStatus('idle'); }}
+                    placeholder="email@example.com"
+                    className="flex-1 min-w-0 bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-[#FB3640]/50 transition-colors"
+                  />
+                  <button
+                    type="submit"
+                    disabled={status === 'loading'}
+                    className="shrink-0 bg-[#FB3640] hover:bg-[#FF6B6B] text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition-colors disabled:opacity-60"
+                  >
+                    {status === 'loading' ? '...' : 'Obuna'}
+                  </button>
+                </div>
+                {status === 'error' && (
+                  <p className="mt-2 text-xs text-red-400">{errorMsg}</p>
+                )}
+              </form>
+            )}
           </div>
         </div>
-        <div className="mt-8 grid grid-cols-1 md:grid-cols-2 ">
-          <p className="text-xs leading-5 text-slate-300 py-4 text-center md:text-left">
-            &copy; 2023 Your Company, Inc. All rights reserved.
+
+        {/* Bottom bar */}
+        <div className="mt-12 pt-6 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-4">
+          <MainLogoText />
+          <p className="text-xs text-zinc-600">
+            © 2026 JetBlog. All rights reserved.
           </p>
-          <div className="text-white py-4 justify-self-center">
-            <div className="flex items-end">
-              <Link href={configuration.links.twitter} target="_blank" rel="noopener noreferrer">
-                <SocialIcons.Twitter className="mx-8" size={24} />
-              </Link>
-              <Link href={configuration.links.github} target="_blank" rel="noopener noreferrer">
-                <SocialIcons.Github className="mx-8" size={24} />
-              </Link>
-              <Link href={configuration.links.linkedin} target="_blank" rel="noopener noreferrer">
-                <SocialIcons.Linkedin className="mx-8" size={24} />
-              </Link>
-            </div>
-          </div>
         </div>
       </div>
     </footer>

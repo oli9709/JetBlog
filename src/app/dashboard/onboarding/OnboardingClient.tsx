@@ -26,6 +26,12 @@ export default function OnboardingClient({ userId }: { userId: string }) {
   const [language, setLanguage] = useState<'uz' | 'ru' | 'en'>('uz');
   const [genLoadingStep, setGenLoadingStep] = useState(0); // 0: input, 1: AI, 2: Image, 3: Publishing
 
+  const handleSkip = async () => {
+    await SupabaseCompleteOnboarding(userId);
+    router.push('/dashboard/main');
+    router.refresh();
+  };
+
   const nextStep = () => {
     setAnimating(true);
     setTimeout(() => {
@@ -160,12 +166,18 @@ export default function OnboardingClient({ userId }: { userId: string }) {
               </div>
             </div>
 
-            <div className="pt-8">
+            <div className="pt-8 flex items-center gap-4">
               <ShimmerButton className="shadow-2xl" onClick={nextStep}>
                 <span className="whitespace-pre-wrap text-center text-sm font-medium leading-none tracking-tight text-white dark:from-white dark:to-slate-900/10 lg:text-lg">
                   Boshlash &rarr;
                 </span>
               </ShimmerButton>
+              <button
+                onClick={handleSkip}
+                className="text-sm text-zinc-500 hover:text-zinc-300 border border-white/10 hover:border-white/20 px-5 py-2.5 rounded-full transition-all duration-200"
+              >
+                Keyinroq →
+              </button>
             </div>
           </div>
         )}

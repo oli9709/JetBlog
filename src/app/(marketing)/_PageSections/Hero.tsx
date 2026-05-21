@@ -28,14 +28,6 @@ export default function Hero() {
       <section className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
         <div className="flex flex-col items-center gap-6 text-center max-w-4xl mx-auto">
 
-          {/* Badge */}
-          <ScrollReveal delay="100">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[#FB3640]/40 bg-[#FB3640]/10 text-[#FF8A8F] text-xs font-bold tracking-wide shadow-[0_0_15px_rgba(251,54,64,0.2)]">
-              <Sparkles className="w-3.5 h-3.5 animate-pulse text-[#FB3640]" />
-              AI SEO Autopilot MVP 1.0 tayyor!
-            </div>
-          </ScrollReveal>
-
           {/* Sarlavha */}
           <ScrollReveal delay="200" className="space-y-4">
             <h1 className="text-4xl md:text-7xl font-extrabold tracking-tight text-white leading-[1.1] md:leading-[1.05]">
