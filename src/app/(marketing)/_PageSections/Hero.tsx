@@ -8,30 +8,30 @@ import { ScrollReveal } from '@/components/ScrollReveal';
 export default function Hero() {
   return (
     <div className="relative overflow-hidden pt-12 pb-20 md:pb-28">
-      
-      {/* Background Gradient Mesh & Particles */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-[600px] pointer-events-none opacity-40 blur-[120px] bg-gradient-to-br from-indigo-600 via-purple-600 to-cyan-600 -z-10 rounded-full mix-blend-screen" />
+
+      {/* Background Gradient Mesh */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-[600px] pointer-events-none opacity-30 blur-[120px] bg-gradient-to-br from-[#FB3640] via-[#FF6B6B] to-[#FB3640]/30 -z-10 rounded-full mix-blend-screen" />
       <div className="particles-container">
         {Array.from({ length: 15 }).map((_, i) => (
-          <div 
-            key={i} 
-            className="particle" 
-            style={{ 
-              left: `${Math.random() * 100}%`, 
+          <div
+            key={i}
+            className="particle"
+            style={{
+              left: `${Math.random() * 100}%`,
               animationDelay: `${Math.random() * 15}s`,
-              animationDuration: `${10 + Math.random() * 10}s` 
-            }} 
+              animationDuration: `${10 + Math.random() * 10}s`
+            }}
           />
         ))}
       </div>
 
       <section className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
         <div className="flex flex-col items-center gap-6 text-center max-w-4xl mx-auto">
-          
+
           {/* Badge */}
           <ScrollReveal delay="100">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-indigo-500/40 bg-indigo-500/10 text-indigo-300 text-xs font-bold tracking-wide shadow-[0_0_15px_rgba(99,102,241,0.2)]">
-              <Sparkles className="w-3.5 h-3.5 animate-pulse text-indigo-400" />
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[#FB3640]/40 bg-[#FB3640]/10 text-[#FF8A8F] text-xs font-bold tracking-wide shadow-[0_0_15px_rgba(251,54,64,0.2)]">
+              <Sparkles className="w-3.5 h-3.5 animate-pulse text-[#FB3640]" />
               AI SEO Autopilot MVP 1.0 tayyor!
             </div>
           </ScrollReveal>
@@ -43,7 +43,7 @@ export default function Hero() {
             </h1>
             <div className="h-[48px] md:h-[80px] flex items-center justify-center">
               <TypingAnimation
-                className="text-4xl md:text-7xl font-extrabold bg-gradient-to-r from-indigo-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent"
+                className="text-4xl md:text-7xl font-extrabold bg-gradient-to-r from-[#FB3640] to-[#FF8A8F] bg-clip-text text-transparent"
                 duration={100}
               >
                 AI SEO Autopilot
@@ -62,8 +62,11 @@ export default function Hero() {
           <ScrollReveal delay="400" className="mt-8">
             <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto items-center justify-center">
               <Link href="/auth/signup" className="w-full sm:w-auto">
-                <ShimmerButton className="shadow-2xl h-14 px-8 text-sm font-bold w-full sm:w-auto">
-                  <span className="whitespace-pre-wrap text-center text-sm font-medium leading-none tracking-tight text-white dark:from-white dark:to-slate-900/10 lg:text-base flex items-center gap-2">
+                <ShimmerButton
+                  background="rgba(251, 54, 64, 1)"
+                  className="shadow-2xl shadow-[#FB3640]/30 h-14 px-8 text-sm font-bold w-full sm:w-auto"
+                >
+                  <span className="whitespace-pre-wrap text-center text-sm font-medium leading-none tracking-tight text-white lg:text-base flex items-center gap-2">
                     Bepul Boshlash <ArrowRight className="w-4 h-4" />
                   </span>
                 </ShimmerButton>
@@ -78,11 +81,11 @@ export default function Hero() {
           </ScrollReveal>
         </div>
 
-        {/* Premium Dashboard Mockup */}
+        {/* Dashboard Mockup */}
         <ScrollReveal delay="500">
-          <div className="mt-16 md:mt-24 p-2 rounded-3xl border border-zinc-800/80 bg-zinc-950/60 backdrop-blur-xl shadow-[0_0_50px_rgba(99,102,241,0.1)] max-w-5xl mx-auto overflow-hidden transition-transform duration-500 hover:scale-[1.01]">
+          <div className="mt-16 md:mt-24 p-2 rounded-3xl border border-zinc-800/80 bg-zinc-950/60 backdrop-blur-xl shadow-[0_0_50px_rgba(251,54,64,0.1)] max-w-5xl mx-auto overflow-hidden transition-transform duration-500 hover:scale-[1.01]">
             <div className="rounded-2xl border border-zinc-900 bg-zinc-950/90 overflow-hidden shadow-inner relative">
-              
+
               {/* Glass reflection */}
               <div className="absolute inset-0 bg-gradient-to-tr from-white/5 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
 
@@ -101,16 +104,16 @@ export default function Hero() {
 
               {/* Window Content */}
               <div className="grid grid-cols-1 md:grid-cols-4 min-h-[420px]">
-                
+
                 {/* Sidebar Mock */}
                 <div className="border-r border-zinc-900 p-4 space-y-6 hidden md:block bg-zinc-950/20 relative z-10">
                   <div className="flex items-center gap-2 px-2 py-1">
-                    <Bot className="w-5 h-5 text-indigo-500" />
+                    <Bot className="w-5 h-5 text-[#FB3640]" />
                     <span className="text-sm font-bold text-white tracking-tight">JetBlog.app</span>
                   </div>
-                  
+
                   <div className="space-y-1.5">
-                    <div className="flex items-center gap-2.5 px-3 py-2 rounded-xl bg-indigo-500/10 text-indigo-400 text-xs font-bold border border-indigo-500/20 shadow-[0_0_15px_rgba(99,102,241,0.15)]">
+                    <div className="flex items-center gap-2.5 px-3 py-2 rounded-xl bg-[#FB3640]/10 text-[#FF8A8F] text-xs font-bold border border-[#FB3640]/20 shadow-[0_0_15px_rgba(251,54,64,0.15)]">
                       <Globe className="w-4 h-4" /> Connections
                     </div>
                     <div className="flex items-center gap-2.5 px-3 py-2 text-zinc-400 text-xs font-semibold hover:text-zinc-200 transition-colors cursor-default">
@@ -124,20 +127,19 @@ export default function Hero() {
 
                 {/* Main Panel Mock */}
                 <div className="col-span-3 p-6 space-y-6 relative z-10">
-                  
+
                   <div className="flex items-center justify-between border-b border-zinc-900/60 pb-4">
                     <div>
                       <h3 className="text-md font-bold text-white">WordPress Ulanishlari</h3>
                       <p className="text-xs text-zinc-500">Faol ulangan bloglar va avtomat nashr qilish jadvallari</p>
                     </div>
-                    <span className="text-xs font-bold text-indigo-400 bg-indigo-500/10 border border-indigo-500/20 px-3 py-1 rounded-xl cursor-default hover:bg-indigo-500/20 transition-colors">
+                    <span className="text-xs font-bold text-[#FB3640] bg-[#FB3640]/10 border border-[#FB3640]/20 px-3 py-1 rounded-xl cursor-default hover:bg-[#FB3640]/20 transition-colors">
                       + Yangi Sayt Ulamoq
                     </span>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    
-                    {/* Site Card Mock 1 */}
+
                     <div className="group p-4 rounded-2xl border border-zinc-800 bg-zinc-900/40 space-y-4 hover:border-emerald-500/50 hover:bg-zinc-900/60 transition-all duration-300">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
@@ -147,11 +149,10 @@ export default function Hero() {
                             <span className="text-[10px] text-zinc-500">WordPress REST API v2</span>
                           </div>
                         </div>
-                        <span className="text-[9px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center gap-1 shadow-[0_0_10px_rgba(16,185,129,0.2)]">
+                        <span className="text-[9px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center gap-1">
                           <Check className="w-2.5 h-2.5" /> Faol
                         </span>
                       </div>
-
                       <div className="space-y-1.5 pt-2 border-t border-zinc-800/60">
                         <div className="flex items-center justify-between text-[10px]">
                           <span className="text-zinc-500 font-semibold">Haftalik reja:</span>
@@ -164,21 +165,19 @@ export default function Hero() {
                       </div>
                     </div>
 
-                    {/* Site Card Mock 2 */}
-                    <div className="group p-4 rounded-2xl border border-zinc-800 bg-zinc-900/40 space-y-4 hover:border-purple-500/50 hover:bg-zinc-900/60 transition-all duration-300">
+                    <div className="group p-4 rounded-2xl border border-zinc-800 bg-zinc-900/40 space-y-4 hover:border-[#FB3640]/50 hover:bg-zinc-900/60 transition-all duration-300">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                          <div className="w-8 h-8 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 font-bold text-xs group-hover:scale-110 transition-transform">WP</div>
+                          <div className="w-8 h-8 rounded-xl bg-[#FB3640]/10 border border-[#FB3640]/20 flex items-center justify-center text-[#FF8A8F] font-bold text-xs group-hover:scale-110 transition-transform">WP</div>
                           <div>
                             <h4 className="text-xs font-bold text-white">marketingdna.com</h4>
                             <span className="text-[10px] text-zinc-500">WordPress REST API v2</span>
                           </div>
                         </div>
-                        <span className="text-[9px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center gap-1 shadow-[0_0_10px_rgba(16,185,129,0.2)]">
+                        <span className="text-[9px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center gap-1">
                           <Check className="w-2.5 h-2.5" /> Faol
                         </span>
                       </div>
-
                       <div className="space-y-1.5 pt-2 border-t border-zinc-800/60">
                         <div className="flex items-center justify-between text-[10px]">
                           <span className="text-zinc-500 font-semibold">Haftalik reja:</span>
@@ -193,10 +192,9 @@ export default function Hero() {
 
                   </div>
 
-                  {/* Features Highlights Row */}
                   <div className="grid grid-cols-3 gap-4 pt-4 border-t border-zinc-900/80">
                     <div className="flex items-center gap-2 group">
-                      <div className="p-1.5 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 group-hover:scale-110 transition-transform">
+                      <div className="p-1.5 rounded-lg bg-[#FB3640]/10 border border-[#FB3640]/20 text-[#FB3640] group-hover:scale-110 transition-transform">
                         <Zap className="w-3.5 h-3.5" />
                       </div>
                       <span className="text-[10px] text-zinc-400 font-bold group-hover:text-zinc-300 transition-colors">100% Avtomatik</span>

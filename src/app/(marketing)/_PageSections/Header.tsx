@@ -34,7 +34,7 @@ export const Header = async () => {
             ) : (
               <Link
                 href="/auth/login"
-                className={cn(buttonVariants({ variant: 'secondary', size: 'sm' }), 'px-6 bg-indigo-500 hover:bg-indigo-400 text-white font-semibold rounded-full transition-all shadow-md shadow-indigo-500/20')}
+                className={cn(buttonVariants({ variant: 'secondary', size: 'sm' }), 'px-6 bg-[#FB3640] hover:bg-[#FF6B6B] text-white font-semibold rounded-full transition-all shadow-md shadow-[#FB3640]/20')}
               >
                 Tizimga kirish
               </Link>

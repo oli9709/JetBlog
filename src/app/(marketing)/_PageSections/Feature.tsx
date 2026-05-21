@@ -21,10 +21,10 @@ export default function Feature() {
       {/* Title */}
       <ScrollReveal>
         <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
-          <span className="text-xs font-bold tracking-widest text-indigo-400 uppercase">Qanday Ishlaydi?</span>
+          <span className="text-xs font-bold tracking-widest text-[#FB3640] uppercase">Qanday Ishlaydi?</span>
           <h2 className="text-3xl md:text-5xl font-extrabold tracking-tight text-white leading-tight">
             Maqola yozishning <br className="hidden sm:block" />
-            <span className="bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent">Yangi Davri</span>
+            <span className="bg-gradient-to-r from-[#FB3640] to-[#FF8A8F] bg-clip-text text-transparent">Yangi Davri</span>
           </h2>
           <p className="text-zinc-400 text-base md:text-lg">
             Siz shunchaki kalit so'zni berasiz. Qolgan barcha bosqichlarni tizim o'zi mustaqil bajaradi va maqolani to'g'ridan-to'g'ri saytingizga yuklaydi.
@@ -42,13 +42,13 @@ export default function Feature() {
             
             {/* Top Row */}
             <div className="flex flex-row items-center justify-between">
-              <div ref={div1Ref} className="z-10 flex h-16 w-16 flex-col items-center justify-center rounded-2xl border-2 border-indigo-500/30 bg-zinc-900 shadow-[0_0_20px_rgba(99,102,241,0.2)]">
-                <Key className="text-indigo-400 h-6 w-6" />
+              <div ref={div1Ref} className="z-10 flex h-16 w-16 flex-col items-center justify-center rounded-2xl border-2 border-[#FB3640]/30 bg-zinc-900 shadow-[0_0_20px_rgba(251,54,64,0.2)]">
+                <Key className="text-[#FB3640] h-6 w-6" />
                 <span className="text-[9px] font-bold mt-1 text-zinc-400">SEO</span>
               </div>
               
-              <div ref={div2Ref} className="z-10 flex h-24 w-24 flex-col items-center justify-center rounded-3xl border-2 border-purple-500/50 bg-zinc-900 shadow-[0_0_30px_rgba(168,85,247,0.3)]">
-                <Bot className="text-purple-400 h-10 w-10 animate-pulse" />
+              <div ref={div2Ref} className="z-10 flex h-24 w-24 flex-col items-center justify-center rounded-3xl border-2 border-[#FB3640]/50 bg-zinc-900 shadow-[0_0_30px_rgba(251,54,64,0.4)]">
+                <Bot className="text-[#FB3640] h-10 w-10 animate-pulse" />
                 <span className="text-[10px] font-extrabold mt-2 text-white">Claude 3.5</span>
               </div>
               
@@ -85,8 +85,8 @@ export default function Feature() {
             curvature={-50}
             endYOffset={-10}
             pathColor="#3f3f46"
-            gradientStartColor="#6366f1"
-            gradientStopColor="#a855f7"
+            gradientStartColor="#FB3640"
+            gradientStopColor="#FF6B6B"
           />
           <AnimatedBeam
             containerRef={containerRef}
@@ -97,7 +97,7 @@ export default function Feature() {
             reverse
             pathColor="#3f3f46"
             gradientStartColor="#06b6d4"
-            gradientStopColor="#a855f7"
+            gradientStopColor="#FB3640"
           />
           <AnimatedBeam
             containerRef={containerRef}
@@ -106,7 +106,7 @@ export default function Feature() {
             curvature={-50}
             startYOffset={10}
             pathColor="#3f3f46"
-            gradientStartColor="#a855f7"
+            gradientStartColor="#FB3640"
             gradientStopColor="#10b981"
           />
           <AnimatedBeam

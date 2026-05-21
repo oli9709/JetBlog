@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="currentColor">
+  <!-- Fighter jet top-down view -->
+  <!-- Main fuselage -->
+  <ellipse cx="50" cy="50" rx="6" ry="32" fill="currentColor"/>
+  <!-- Nose cone -->
+  <polygon points="50,8 44,28 56,28" fill="currentColor"/>
+  <!-- Main delta wings -->
+  <polygon points="50,38 8,72 50,62 92,72" fill="currentColor"/>
+  <!-- Rear stabilizers -->
+  <polygon points="50,68 26,88 44,78" fill="currentColor"/>
+  <polygon points="50,68 74,88 56,78" fill="currentColor"/>
+  <!-- Cockpit -->
+  <ellipse cx="50" cy="34" rx="3.5" ry="6" fill="currentColor" opacity="0.5"/>
+</svg>

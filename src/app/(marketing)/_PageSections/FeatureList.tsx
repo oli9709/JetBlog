@@ -9,7 +9,7 @@ const features = [
     description: "Sun'iy intellekt orqali to'liq original, SEO-optimallashtirilgan sarlavha va maqola matnlarini noldan yaratish.",
     href: "/",
     cta: "Batafsil ma'lumot",
-    background: <div className="absolute inset-0 bg-zinc-950/20 mix-blend-overlay transition-all duration-300 group-hover:bg-indigo-500/10 pointer-events-none" />,
+    background: <div className="absolute inset-0 bg-zinc-950/20 mix-blend-overlay transition-all duration-300 group-hover:bg-[#FB3640]/10 pointer-events-none" />,
     className: "lg:row-start-1 lg:row-end-4 lg:col-start-1 lg:col-end-3",
   },
   {
@@ -18,7 +18,7 @@ const features = [
     description: "Kalit so'zlarning qidiruv hajmi va raqobat darajasini DataForSEO orqali tahlil qiling.",
     href: "/",
     cta: "Batafsil ma'lumot",
-    background: <div className="absolute inset-0 bg-zinc-950/20 mix-blend-overlay transition-all duration-300 group-hover:bg-purple-500/10 pointer-events-none" />,
+    background: <div className="absolute inset-0 bg-zinc-950/20 mix-blend-overlay transition-all duration-300 group-hover:bg-[#FB3640]/10 pointer-events-none" />,
     className: "lg:col-start-3 lg:col-end-4 lg:row-start-1 lg:row-end-3",
   },
   {
@@ -59,7 +59,7 @@ export default function FeatureList() {
         <div className="mx-auto flex max-w-3xl flex-col items-center space-y-4 text-center">
           <h2 className="text-3xl md:text-5xl font-extrabold tracking-tight text-white leading-tight">
             Saytingiz o'sishi uchun{' '}
-            <span className="bg-gradient-to-r from-indigo-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-[#FB3640] to-[#FF8A8F] bg-clip-text text-transparent">
               Cheksiz Imkoniyatlar
             </span>
           </h2>
