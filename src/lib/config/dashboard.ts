@@ -18,18 +18,18 @@ const configuration = {
   },
   products: [
     {
-      name: 'Free',
-      description: 'AI SEO imkoniyatlarini bepul sinab ko\'rish uchun',
+      name: 'Free Trial',
+      description: 'JetBlog ni bepul sinab ko\'ring',
       features: [
+        '2 ta AI maqola (bir martalik)',
         '1 ta WordPress sayt bog\'lash',
-        '10 ta kalit so\'z tahlili / oy',
-        '2 ta AI maqola / oy',
-        'Telegram kanalda avto-anons',
-        'Standard yordam'
+        '1 ta Telegram kanal',
+        '10 ta kalit so\'z tahlili',
+        'DALL-E 3 rasm (2 ta)'
       ],
       plans: [
         {
-          name: 'Free Plan',
+          name: 'Free Trial',
           interval: IntervalE.MONTHLY,
           price: '0',
           price_id: 'plan_free',
@@ -39,27 +39,28 @@ const configuration = {
     },
     {
       name: 'Starter',
-      description: 'Kichik bloglar va yangi boshlovchilar uchun mos',
+      description: 'Kichik bloglar va yangi boshlovchilar uchun',
       features: [
-        '3 ta WordPress sayt bog\'lash',
+        '30 ta AI maqola / oy',
+        '1 ta WordPress sayt',
+        '1 ta Telegram kanal',
         '100 ta kalit so\'z tahlili / oy',
-        '20 ta AI maqola / oy',
-        'Telegram kanalda avto-anons',
         'DALL-E 3 muqova rasmlari',
-        'Email orqali qo\'llab-quvvatlash'
+        'UZ / RU / EN tillar',
+        'Email yordam'
       ],
       plans: [
         {
           name: 'Starter Monthly',
           interval: IntervalE.MONTHLY,
-          price: '19',
+          price: '9',
           price_id: 'plan_starter_monthly',
           isPopular: false
         },
         {
           name: 'Starter Annual',
           interval: IntervalE.YEARLY,
-          price: '190',
+          price: '7',
           price_id: 'plan_starter_yearly',
           isPopular: false
         }
@@ -67,27 +68,29 @@ const configuration = {
     },
     {
       name: 'Pro',
-      description: 'Professionallar va o\'suvchi bizneslar uchun mukammal yechim',
+      description: 'O\'suvchi bizneslar uchun mukammal yechim',
       features: [
-        '10 ta WordPress sayt bog\'lash',
-        '500 ta kalit so\'z tahlili / oy',
         '80 ta AI maqola / oy',
-        'Telegram kanalda avto-anons',
+        '3 ta WordPress sayt',
+        '3 ta Telegram kanal',
+        '500 ta kalit so\'z tahlili / oy',
         'DALL-E 3 muqova rasmlari',
-        '24/7 VIP tezkor qo\'llab-quvvatlash'
+        'Webhook integratsiya',
+        'Google Search Console',
+        '24/7 tezkor yordam'
       ],
       plans: [
         {
           name: 'Pro Monthly',
           interval: IntervalE.MONTHLY,
-          price: '49',
+          price: '19',
           price_id: 'plan_pro_monthly',
           isPopular: true
         },
         {
           name: 'Pro Annual',
           interval: IntervalE.YEARLY,
-          price: '490',
+          price: '15',
           price_id: 'plan_pro_yearly',
           isPopular: false
         }
@@ -95,27 +98,29 @@ const configuration = {
     },
     {
       name: 'Agency',
-      description: 'Agentliklar va yirik brendlar uchun to\'liq avtomatlashtirish',
+      description: 'Agentliklar va yirik brendlar uchun',
       features: [
-        'Cheksiz WordPress sayt bog\'lash',
+        '250 ta AI maqola / oy',
+        '10 ta WordPress sayt',
+        'Cheksiz Telegram kanallar',
         'Cheksiz kalit so\'z tahlili',
-        '200 ta AI maqola / oy',
-        'Telegram kanalda avto-anons',
         'DALL-E 3 muqova rasmlari',
-        'Shaxsiy menejer yordami'
+        'Webhook + GSC + Admin panel',
+        'Shaxsiy menejer',
+        'Invoice (hisob-faktura) tizimi'
       ],
       plans: [
         {
           name: 'Agency Monthly',
           interval: IntervalE.MONTHLY,
-          price: '99',
+          price: '49',
           price_id: 'plan_agency_monthly',
           isPopular: false
         },
         {
           name: 'Agency Annual',
           interval: IntervalE.YEARLY,
-          price: '990',
+          price: '39',
           price_id: 'plan_agency_yearly',
           isPopular: false
         }
