@@ -4,12 +4,16 @@ import { Marquee } from '@/components/magicui/marquee';
 import { ScrollReveal } from '@/components/ScrollReveal';
 
 const logos = [
-  { name: 'WordPress', icon: 'SiWordpress' },
-  { name: 'Claude AI', icon: 'SiAnthropic' },
-  { name: 'OpenAI', icon: 'SiOpenai' },
-  { name: 'DataForSEO', icon: 'TbSeo' },
-  { name: 'Telegram', icon: 'SiTelegram' },
-  { name: 'Next.js', icon: 'SiNextdotjs' }
+  { name: 'Claude AI', icon: '🤖' },
+  { name: 'DataForSEO', icon: '📊' },
+  { name: 'Telegram', icon: '💬' },
+  { name: 'Next.js', icon: '⚡' },
+  { name: 'WordPress', icon: '🌐' },
+  { name: 'OpenAI', icon: '🎨' },
+  { name: 'Webhook', icon: '🔗' },
+  { name: 'Google GSC', icon: '🔍' },
+  { name: 'Supabase', icon: '☁️' },
+  { name: 'Vercel', icon: '🚀' }
 ];
 
 export default function LogoMarquee() {
@@ -21,23 +25,24 @@ export default function LogoMarquee() {
             Zamonaviy texnologiyalar bilan integratsiya qilingan
           </p>
           
-          <div className="relative flex h-full w-full max-w-7xl flex-col items-center justify-center overflow-hidden">
-            <Marquee pauseOnHover className="[--duration:20s]">
+          <div 
+            className="relative flex h-full w-full max-w-7xl flex-col items-center justify-center overflow-hidden"
+            style={{
+              WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%)',
+              maskImage: 'linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%)',
+            }}
+          >
+            <Marquee pauseOnHover className="py-4 [--duration:30s]">
               {logos.map((logo, idx) => (
                 <div
                   key={idx}
-                  className="mx-4 flex items-center justify-center gap-2 rounded-2xl border border-zinc-800/80 bg-zinc-900/30 px-6 py-4 backdrop-blur-sm transition-all hover:bg-zinc-800/50 hover:border-zinc-700 shadow-md"
+                  className="mx-2 flex items-center justify-center gap-2 rounded-full border border-white/10 bg-white/5 px-6 py-3 backdrop-blur-sm transition-all hover:bg-white/10 shadow-md"
                 >
-                  {/* We are just rendering text since we don't have react-icons installed, 
-                      but we simulate a professional badge look */}
-                  <span className="text-lg font-bold text-zinc-300">{logo.name}</span>
+                  <span className="text-xl">{logo.icon}</span>
+                  <span className="text-sm font-medium text-white/90">{logo.name}</span>
                 </div>
               ))}
             </Marquee>
-            
-            {/* Gradient edges for smooth fade out */}
-            <div className="pointer-events-none absolute inset-y-0 left-0 w-1/4 bg-gradient-to-r from-background dark:from-background"></div>
-            <div className="pointer-events-none absolute inset-y-0 right-0 w-1/4 bg-gradient-to-l from-background dark:from-background"></div>
           </div>
         </div>
       </ScrollReveal>
