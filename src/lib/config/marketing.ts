@@ -17,15 +17,15 @@ const config = {
     resources: {
       title: 'Resources',
       routes: [
-        { title: 'Blog', link: '/' },
-        { title: 'Docs', link: '/' }
+        { title: 'Blog', link: '/blog' },
+        { title: 'Docs', link: '/docs' }
       ]
     },
     legal: {
       title: 'Legal',
       routes: [
-        { title: 'Privacy Policy', link: '/' },
-        { title: 'Terms and Conditions', link: '/' }
+        { title: 'Privacy Policy', link: '/privacy' },
+        { title: 'Terms and Conditions', link: '/terms' }
       ]
     }
   },
