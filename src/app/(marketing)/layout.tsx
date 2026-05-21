@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { Header } from './_PageSections/Header';
 import { LayoutProps } from '@/lib/types/types';
 import Footer from '@/components/Footer';

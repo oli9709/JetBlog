@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { MainLogoText, MainLogoIcon } from '@/components/MainLogo';
 import { Separator } from '@/components/ui/Separator';
 import { LayoutProps } from '@/lib/types/types';
