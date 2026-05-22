@@ -57,7 +57,7 @@ export function ContentQueue({
             <span>Jami:</span>
             <NumberTicker value={total} className="text-white font-bold" />
           </div>
-          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-indigo-400">
+          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#FB3640]/10 border border-[#FB3640]/20 text-[#FF6B6B]">
             <span>Navbatda:</span>
             <NumberTicker value={scheduled} className="text-white font-bold" />
           </div>
@@ -69,12 +69,12 @@ export function ContentQueue({
 
         {/* Qidiruv Input */}
         <div className="relative mb-4 group">
-          <Search className="absolute left-3 top-3 h-4 w-4 text-zinc-500 transition-colors group-focus-within:text-indigo-400 z-10" />
+          <Search className="absolute left-3 top-3 h-4 w-4 text-zinc-500 transition-colors group-focus-within:text-[#FF6B6B] z-10" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 bg-black/40 border border-[#222222] rounded-xl text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 transition-all shadow-inner relative z-20"
+            className="w-full pl-9 pr-4 py-2 bg-black/40 border border-[#222222] rounded-xl text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:ring-1 focus:ring-[#FB3640] focus:border-[#FB3640] transition-all shadow-inner relative z-20"
           />
           {/* Fake Animated Placeholder */}
           {!searchQuery && (
@@ -99,7 +99,7 @@ export function ContentQueue({
               >
                 {tab.label}
                 {isActive && (
-                  <span className="absolute bottom-0 left-0 w-full h-[2px] bg-gradient-to-r from-indigo-500 to-purple-600 rounded-t-full shadow-[0_-2px_10px_rgba(99,102,241,0.5)]" />
+                  <span className="absolute bottom-0 left-0 w-full h-[2px] bg-gradient-to-r from-[#FB3640] to-[#FB3640] rounded-t-full shadow-[0_-2px_10px_rgba(251,54,64,0.2)]" />
                 )}
               </button>
             );
@@ -108,7 +108,7 @@ export function ContentQueue({
       </div>
 
       {/* Maqolalar Ro'yxati (Scrollable) */}
-      <div className="flex-1 p-5 overflow-y-auto [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-indigo-500/20 hover:[&::-webkit-scrollbar-thumb]:bg-indigo-500/40 [&::-webkit-scrollbar-thumb]:rounded-full transition-colors">
+      <div className="flex-1 p-5 overflow-y-auto [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-[#FB3640]/20 hover:[&::-webkit-scrollbar-thumb]:bg-[#FB3640]/40 [&::-webkit-scrollbar-thumb]:rounded-full transition-colors">
         
         {isLoading ? (
           // Loading Skeleton

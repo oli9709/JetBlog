@@ -37,7 +37,7 @@ export function Analytics({ siteId, stats, gsc, onConnectGSC, onDisconnectGSC }:
         <div className="bg-[#111111]/90 backdrop-blur-md border border-white/10 p-3 rounded-lg shadow-xl">
           <p className="text-zinc-400 text-xs mb-1">{label}</p>
           <p className="text-white font-bold text-sm flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-indigo-500" />
+            <span className="w-2 h-2 rounded-full bg-[#FB3640]" />
             {payload[0].value} ta maqola
           </p>
         </div>
@@ -70,11 +70,11 @@ export function Analytics({ siteId, stats, gsc, onConnectGSC, onDisconnectGSC }:
 
         {/* Big card: Publish graph */}
         <div className="lg:col-span-2 lg:row-span-2 bg-[#0a0a0a]/80 backdrop-blur-xl rounded-3xl border border-white/10 shadow-2xl p-6 flex flex-col relative overflow-hidden group">
-          <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-transparent pointer-events-none" />
+          <div className="absolute inset-0 bg-gradient-to-br from-[#FB3640]/5 to-transparent pointer-events-none" />
           <div className="flex justify-between items-start mb-6 z-10">
             <div>
               <h3 className="text-white font-bold flex items-center gap-2">
-                <Activity className="h-4 w-4 text-indigo-400" />
+                <Activity className="h-4 w-4 text-[#FF6B6B]" />
                 Oylik Nashr Grafigi
               </h3>
               <p className="text-zinc-400 text-xs mt-1">Oxirgi 30 kun ichida nashr qilingan maqolalar dinamikasi</p>
@@ -101,9 +101,9 @@ export function Analytics({ siteId, stats, gsc, onConnectGSC, onDisconnectGSC }:
 
         {/* Small cards */}
         <div className="bg-[#0a0a0a]/80 backdrop-blur-xl rounded-3xl border border-white/10 shadow-2xl p-6 flex flex-col justify-between relative overflow-hidden group hover:border-white/20 transition-colors">
-          <div className="absolute -right-6 -top-6 w-24 h-24 bg-blue-500/10 rounded-full blur-xl group-hover:bg-blue-500/20 transition-colors" />
+          <div className="absolute -right-6 -top-6 w-24 h-24 bg-[#FB3640]/10 rounded-full blur-xl group-hover:bg-[#FB3640]/20 transition-colors" />
           <div className="flex items-center gap-2 text-zinc-400 font-medium text-sm">
-            <FileText className="h-4 w-4 text-blue-400" />
+            <FileText className="h-4 w-4 text-[#FF6B6B]" />
             Jami Maqolalar
           </div>
           <div className="flex items-end justify-between">
@@ -143,9 +143,9 @@ export function Analytics({ siteId, stats, gsc, onConnectGSC, onDisconnectGSC }:
         </div>
 
         <div className="bg-[#0a0a0a]/80 backdrop-blur-xl rounded-3xl border border-white/10 shadow-2xl p-6 flex flex-col justify-between relative overflow-hidden group hover:border-white/20 transition-colors">
-          <div className="absolute -right-6 -top-6 w-24 h-24 bg-purple-500/10 rounded-full blur-xl group-hover:bg-purple-500/20 transition-colors" />
+          <div className="absolute -right-6 -top-6 w-24 h-24 bg-[#FB3640]/20 rounded-full blur-xl group-hover:bg-[#FB3640]/20 transition-colors" />
           <div className="flex items-center gap-2 text-zinc-400 font-medium text-sm">
-            <Hash className="h-4 w-4 text-purple-400" />
+            <Hash className="h-4 w-4 text-[#FF6B6B]" />
             O'rtacha Uzunlik
           </div>
           <div className="flex flex-col gap-1">
@@ -155,7 +155,7 @@ export function Analytics({ siteId, stats, gsc, onConnectGSC, onDisconnectGSC }:
             </div>
             <div className="flex gap-1 h-3 items-end mt-2">
               {[40, 70, 45, 90, 60, 80, 50].map((h, i) => (
-                <div key={i} className="w-2 bg-purple-500/40 rounded-t-sm" style={{ height: `${h}%` }} />
+                <div key={i} className="w-2 bg-[#FB3640]/20 rounded-t-sm" style={{ height: `${h}%` }} />
               ))}
             </div>
           </div>
@@ -175,9 +175,9 @@ export function Analytics({ siteId, stats, gsc, onConnectGSC, onDisconnectGSC }:
             </Marquee>
             <Marquee reverse pauseOnHover className="[--duration:25s] absolute inset-x-0 bottom-0">
               {stats.topKeywords.slice(Math.ceil(stats.topKeywords.length / 2)).map((kw, i) => (
-                <div key={i} className="flex items-center gap-2 px-3 py-1.5 mx-1 bg-indigo-500/10 border border-indigo-500/20 rounded-full backdrop-blur-md">
-                  <span className="text-xs font-bold text-indigo-300">{kw.keyword}</span>
-                  <span className="text-[10px] bg-indigo-500/20 px-1.5 rounded-full text-indigo-400">{kw.count}</span>
+                <div key={i} className="flex items-center gap-2 px-3 py-1.5 mx-1 bg-[#FB3640]/10 border border-[#FB3640]/20 rounded-full backdrop-blur-md">
+                  <span className="text-xs font-bold text-[#FF8A8F]">{kw.keyword}</span>
+                  <span className="text-[10px] bg-[#FB3640]/20 px-1.5 rounded-full text-[#FF6B6B]">{kw.count}</span>
                 </div>
               ))}
             </Marquee>
@@ -286,7 +286,7 @@ export function Analytics({ siteId, stats, gsc, onConnectGSC, onDisconnectGSC }:
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
               <div className="bg-white/5 rounded-2xl p-4 border border-white/8">
                 <div className="flex items-center gap-2 text-zinc-400 text-xs mb-2">
-                  <MousePointerClick className="h-3.5 w-3.5 text-blue-400" />
+                  <MousePointerClick className="h-3.5 w-3.5 text-[#FF6B6B]" />
                   Jami Kliklar
                 </div>
                 <div className="text-2xl font-extrabold text-white">
@@ -295,7 +295,7 @@ export function Analytics({ siteId, stats, gsc, onConnectGSC, onDisconnectGSC }:
               </div>
               <div className="bg-white/5 rounded-2xl p-4 border border-white/8">
                 <div className="flex items-center gap-2 text-zinc-400 text-xs mb-2">
-                  <Eye className="h-3.5 w-3.5 text-purple-400" />
+                  <Eye className="h-3.5 w-3.5 text-[#FF6B6B]" />
                   Impresyalar
                 </div>
                 <div className="text-2xl font-extrabold text-white">
@@ -327,7 +327,7 @@ export function Analytics({ siteId, stats, gsc, onConnectGSC, onDisconnectGSC }:
             {gsc.stats.dailyData.length > 0 && (
               <div className="bg-white/5 rounded-2xl p-5 border border-white/8">
                 <h4 className="text-white text-sm font-semibold mb-4 flex items-center gap-2">
-                  <MousePointerClick className="h-4 w-4 text-blue-400" />
+                  <MousePointerClick className="h-4 w-4 text-[#FF6B6B]" />
                   Kunlik Kliklar (oxirgi 28 kun)
                 </h4>
                 <div className="h-48">
@@ -382,8 +382,8 @@ export function Analytics({ siteId, stats, gsc, onConnectGSC, onDisconnectGSC }:
                         <tr key={i} className="border-t border-white/5 hover:bg-white/5 transition-colors">
                           <td className="py-2 pr-4 text-zinc-600 text-xs">{i + 1}</td>
                           <td className="py-2 pr-4 text-white text-sm font-medium max-w-[180px] truncate">{kw.query}</td>
-                          <td className="py-2 pr-4 text-blue-400 text-sm font-mono text-right">{kw.clicks}</td>
-                          <td className="py-2 pr-4 text-purple-400 text-sm font-mono text-right">{kw.impressions}</td>
+                          <td className="py-2 pr-4 text-[#FF6B6B] text-sm font-mono text-right">{kw.clicks}</td>
+                          <td className="py-2 pr-4 text-[#FF6B6B] text-sm font-mono text-right">{kw.impressions}</td>
                           <td className="py-2 pr-4 text-emerald-400 text-sm font-mono text-right">
                             {(kw.ctr * 100).toFixed(1)}%
                           </td>

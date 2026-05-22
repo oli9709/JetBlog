@@ -20,8 +20,8 @@ export function SettingsNav({ items }: SettingsNavProps) {
           href={item.link}
           className={`text-sm font-medium transition-colors ${
             item.link !== pathname
-              ? 'hover:text-primary hover:underline underline-offset-8 decoration-2 decoration-blue-500'
-              : 'text-primary underline underline-offset-8 decoration-2 decoration-blue-500'
+              ? 'hover:text-primary hover:underline underline-offset-8 decoration-2 decoration-[#FB3640]'
+              : 'text-primary underline underline-offset-8 decoration-2 decoration-[#FB3640]'
           }`}
         >
           {item.title}

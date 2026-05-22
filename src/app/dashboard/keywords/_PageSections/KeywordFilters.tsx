@@ -56,7 +56,7 @@ export const KeywordFilters: React.FC<KeywordFiltersProps> = ({
               )}
             >
               {isActive && (
-                <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg shadow-[0_0_12px_rgba(99,102,241,0.4)] transition-all duration-500" />
+                <div className="absolute inset-0 bg-gradient-to-r from-[#FB3640] to-[#FB3640] rounded-lg shadow-[0_0_12px_rgba(251,54,64,0.2)] transition-all duration-500" />
               )}
               <span className="relative z-10">{status.label}</span>
             </button>
@@ -68,7 +68,7 @@ export const KeywordFilters: React.FC<KeywordFiltersProps> = ({
       <div className="flex gap-6 items-center px-4 py-2 bg-black/30 rounded-full border border-white/5">
         <div className="flex flex-col items-center">
           <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">Jami</span>
-          <span className="font-mono text-sm font-bold text-indigo-400">
+          <span className="font-mono text-sm font-bold text-[#FF6B6B]">
             <NumberTicker value={totalCount} />
           </span>
         </div>

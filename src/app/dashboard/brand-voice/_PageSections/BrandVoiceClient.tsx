@@ -150,8 +150,8 @@ export default function BrandVoiceClient({ initialSites, userId }: BrandVoiceCli
       {/* Header & site selector */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-border/40 pb-5">
         <div>
-          <h1 className="text-3xl font-extrabold tracking-tight flex items-center gap-2 bg-gradient-to-r from-indigo-500 to-purple-500 bg-clip-text text-transparent">
-            <Sparkles className="h-8 w-8 text-indigo-500" />
+          <h1 className="text-3xl font-extrabold tracking-tight flex items-center gap-2 bg-gradient-to-r from-[#FB3640] to-[#FB3640] bg-clip-text text-transparent">
+            <Sparkles className="h-8 w-8 text-[#FB3640]" />
             Brand Voice DNA
           </h1>
           <p className="text-muted-foreground mt-1">
@@ -176,7 +176,7 @@ export default function BrandVoiceClient({ initialSites, userId }: BrandVoiceCli
           </div>
         ) : (
           <Link href="/dashboard/connections">
-            <Button size="sm" className="bg-indigo-600 hover:bg-indigo-700">
+            <Button size="sm" className="bg-[#FB3640] hover:bg-[#e02d36]">
               Bog'lanish
             </Button>
           </Link>
@@ -186,8 +186,8 @@ export default function BrandVoiceClient({ initialSites, userId }: BrandVoiceCli
       {sites.length === 0 ? (
         <Card className="border-dashed border-2 py-10 text-center">
           <CardContent className="space-y-4">
-            <div className="mx-auto w-12 h-12 bg-indigo-500/10 rounded-full flex items-center justify-center">
-              <Globe className="h-6 w-6 text-indigo-500" />
+            <div className="mx-auto w-12 h-12 bg-[#FB3640]/10 rounded-full flex items-center justify-center">
+              <Globe className="h-6 w-6 text-[#FB3640]" />
             </div>
             <div className="max-w-md mx-auto space-y-1">
               <CardTitle>WordPress sayt bog'lanmagan</CardTitle>
@@ -196,7 +196,7 @@ export default function BrandVoiceClient({ initialSites, userId }: BrandVoiceCli
               </CardDescription>
             </div>
             <Link href="/dashboard/connections">
-              <Button className="bg-indigo-600 hover:bg-indigo-700 mt-2">
+              <Button className="bg-[#FB3640] hover:bg-[#e02d36] mt-2">
                 <Plus className="mr-1.5 h-4 w-4" /> Sayt ulashtirish
               </Button>
             </Link>

@@ -53,11 +53,11 @@ export const KeywordForm: React.FC<KeywordFormProps> = ({ onSubmit, isLoading, s
       className="flex flex-col gap-6 bg-[#111111]/80 backdrop-blur-xl border border-[#222222] rounded-2xl p-6 md:p-8 shadow-2xl relative overflow-hidden group"
     >
       {/* Background glow decoration */}
-      <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 pointer-events-none" />
+      <div className="absolute top-0 right-0 w-64 h-64 bg-[#FB3640]/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 pointer-events-none" />
 
       <div>
         <h2 className="text-xl font-bold text-white mb-1 flex items-center gap-2">
-          <Plus className="w-5 h-5 text-indigo-500" /> Yangi Kalit So'z
+          <Plus className="w-5 h-5 text-[#FB3640]" /> Yangi Kalit So'z
         </h2>
         <p className="text-sm text-zinc-500">Oyiga qancha qidirilishi va qiyinchilik darajasini AI tahlil qiladi</p>
       </div>
@@ -75,14 +75,14 @@ export const KeywordForm: React.FC<KeywordFormProps> = ({ onSubmit, isLoading, s
             className="peer block w-full px-4 pt-5 pb-2 bg-black/40 border border-zinc-800 rounded-xl text-white focus:outline-none focus:ring-0 transition-all duration-300 placeholder-transparent"
           />
           {/* Animated gradient border on focus */}
-          <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 opacity-0 peer-focus:opacity-100 transition-opacity duration-500 -z-10 blur-[1px]" style={{ padding: '1px' }}>
+          <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#FB3640] to-[#FB3640] opacity-0 peer-focus:opacity-100 transition-opacity duration-500 -z-10 blur-[1px]" style={{ padding: '1px' }}>
              <div className="w-full h-full bg-black/90 rounded-xl" />
           </div>
           <div className="absolute inset-0 rounded-xl border border-zinc-800 peer-focus:border-transparent pointer-events-none transition-colors duration-300" />
           
           <label 
             htmlFor="keyword"
-            className="absolute text-sm text-zinc-500 duration-300 transform -translate-y-3.5 scale-75 top-4 z-20 origin-[0] left-4 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-3.5 peer-focus:text-indigo-400 pointer-events-none"
+            className="absolute text-sm text-zinc-500 duration-300 transform -translate-y-3.5 scale-75 top-4 z-20 origin-[0] left-4 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-3.5 peer-focus:text-[#FF6B6B] pointer-events-none"
           >
             Kalit so'zni kiriting
           </label>

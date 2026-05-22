@@ -48,7 +48,7 @@ export const SiteForm: React.FC<SiteFormProps> = ({ onSubmit, isLoading }) => {
       <div className="flex flex-col gap-5">
         {/* Floating Label Input - URL */}
         <div className="relative group">
-          <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-zinc-500 group-focus-within:text-indigo-400 transition-colors z-20">
+          <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-zinc-500 group-focus-within:text-[#FF6B6B] transition-colors z-20">
             <Globe className="h-5 w-5" />
           </div>
           <input
@@ -58,11 +58,11 @@ export const SiteForm: React.FC<SiteFormProps> = ({ onSubmit, isLoading }) => {
             placeholder=" "
             value={formData.url}
             onChange={(e) => setFormData({ ...formData, url: e.target.value })}
-            className="peer block w-full pl-11 pr-4 pt-4 pb-2 bg-black/50 border border-zinc-800 rounded-xl text-white focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300 placeholder-transparent z-10 relative"
+            className="peer block w-full pl-11 pr-4 pt-4 pb-2 bg-black/50 border border-zinc-800 rounded-xl text-white focus:outline-none focus:ring-1 focus:ring-[#FB3640] focus:border-[#FB3640] transition-all duration-300 placeholder-transparent z-10 relative"
           />
           <label 
             htmlFor="url"
-            className="absolute text-sm text-zinc-500 duration-300 transform -translate-y-3 scale-75 top-4 z-20 origin-[0] left-11 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-3 peer-focus:text-indigo-400 pointer-events-none"
+            className="absolute text-sm text-zinc-500 duration-300 transform -translate-y-3 scale-75 top-4 z-20 origin-[0] left-11 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-3 peer-focus:text-[#FF6B6B] pointer-events-none"
           >
             Sayt URL manzili
           </label>
@@ -70,7 +70,7 @@ export const SiteForm: React.FC<SiteFormProps> = ({ onSubmit, isLoading }) => {
 
         {/* Floating Label Input - Username */}
         <div className="relative group">
-          <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-zinc-500 group-focus-within:text-indigo-400 transition-colors z-20">
+          <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-zinc-500 group-focus-within:text-[#FF6B6B] transition-colors z-20">
             <User className="h-5 w-5" />
           </div>
           <input
@@ -80,11 +80,11 @@ export const SiteForm: React.FC<SiteFormProps> = ({ onSubmit, isLoading }) => {
             placeholder=" "
             value={formData.wp_username}
             onChange={(e) => setFormData({ ...formData, wp_username: e.target.value })}
-            className="peer block w-full pl-11 pr-4 pt-4 pb-2 bg-black/50 border border-zinc-800 rounded-xl text-white focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300 placeholder-transparent z-10 relative"
+            className="peer block w-full pl-11 pr-4 pt-4 pb-2 bg-black/50 border border-zinc-800 rounded-xl text-white focus:outline-none focus:ring-1 focus:ring-[#FB3640] focus:border-[#FB3640] transition-all duration-300 placeholder-transparent z-10 relative"
           />
           <label 
             htmlFor="wp_username"
-            className="absolute text-sm text-zinc-500 duration-300 transform -translate-y-3 scale-75 top-4 z-20 origin-[0] left-11 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-3 peer-focus:text-indigo-400 pointer-events-none"
+            className="absolute text-sm text-zinc-500 duration-300 transform -translate-y-3 scale-75 top-4 z-20 origin-[0] left-11 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-3 peer-focus:text-[#FF6B6B] pointer-events-none"
           >
             WP Username
           </label>
@@ -92,7 +92,7 @@ export const SiteForm: React.FC<SiteFormProps> = ({ onSubmit, isLoading }) => {
 
         {/* Floating Label Input - Password */}
         <div className="relative group">
-          <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-zinc-500 group-focus-within:text-indigo-400 transition-colors z-20">
+          <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-zinc-500 group-focus-within:text-[#FF6B6B] transition-colors z-20">
             <Lock className="h-5 w-5" />
           </div>
           <input
@@ -102,11 +102,11 @@ export const SiteForm: React.FC<SiteFormProps> = ({ onSubmit, isLoading }) => {
             placeholder=" "
             value={formData.app_password}
             onChange={(e) => setFormData({ ...formData, app_password: e.target.value })}
-            className="peer block w-full pl-11 pr-12 pt-4 pb-2 bg-black/50 border border-zinc-800 rounded-xl text-white focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300 placeholder-transparent z-10 relative"
+            className="peer block w-full pl-11 pr-12 pt-4 pb-2 bg-black/50 border border-zinc-800 rounded-xl text-white focus:outline-none focus:ring-1 focus:ring-[#FB3640] focus:border-[#FB3640] transition-all duration-300 placeholder-transparent z-10 relative"
           />
           <label 
             htmlFor="app_password"
-            className="absolute text-sm text-zinc-500 duration-300 transform -translate-y-3 scale-75 top-4 z-20 origin-[0] left-11 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-3 peer-focus:text-indigo-400 pointer-events-none"
+            className="absolute text-sm text-zinc-500 duration-300 transform -translate-y-3 scale-75 top-4 z-20 origin-[0] left-11 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-3 peer-focus:text-[#FF6B6B] pointer-events-none"
           >
             Application Password
           </label>
@@ -126,7 +126,7 @@ export const SiteForm: React.FC<SiteFormProps> = ({ onSubmit, isLoading }) => {
         disabled={isLoading || isSuccess}
         className={cn(
           "relative w-full h-12 mt-2 rounded-xl overflow-hidden group border-0 font-bold tracking-wide transition-all duration-500",
-          isSuccess ? "bg-emerald-500 text-white" : "bg-gradient-to-r from-indigo-500 to-purple-600 text-white hover:shadow-[0_0_30px_rgba(99,102,241,0.4)] hover:scale-[1.02] active:scale-95"
+          isSuccess ? "bg-emerald-500 text-white" : "bg-gradient-to-r from-[#FB3640] to-[#FB3640] text-white hover:shadow-[0_0_30px_rgba(251,54,64,0.2)] hover:scale-[1.02] active:scale-95"
         )}
       >
         <span className="relative z-10 flex items-center justify-center gap-2">

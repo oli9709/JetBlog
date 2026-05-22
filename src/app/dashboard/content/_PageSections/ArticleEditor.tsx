@@ -53,9 +53,9 @@ export function ArticleEditor({
     return (
       <div className="flex flex-col h-full bg-[#111111]/80 backdrop-blur-xl rounded-2xl border border-[#222222] shadow-xl overflow-hidden items-center justify-center p-8">
         <div className="relative mb-6">
-          <div className="absolute inset-0 bg-indigo-500/20 rounded-full blur-3xl animate-pulse" />
+          <div className="absolute inset-0 bg-[#FB3640]/20 rounded-full blur-3xl animate-pulse" />
           <div className="relative bg-[#0a0a0a] border border-[#222222] h-24 w-24 rounded-full flex items-center justify-center shadow-2xl">
-            <Edit3 className="h-10 w-10 text-indigo-500" />
+            <Edit3 className="h-10 w-10 text-[#FB3640]" />
           </div>
         </div>
         <TypingAnimation

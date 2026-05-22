@@ -62,10 +62,10 @@ export const KeywordTable: React.FC<KeywordTableProps> = ({ keywords, onApprove,
         return (
           <div 
             key={kw.id} 
-            className="group relative flex flex-col justify-between p-6 bg-[#111111]/80 backdrop-blur-xl border border-[#222222] rounded-2xl transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_10px_40px_-15px_rgba(99,102,241,0.4)] overflow-hidden"
+            className="group relative flex flex-col justify-between p-6 bg-[#111111]/80 backdrop-blur-xl border border-[#222222] rounded-2xl transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_10px_40px_-15px_rgba(251,54,64,0.2)] overflow-hidden"
           >
             {/* Glow Hover */}
-            <div className="absolute -inset-px bg-gradient-to-br from-indigo-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl pointer-events-none" />
+            <div className="absolute -inset-px bg-gradient-to-br from-[#FB3640]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl pointer-events-none" />
 
             {/* Sarlavha qismi */}
             <div className="flex justify-between items-start mb-6 z-10">
@@ -81,7 +81,7 @@ export const KeywordTable: React.FC<KeywordTableProps> = ({ keywords, onApprove,
             <div className="space-y-4 mb-6 z-10 flex-grow">
               <div className="flex justify-between items-center bg-black/40 px-3 py-2 rounded-xl border border-white/5">
                 <span className="text-xs text-zinc-500 font-medium">Qidiruv hajmi</span>
-                <span className="font-mono text-indigo-400 font-bold">
+                <span className="font-mono text-[#FF6B6B] font-bold">
                   <NumberTicker value={kw.search_volume} />
                 </span>
               </div>
@@ -124,7 +124,7 @@ export const KeywordTable: React.FC<KeywordTableProps> = ({ keywords, onApprove,
                   <Button 
                     variant="outline" 
                     size="sm" 
-                    className="h-8 rounded-xl border-white/10 hover:border-indigo-500/50 hover:bg-indigo-500/10 text-xs text-zinc-400 hover:text-indigo-400 transition-all duration-300"
+                    className="h-8 rounded-xl border-white/10 hover:border-[#FB3640]/50 hover:bg-[#FB3640]/10 text-xs text-zinc-400 hover:text-[#FF6B6B] transition-all duration-300"
                     onClick={() => onViewArticle(kw.article_id!)}
                   >
                     <FileText className="w-3.5 h-3.5 mr-1.5" /> O'qish

@@ -165,7 +165,7 @@ export default function ConnectionsClient({ initialSites, userId }: ConnectionsC
       {/* HEADER SECTION */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 bg-zinc-900/40 backdrop-blur-md p-6 rounded-2xl border border-zinc-800/80">
         <div>
-          <h1 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">
+          <h1 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-[#FB3640]">
             WordPress Connections
           </h1>
           <p className="text-zinc-400 mt-2">
@@ -175,7 +175,7 @@ export default function ConnectionsClient({ initialSites, userId }: ConnectionsC
         <div>
           <button
             onClick={() => setShowAddModal(true)}
-            className="flex items-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-semibold transition-all duration-300 shadow-[0_0_15px_rgba(6,182,212,0.15)] hover:shadow-[0_0_20px_rgba(6,182,212,0.3)] transform hover:-translate-y-0.5 active:translate-y-0"
+            className="flex items-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-[#FB3640] hover:from-cyan-400 hover:to-[#FB3640] text-white font-semibold transition-all duration-300 shadow-[0_0_15px_rgba(6,182,212,0.15)] hover:shadow-[0_0_20px_rgba(6,182,212,0.3)] transform hover:-translate-y-0.5 active:translate-y-0"
           >
             <Plus className="w-5 h-5" />
             Yangi sayt ulash
@@ -198,7 +198,7 @@ export default function ConnectionsClient({ initialSites, userId }: ConnectionsC
         <div className="bg-zinc-900/30 backdrop-blur-md border border-zinc-800/60 p-6 rounded-2xl">
           <div className="text-zinc-400 text-sm font-semibold uppercase tracking-wider">Navbatdagi nashr kuni</div>
           <div className="text-lg font-semibold text-zinc-300 mt-3 flex items-center gap-2">
-            <Calendar className="w-5 h-5 text-blue-400" />
+            <Calendar className="w-5 h-5 text-[#FF6B6B]" />
             Har kuni soat 03:00 UTC
           </div>
         </div>

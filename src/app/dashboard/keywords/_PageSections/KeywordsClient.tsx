@@ -240,8 +240,8 @@ export default function KeywordsClient({ initialSites, userId }: KeywordsClientP
       {/* Sarlavha va Sayt tanlagich */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-border/40 pb-5">
         <div>
-          <h1 className="text-3xl font-extrabold tracking-tight flex items-center gap-2 bg-gradient-to-r from-indigo-500 to-purple-500 bg-clip-text text-transparent">
-            <Key className="h-8 w-8 text-indigo-500" />
+          <h1 className="text-3xl font-extrabold tracking-tight flex items-center gap-2 bg-gradient-to-r from-[#FB3640] to-[#FB3640] bg-clip-text text-transparent">
+            <Key className="h-8 w-8 text-[#FB3640]" />
             Keywords Autopilot
           </h1>
           <p className="text-muted-foreground mt-1">
@@ -266,7 +266,7 @@ export default function KeywordsClient({ initialSites, userId }: KeywordsClientP
           </div>
         ) : (
           <Link href="/dashboard/connections">
-            <Button size="sm" className="bg-indigo-600 hover:bg-indigo-700">
+            <Button size="sm" className="bg-[#FB3640] hover:bg-[#e02d36]">
               <Plus className="mr-1.5 h-4 w-4" /> Sayt Bog'lash
             </Button>
           </Link>
@@ -276,8 +276,8 @@ export default function KeywordsClient({ initialSites, userId }: KeywordsClientP
       {sites.length === 0 && (
         <Card className="border-dashed border-2 py-10 text-center">
           <CardContent className="space-y-4">
-            <div className="mx-auto w-12 h-12 bg-indigo-500/10 rounded-full flex items-center justify-center">
-              <Globe className="h-6 w-6 text-indigo-500" />
+            <div className="mx-auto w-12 h-12 bg-[#FB3640]/10 rounded-full flex items-center justify-center">
+              <Globe className="h-6 w-6 text-[#FB3640]" />
             </div>
             <div className="max-w-md mx-auto space-y-1">
               <CardTitle>WordPress sayt bog'lanmagan</CardTitle>
@@ -286,7 +286,7 @@ export default function KeywordsClient({ initialSites, userId }: KeywordsClientP
               </CardDescription>
             </div>
             <Link href="/dashboard/connections">
-              <Button className="bg-indigo-600 hover:bg-indigo-700 mt-2">
+              <Button className="bg-[#FB3640] hover:bg-[#e02d36] mt-2">
                 <Plus className="mr-1.5 h-4 w-4" /> Hozir bog'lash
               </Button>
             </Link>
@@ -302,7 +302,7 @@ export default function KeywordsClient({ initialSites, userId }: KeywordsClientP
               <CardContent className="pt-6">
                 <div className="flex justify-between items-center">
                   <p className="text-sm font-medium text-muted-foreground">Jami kalit so'zlar</p>
-                  <Key className="h-4 w-4 text-indigo-500" />
+                  <Key className="h-4 w-4 text-[#FB3640]" />
                 </div>
                 <div className="mt-2 flex items-baseline gap-2">
                   <span className="text-3xl font-bold">{keywords.length}</span>
@@ -343,7 +343,7 @@ export default function KeywordsClient({ initialSites, userId }: KeywordsClientP
               <CardContent className="pt-6">
                 <div className="flex justify-between items-center">
                   <p className="text-sm font-medium text-muted-foreground">Oson kalit so'zlar</p>
-                  <Check className="h-4 w-4 text-indigo-500" />
+                  <Check className="h-4 w-4 text-[#FB3640]" />
                 </div>
                 <div className="mt-2 flex items-baseline gap-2">
                   <span className="text-3xl font-bold">
@@ -370,7 +370,7 @@ export default function KeywordsClient({ initialSites, userId }: KeywordsClientP
                 className="w-full border-dashed border-[#222222] bg-[#111111]/80 hover:bg-black text-zinc-400 h-12 rounded-xl"
                 onClick={() => setIsBulkOpen(!isBulkOpen)}
               >
-                <FileSpreadsheet className="mr-2 h-4 w-4 text-indigo-500" />
+                <FileSpreadsheet className="mr-2 h-4 w-4 text-[#FB3640]" />
                 Ommaviy yuklash (Bulk Upload)
               </Button>
 
@@ -382,7 +382,7 @@ export default function KeywordsClient({ initialSites, userId }: KeywordsClientP
                   <textarea
                     rows={4}
                     placeholder="AI maqola yozish&#10;WordPress avtomatlashtirish&#10;SEO maslahatlar"
-                    className="w-full text-sm p-4 rounded-xl bg-black/40 border border-zinc-800 focus:outline-none focus:ring-1 focus:ring-indigo-500 text-white placeholder-zinc-700 transition-all duration-300"
+                    className="w-full text-sm p-4 rounded-xl bg-black/40 border border-zinc-800 focus:outline-none focus:ring-1 focus:ring-[#FB3640] text-white placeholder-zinc-700 transition-all duration-300"
                     value={bulkText}
                     onChange={(e) => setBulkText(e.target.value)}
                   />
@@ -394,7 +394,7 @@ export default function KeywordsClient({ initialSites, userId }: KeywordsClientP
                       size="sm" 
                       disabled={isSubmitting || !bulkText.trim()}
                       onClick={handleBulkAdd}
-                      className="bg-indigo-600 hover:bg-indigo-700 rounded-lg px-4"
+                      className="bg-[#FB3640] hover:bg-[#e02d36] rounded-lg px-4"
                     >
                       {isSubmitting ? 'Kiritilmoqda...' : 'Yuklash'}
                     </Button>
@@ -405,7 +405,7 @@ export default function KeywordsClient({ initialSites, userId }: KeywordsClientP
               {/* Informative Guidance Card */}
               <Card className="bg-[#111111]/80 backdrop-blur-xl border border-[#222222] shadow-xl rounded-2xl">
                 <CardContent className="pt-6 flex gap-4">
-                  <AlertCircle className="h-5 w-5 text-indigo-500 shrink-0 mt-0.5" />
+                  <AlertCircle className="h-5 w-5 text-[#FB3640] shrink-0 mt-0.5" />
                   <div className="space-y-1.5">
                     <h4 className="text-sm font-bold text-zinc-200">Autopilot qanday ishlaydi?</h4>
                     <p className="text-xs leading-relaxed text-zinc-500">
@@ -432,7 +432,7 @@ export default function KeywordsClient({ initialSites, userId }: KeywordsClientP
                 <Search className="absolute left-4 top-3.5 h-5 w-5 text-zinc-500 z-10" />
                 <Input
                   placeholder="Kalit so'zlar bo'yicha izlash..."
-                  className="pl-12 bg-[#111111]/80 backdrop-blur-xl border border-[#222222] rounded-xl text-white focus:ring-1 focus:ring-indigo-500 focus-visible:ring-indigo-500 h-12 shadow-xl border-none outline-none"
+                  className="pl-12 bg-[#111111]/80 backdrop-blur-xl border border-[#222222] rounded-xl text-white focus:ring-1 focus:ring-[#FB3640] focus-visible:ring-[#FB3640] h-12 shadow-xl border-none outline-none"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />

@@ -129,7 +129,7 @@ const Billing = ({ initialInvoices, userId, initialCredits }: BillingPropsI) => 
         <Card className="bg-zinc-900/40 backdrop-blur-md border border-zinc-800/80 p-2">
           <CardHeader>
             <div className="flex items-center gap-2">
-              <Receipt className="w-5 h-5 text-indigo-400" />
+              <Receipt className="w-5 h-5 text-[#FF6B6B]" />
               <CardTitle className="text-lg font-bold text-white">Manual Invoice Billing</CardTitle>
             </div>
             <CardDescription className="text-zinc-400">
@@ -139,7 +139,7 @@ const Billing = ({ initialInvoices, userId, initialCredits }: BillingPropsI) => 
           <CardContent className="space-y-4 pt-2">
             <div className="p-3.5 rounded-xl bg-zinc-950/60 border border-zinc-800/60 space-y-1">
               <div className="text-xs font-semibold text-zinc-300 flex items-center gap-2">
-                <Sparkles className="w-3.5 h-3.5 text-indigo-500" />
+                <Sparkles className="w-3.5 h-3.5 text-[#FB3640]" />
                 Active Plan: PRO Autopilot
               </div>
               <p className="text-[10px] text-zinc-500">
@@ -161,7 +161,7 @@ const Billing = ({ initialInvoices, userId, initialCredits }: BillingPropsI) => 
       <Card className="bg-zinc-900/40 backdrop-blur-md border border-zinc-800/80 p-2">
         <CardHeader>
           <CardTitle className="text-lg font-bold text-white flex items-center gap-2">
-            <Plus className="w-5 h-5 text-indigo-500" /> Balansni To'ldirish Paketlari
+            <Plus className="w-5 h-5 text-[#FB3640]" /> Balansni To'ldirish Paketlari
           </CardTitle>
           <CardDescription className="text-zinc-400">
             Biznesingiz yoki blogingiz hajmidan kelib chiqib hisobni chiroyli avtomatik hisob-faktura varaqasi orqali to'ldiring.
@@ -182,7 +182,7 @@ const Billing = ({ initialInvoices, userId, initialCredits }: BillingPropsI) => 
                 <Button
                   onClick={() => handleCreateInvoice(pkg)}
                   disabled={isGenerating}
-                  className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-400 hover:to-purple-500 text-white text-xs font-bold py-2.5 rounded-xl shadow-lg transition-all"
+                  className="w-full bg-gradient-to-r from-[#FB3640] to-[#FB3640] hover:from-[#FF6B6B] hover:to-[#FB3640] text-white text-xs font-bold py-2.5 rounded-xl shadow-lg transition-all"
                 >
                   {isGenerating ? 'Yaratilmoqda...' : 'Invoice Yaratish'}
                 </Button>
@@ -196,7 +196,7 @@ const Billing = ({ initialInvoices, userId, initialCredits }: BillingPropsI) => 
       <Card className="bg-zinc-900/40 backdrop-blur-md border border-zinc-800/80 p-2">
         <CardHeader>
           <CardTitle className="text-lg font-bold text-white flex items-center gap-2">
-            <FileText className="w-5 h-5 text-indigo-500" /> To'lov kvitansiyalari va hisob-fakturalar
+            <FileText className="w-5 h-5 text-[#FB3640]" /> To'lov kvitansiyalari va hisob-fakturalar
           </CardTitle>
           <CardDescription className="text-zinc-400">
             Yaratilgan hisob varaqalari va amalga oshirilgan to'lovlar tarixi

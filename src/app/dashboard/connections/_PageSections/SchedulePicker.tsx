@@ -35,7 +35,7 @@ export const SchedulePicker: React.FC<SchedulePickerProps> = ({ days, time, onCh
   return (
     <div className="bg-[#111111]/80 backdrop-blur-xl border border-[#222222] rounded-2xl p-6 shadow-2xl">
       <h3 className="text-lg font-semibold text-white mb-6 flex items-center gap-2">
-        <Clock className="w-5 h-5 text-indigo-400" />
+        <Clock className="w-5 h-5 text-[#FF6B6B]" />
         Nashr jadvali
       </h3>
 
@@ -53,12 +53,12 @@ export const SchedulePicker: React.FC<SchedulePickerProps> = ({ days, time, onCh
                   className={cn(
                     "relative px-4 py-2 text-sm font-semibold rounded-xl transition-all duration-300 active:scale-95 overflow-hidden",
                     isActive 
-                      ? "text-white shadow-[0_0_15px_rgba(99,102,241,0.4)] border-transparent" 
+                      ? "text-white shadow-[0_0_15px_rgba(251,54,64,0.2)] border-transparent" 
                       : "text-zinc-400 bg-zinc-800/50 border border-white/5 hover:bg-zinc-800 hover:text-zinc-200"
                   )}
                 >
                   {isActive && (
-                    <div className="absolute inset-0 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl" />
+                    <div className="absolute inset-0 bg-gradient-to-br from-[#FB3640] to-[#FB3640] rounded-xl" />
                   )}
                   <span className="relative z-10">{day.label}</span>
                 </button>
@@ -71,14 +71,14 @@ export const SchedulePicker: React.FC<SchedulePickerProps> = ({ days, time, onCh
         <div>
           <label className="block text-xs font-medium text-zinc-500 uppercase tracking-wider mb-3">Vaqt (HH:MM)</label>
           <div className="relative max-w-[150px] group">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-zinc-500 group-focus-within:text-indigo-400 transition-colors">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-zinc-500 group-focus-within:text-[#FF6B6B] transition-colors">
               <Clock className="h-4 w-4" />
             </div>
             <input
               type="time"
               value={time}
               onChange={(e) => onChange(days, e.target.value)}
-              className="block w-full pl-10 pr-3 py-2.5 bg-black/50 border border-zinc-800 rounded-xl text-white font-mono focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300 shadow-inner"
+              className="block w-full pl-10 pr-3 py-2.5 bg-black/50 border border-zinc-800 rounded-xl text-white font-mono focus:outline-none focus:ring-1 focus:ring-[#FB3640] focus:border-[#FB3640] transition-all duration-300 shadow-inner"
             />
           </div>
         </div>
@@ -89,9 +89,9 @@ export const SchedulePicker: React.FC<SchedulePickerProps> = ({ days, time, onCh
             <Button 
               onClick={onSave} 
               disabled={isSaving}
-              className="relative w-full overflow-hidden group bg-zinc-900 border border-white/10 hover:border-indigo-500/50 rounded-xl py-6 transition-all duration-500"
+              className="relative w-full overflow-hidden group bg-zinc-900 border border-white/10 hover:border-[#FB3640]/50 rounded-xl py-6 transition-all duration-500"
             >
-              <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-indigo-500 to-purple-600 opacity-0 group-hover:opacity-20 transition-opacity duration-500" />
+              <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-[#FB3640] to-[#FB3640] opacity-0 group-hover:opacity-20 transition-opacity duration-500" />
               <span className={cn("relative z-10 font-bold tracking-wide", isSaving ? "opacity-50" : "opacity-100")}>
                 {isSaving ? "Saqlanmoqda..." : "Saqlash"}
               </span>

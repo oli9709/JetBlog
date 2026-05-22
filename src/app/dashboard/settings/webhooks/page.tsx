@@ -239,7 +239,7 @@ export default function WebhooksPage() {
                   <button
                     onClick={() => testWebhook(wh.id)}
                     disabled={testingId === wh.id}
-                    className="text-xs bg-blue-600 text-white px-3 py-1 rounded disabled:opacity-50"
+                    className="text-xs bg-[#FB3640] text-white px-3 py-1 rounded disabled:opacity-50"
                   >
                     {testingId === wh.id ? '...' : 'Test'}
                   </button>

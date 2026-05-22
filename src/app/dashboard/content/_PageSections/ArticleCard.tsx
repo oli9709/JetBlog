@@ -34,8 +34,8 @@ export function ArticleCard({
 }: ArticleCardProps) {
   // Tanlangan holat uchun class
   const selectedStyle = isSelected
-    ? 'ring-2 ring-indigo-500 shadow-[0_0_20px_rgba(99,102,241,0.2)] bg-[#111111]'
-    : 'border-[#222222] hover:border-indigo-500/50 bg-black/40';
+    ? 'ring-2 ring-[#FB3640] shadow-[0_0_20px_rgba(251,54,64,0.2)] bg-[#111111]'
+    : 'border-[#222222] hover:border-[#FB3640]/50 bg-black/40';
 
   return (
     <div
@@ -109,7 +109,7 @@ export function ArticleCard({
                 target="_blank"
                 rel="noreferrer"
                 onClick={(e) => e.stopPropagation()}
-                className="flex items-center gap-1 text-indigo-400 hover:text-indigo-300 transition-colors"
+                className="flex items-center gap-1 text-[#FF6B6B] hover:text-[#FF8A8F] transition-colors"
               >
                 WP <ExternalLink className="h-3 w-3" />
               </a>
@@ -126,7 +126,7 @@ export function ArticleCard({
                   e.stopPropagation();
                   onPublish(article.id);
                 }}
-                className="text-xs font-semibold text-white bg-indigo-500/20 hover:bg-indigo-500/30 px-3 py-1.5 rounded-lg transition-colors border border-indigo-500/20"
+                className="text-xs font-semibold text-white bg-[#FB3640]/20 hover:bg-[#FB3640]/30 px-3 py-1.5 rounded-lg transition-colors border border-[#FB3640]/20"
               >
                 Nashr
               </button>

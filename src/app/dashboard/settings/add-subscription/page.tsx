@@ -59,7 +59,7 @@ export default function AddSubscriptionPage() {
       
       {/* Header */}
       <div className="text-center space-y-3">
-        <h1 className="text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">
+        <h1 className="text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-[#FB3640]">
           JetBlog Rejalari va Tariflari
         </h1>
         <p className="text-zinc-400 max-w-2xl mx-auto text-sm md:text-base">

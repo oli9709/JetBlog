@@ -63,7 +63,7 @@ export const SiteCard: React.FC<SiteCardProps> = ({ site, onDelete, onToggle, on
     <div className="group relative flex flex-col bg-[#111111]/80 backdrop-blur-xl border border-[#222222] rounded-2xl p-6 transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_10px_40px_-10px_rgba(0,0,0,0.5)] hover:border-white/10 overflow-hidden">
       
       {/* Background Gradient Glow on Hover */}
-      <div className="absolute -inset-px bg-gradient-to-br from-indigo-500/10 via-purple-500/10 to-transparent opacity-0 group-hover:opacity-100 rounded-2xl transition-opacity duration-500 pointer-events-none" />
+      <div className="absolute -inset-px bg-gradient-to-br from-[#FB3640]/10 via-[#FB3640]/20 to-transparent opacity-0 group-hover:opacity-100 rounded-2xl transition-opacity duration-500 pointer-events-none" />
 
       {/* Header */}
       <div className="flex justify-between items-start mb-6 z-10">
@@ -106,7 +106,7 @@ export const SiteCard: React.FC<SiteCardProps> = ({ site, onDelete, onToggle, on
           <span className="text-zinc-500">Nashr kunlari</span>
           <div className="flex gap-1">
             {site.publish_days.map(day => (
-              <span key={day} className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 rounded-md shadow-sm">
+              <span key={day} className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-[#FB3640]/10 text-[#FF6B6B] border border-[#FB3640]/20 rounded-md shadow-sm">
                 {DAYS_MAP[day] || day}
               </span>
             ))}

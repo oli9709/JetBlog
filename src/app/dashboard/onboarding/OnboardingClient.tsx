@@ -140,18 +140,18 @@ export default function OnboardingClient({ userId }: { userId: string }) {
   return (
     <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl shadow-2xl p-8 sm:p-10 transition-all duration-300 min-h-[500px] flex flex-col">
       {/* Background Gradients */}
-      <div className="absolute inset-0 bg-gradient-to-br from-black via-purple-950/20 to-black -z-10 pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-br from-black via-[#FB3640]/5 to-black -z-10 pointer-events-none" />
       
       {/* Progress Bar */}
       <div className="absolute top-0 left-0 right-0 h-1.5 bg-white/5">
         <div 
-          className="h-full bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 transition-all duration-500 ease-in-out"
+          className="h-full bg-gradient-to-r from-[#FB3640] via-[#FB3640] to-[#FB3640] transition-all duration-500 ease-in-out"
           style={{ width: `${(step / 3) * 100}%` }}
         />
       </div>
 
       <div className="text-center mb-8">
-        <span className="inline-block py-1 px-3 rounded-full bg-white/10 border border-white/10 text-xs font-medium text-purple-300 mb-4">
+        <span className="inline-block py-1 px-3 rounded-full bg-white/10 border border-white/10 text-xs font-medium text-[#FF8A8F] mb-4">
           Qadam {step} / 3
         </span>
       </div>
@@ -160,7 +160,7 @@ export default function OnboardingClient({ userId }: { userId: string }) {
         {/* STEP 1: WELCOME */}
         {step === 1 && (
           <div className="flex flex-col items-center text-center space-y-6">
-            <h1 className="text-4xl sm:text-5xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-pink-500 to-blue-500">
+            <h1 className="text-4xl sm:text-5xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-[#FF6B6B] via-[#FB3640] to-[#FB3640]">
               JetBlog ga xush kelibsiz! 🚀
             </h1>
             <p className="text-gray-400 max-w-lg text-lg">
@@ -169,20 +169,20 @@ export default function OnboardingClient({ userId }: { userId: string }) {
             
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full mt-8">
               <div className="p-4 rounded-xl bg-white/5 border border-white/10 flex flex-col items-center">
-                <div className="w-12 h-12 rounded-full bg-purple-500/20 flex items-center justify-center mb-3">
-                  <RefreshCw className="w-6 h-6 text-purple-400" />
+                <div className="w-12 h-12 rounded-full bg-[#FB3640]/20 flex items-center justify-center mb-3">
+                  <RefreshCw className="w-6 h-6 text-[#FF6B6B]" />
                 </div>
                 <h3 className="font-semibold text-white">Avto Nashr</h3>
               </div>
               <div className="p-4 rounded-xl bg-white/5 border border-white/10 flex flex-col items-center">
-                <div className="w-12 h-12 rounded-full bg-pink-500/20 flex items-center justify-center mb-3">
-                  <Check className="w-6 h-6 text-pink-400" />
+                <div className="w-12 h-12 rounded-full bg-[#FB3640]/20 flex items-center justify-center mb-3">
+                  <Check className="w-6 h-6 text-[#FF6B6B]" />
                 </div>
                 <h3 className="font-semibold text-white">SEO Optimizatsiya</h3>
               </div>
               <div className="p-4 rounded-xl bg-white/5 border border-white/10 flex flex-col items-center">
-                <div className="w-12 h-12 rounded-full bg-blue-500/20 flex items-center justify-center mb-3">
-                  <Key className="w-6 h-6 text-blue-400" />
+                <div className="w-12 h-12 rounded-full bg-[#FB3640]/20 flex items-center justify-center mb-3">
+                  <Key className="w-6 h-6 text-[#FF6B6B]" />
                 </div>
                 <h3 className="font-semibold text-white">To'liq Xavfsizlik</h3>
               </div>
@@ -212,13 +212,13 @@ export default function OnboardingClient({ userId }: { userId: string }) {
             <div className="flex space-x-2 bg-white/5 p-1 rounded-lg w-fit mx-auto mb-8 border border-white/10">
               <button 
                 onClick={() => setTab('wp')}
-                className={`px-6 py-2 rounded-md text-sm font-medium transition-all ${tab === 'wp' ? 'bg-purple-500 text-white shadow-lg' : 'text-gray-400 hover:text-white'}`}
+                className={`px-6 py-2 rounded-md text-sm font-medium transition-all ${tab === 'wp' ? 'bg-[#FB3640] text-white shadow-lg' : 'text-gray-400 hover:text-white'}`}
               >
                 WordPress
               </button>
               <button 
                 onClick={() => setTab('webhook')}
-                className={`px-6 py-2 rounded-md text-sm font-medium transition-all ${tab === 'webhook' ? 'bg-purple-500 text-white shadow-lg' : 'text-gray-400 hover:text-white'}`}
+                className={`px-6 py-2 rounded-md text-sm font-medium transition-all ${tab === 'webhook' ? 'bg-[#FB3640] text-white shadow-lg' : 'text-gray-400 hover:text-white'}`}
               >
                 Webhook API
               </button>
@@ -236,7 +236,7 @@ export default function OnboardingClient({ userId }: { userId: string }) {
                       value={wpUrl}
                       onChange={(e) => setWpUrl(e.target.value)}
                       placeholder="https://mysite.com"
-                      className="w-full pl-10 pr-4 py-2.5 bg-black/40 border border-white/10 rounded-lg focus:ring-2 focus:ring-purple-500 text-white placeholder-gray-600 outline-none transition-all"
+                      className="w-full pl-10 pr-4 py-2.5 bg-black/40 border border-white/10 rounded-lg focus:ring-2 focus:ring-[#FB3640] text-white placeholder-gray-600 outline-none transition-all"
                     />
                   </div>
                 </div>
@@ -248,7 +248,7 @@ export default function OnboardingClient({ userId }: { userId: string }) {
                     value={wpUser}
                     onChange={(e) => setWpUser(e.target.value)}
                     placeholder="admin"
-                    className="w-full px-4 py-2.5 bg-black/40 border border-white/10 rounded-lg focus:ring-2 focus:ring-purple-500 text-white placeholder-gray-600 outline-none transition-all"
+                    className="w-full px-4 py-2.5 bg-black/40 border border-white/10 rounded-lg focus:ring-2 focus:ring-[#FB3640] text-white placeholder-gray-600 outline-none transition-all"
                   />
                 </div>
                 <div>
@@ -259,7 +259,7 @@ export default function OnboardingClient({ userId }: { userId: string }) {
                     value={wpPass}
                     onChange={(e) => setWpPass(e.target.value)}
                     placeholder="xxxx xxxx xxxx xxxx"
-                    className="w-full px-4 py-2.5 bg-black/40 border border-white/10 rounded-lg focus:ring-2 focus:ring-purple-500 text-white placeholder-gray-600 outline-none transition-all"
+                    className="w-full px-4 py-2.5 bg-black/40 border border-white/10 rounded-lg focus:ring-2 focus:ring-[#FB3640] text-white placeholder-gray-600 outline-none transition-all"
                   />
                   <p className="text-xs text-gray-500 mt-2">WP Admin -&gt; Users -&gt; Profile pastki qismida "Application Passwords" orqali yarating.</p>
                 </div>
@@ -300,7 +300,7 @@ export default function OnboardingClient({ userId }: { userId: string }) {
                 <div className="bg-black/40 border border-white/10 rounded-lg p-4">
                   <p className="text-sm text-gray-400 mb-2">Endpoint URL (POST):</p>
                   <div className="flex items-center justify-between bg-black/60 rounded p-2">
-                    <code className="text-blue-400 text-sm">https://jetblog.app/api/webhook/receive</code>
+                    <code className="text-[#FF6B6B] text-sm">https://jetblog.app/api/webhook/receive</code>
                     <button onClick={() => copyToClipboard('https://jetblog.app/api/webhook/receive')} className="text-gray-400 hover:text-white">
                       <Copy className="w-4 h-4" />
                     </button>
@@ -340,7 +340,7 @@ export default function OnboardingClient({ userId }: { userId: string }) {
 
             {loading ? (
               <div className="flex flex-col items-center justify-center py-12 space-y-6">
-                <Loader2 className="w-12 h-12 text-purple-500 animate-spin" />
+                <Loader2 className="w-12 h-12 text-[#FB3640] animate-spin" />
                 <div className="h-8 flex items-center justify-center">
                   <TypingAnimation className="text-xl font-medium text-white">
                     {generateLoadingTexts[genLoadingStep - 1] || "Kutilyapti..."} 
@@ -379,7 +379,7 @@ export default function OnboardingClient({ userId }: { userId: string }) {
                     value={keyword}
                     onChange={(e) => setKeyword(e.target.value)}
                     placeholder="Masalan: Uyda pul ishlash usullari"
-                    className="w-full px-4 py-3 bg-black/40 border border-white/10 rounded-lg focus:ring-2 focus:ring-purple-500 text-white placeholder-gray-600 outline-none transition-all text-lg"
+                    className="w-full px-4 py-3 bg-black/40 border border-white/10 rounded-lg focus:ring-2 focus:ring-[#FB3640] text-white placeholder-gray-600 outline-none transition-all text-lg"
                   />
                 </div>
 

@@ -89,7 +89,7 @@ export function BrandForm({ siteId, initialData, onSave, isSaving }: BrandFormPr
   return (
     <div className="bg-[#0a0a0a]/80 backdrop-blur-xl rounded-2xl border border-white/10 shadow-2xl p-6 relative overflow-hidden">
       {/* Decorative gradient */}
-      <div className="absolute -top-40 -right-40 w-80 h-80 bg-purple-500/20 blur-[100px] rounded-full pointer-events-none" />
+      <div className="absolute -top-40 -right-40 w-80 h-80 bg-[#FB3640]/20 blur-[100px] rounded-full pointer-events-none" />
       
       <div className="flex flex-col lg:flex-row gap-8">
         
@@ -114,7 +114,7 @@ export function BrandForm({ siteId, initialData, onSave, isSaving }: BrandFormPr
                     : "text-zinc-400 hover:text-white hover:bg-white/5 border border-transparent"
                 )}
               >
-                <Icon className={cn("h-4 w-4", isActive ? "text-indigo-400" : "text-zinc-500")} />
+                <Icon className={cn("h-4 w-4", isActive ? "text-[#FF6B6B]" : "text-zinc-500")} />
                 {tab.label}
               </button>
             );
@@ -132,8 +132,8 @@ export function BrandForm({ siteId, initialData, onSave, isSaving }: BrandFormPr
             </div>
             
             <div className="relative group">
-              <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/20 to-purple-500/20 rounded-xl blur-xl opacity-0 group-focus-within:opacity-100 transition-opacity" />
-              <div className="relative bg-[#111111] border border-[#333333] group-focus-within:border-indigo-500/50 rounded-xl overflow-hidden transition-colors">
+              <div className="absolute inset-0 bg-gradient-to-r from-[#FB3640]/20 to-[#FB3640]/20 rounded-xl blur-xl opacity-0 group-focus-within:opacity-100 transition-opacity" />
+              <div className="relative bg-[#111111] border border-[#333333] group-focus-within:border-[#FB3640]/50 rounded-xl overflow-hidden transition-colors">
                 {!description && (
                   <div className="absolute top-4 left-4 pointer-events-none text-zinc-500">
                     <TypingAnimation
@@ -171,19 +171,19 @@ export function BrandForm({ siteId, initialData, onSave, isSaving }: BrandFormPr
                     className={cn(
                       "relative p-5 rounded-2xl cursor-pointer transition-all duration-300 group border",
                       isSelected 
-                        ? "bg-indigo-500/10 border-indigo-500/50 shadow-[0_0_20px_rgba(99,102,241,0.15)]" 
+                        ? "bg-[#FB3640]/10 border-[#FB3640]/50 shadow-[0_0_20px_rgba(251,54,64,0.2)]" 
                         : "bg-[#111111] border-[#333333] hover:border-[#444444] hover:bg-[#151515]"
                     )}
                   >
                     <div className="flex items-center gap-4">
                       <div className={cn(
                         "w-12 h-12 rounded-full flex items-center justify-center text-2xl bg-black/50 border transition-colors",
-                        isSelected ? "border-indigo-500/30" : "border-white/5"
+                        isSelected ? "border-[#FB3640]/30" : "border-white/5"
                       )}>
                         {t.emoji}
                       </div>
                       <div>
-                        <h4 className={cn("font-bold", isSelected ? "text-indigo-400" : "text-white")}>
+                        <h4 className={cn("font-bold", isSelected ? "text-[#FF6B6B]" : "text-white")}>
                           {t.label}
                         </h4>
                         <p className="text-xs text-zinc-400 mt-0.5">{t.desc}</p>
@@ -222,7 +222,7 @@ export function BrandForm({ siteId, initialData, onSave, isSaving }: BrandFormPr
                         className={cn(
                           "flex items-center gap-2 px-4 py-2.5 rounded-lg font-medium text-sm transition-all duration-300 border",
                           isSelected 
-                            ? "bg-indigo-500/15 text-indigo-300 border-indigo-500/50 shadow-[0_0_15px_rgba(99,102,241,0.15)]" 
+                            ? "bg-[#FB3640]/15 text-[#FF8A8F] border-[#FB3640]/50 shadow-[0_0_15px_rgba(251,54,64,0.2)]" 
                             : "bg-white/5 text-zinc-400 border-white/5 hover:bg-white/10 hover:text-white"
                         )}
                       >
@@ -240,7 +240,7 @@ export function BrandForm({ siteId, initialData, onSave, isSaving }: BrandFormPr
                 </label>
                 <div className="flex flex-wrap gap-2 mb-3">
                   {audience.map((a, i) => (
-                    <span key={i} className="flex items-center gap-1.5 px-3 py-1 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded-full text-xs font-medium">
+                    <span key={i} className="flex items-center gap-1.5 px-3 py-1 bg-[#FB3640]/10 text-[#FF6B6B] border border-[#FB3640]/20 rounded-full text-xs font-medium">
                       {a}
                       <button onClick={() => removePill(a, audience, setAudience)} className="hover:text-white transition-colors">
                         <X className="h-3 w-3" />
@@ -357,7 +357,7 @@ function InputPill({ value, onChange, onKeyDown, placeholder }: any) {
         onChange={(e) => onChange(e.target.value)}
         onKeyDown={onKeyDown}
         placeholder={placeholder}
-        className="w-full bg-black/50 border border-[#333333] focus:border-indigo-500/50 rounded-lg px-3 py-2 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:ring-1 focus:ring-indigo-500/50 transition-all"
+        className="w-full bg-black/50 border border-[#333333] focus:border-[#FB3640]/50 rounded-lg px-3 py-2 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:ring-1 focus:ring-[#FB3640]/50 transition-all"
       />
       <div className="absolute right-2 flex items-center gap-1 bg-[#222222] px-1.5 py-0.5 rounded text-[10px] text-zinc-500 font-mono">
         <span className="text-xs">↵</span> Enter

@@ -33,8 +33,8 @@ const SidebarNavItem = ({ item, isOpen }: SidebarNavItemProps) => {
           ${!isOpen && 'justify-center'}
            ${
              item.link !== pathname
-               ? 'hover:bg-accent hover:text-accent-foreground'
-               : 'bg-accent text-accent-foreground'
+               ? 'hover:bg-[#FB3640]/10 hover:text-[#FB3640] text-zinc-400'
+               : 'bg-[#FB3640]/10 border-l-2 border-[#FB3640] text-[#FB3640]'
            }`}
         >
           <IconComp className="h-4 w-4" />

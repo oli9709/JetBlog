@@ -72,7 +72,7 @@ export function SiteScanner({ onScanComplete, isScanning, onScan }: SiteScannerP
     <div className="bg-[#0a0a0a]/80 backdrop-blur-xl rounded-2xl border border-white/10 shadow-2xl p-8 lg:p-12 relative overflow-hidden flex flex-col items-center justify-center min-h-[500px]" ref={containerRef}>
       
       {/* Background elements */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-indigo-500/20 blur-[120px] rounded-full pointer-events-none" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-[#FB3640]/20 blur-[120px] rounded-full pointer-events-none" />
       
       <div className="text-center space-y-3 mb-12 relative z-10">
         <h2 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-white to-zinc-400">
@@ -86,23 +86,23 @@ export function SiteScanner({ onScanComplete, isScanning, onScan }: SiteScannerP
       {/* Animated Beam Section */}
       <div className="relative flex w-full max-w-2xl items-center justify-between mb-12 px-4 z-10">
         <div ref={div1Ref} className="z-10 bg-[#111] p-4 rounded-full border border-white/10 shadow-xl relative">
-          <Globe className="h-8 w-8 text-blue-400" />
+          <Globe className="h-8 w-8 text-[#FF6B6B]" />
           <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-xs font-bold text-zinc-500 whitespace-nowrap">Veb-sayt</div>
         </div>
         
         <div ref={div2Ref} className={cn(
-          "relative z-10 bg-[#111] p-5 rounded-full border shadow-[0_0_30px_rgba(99,102,241,0.2)] transition-all duration-700",
-          isScanning ? "border-indigo-500/50 scale-110" : "border-white/10"
+          "relative z-10 bg-[#111] p-5 rounded-full border shadow-[0_0_30px_rgba(251,54,64,0.2)] transition-all duration-700",
+          isScanning ? "border-[#FB3640]/50 scale-110" : "border-white/10"
         )}>
-          <Sparkles className={cn("h-10 w-10 transition-colors", isScanning ? "text-indigo-400 animate-pulse" : "text-zinc-600")} />
-          <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-xs font-bold text-indigo-500 whitespace-nowrap">JetBlog AI</div>
+          <Sparkles className={cn("h-10 w-10 transition-colors", isScanning ? "text-[#FF6B6B] animate-pulse" : "text-zinc-600")} />
+          <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-xs font-bold text-[#FB3640] whitespace-nowrap">JetBlog AI</div>
         </div>
 
         <div ref={div3Ref} className={cn(
           "relative z-10 bg-[#111] p-4 rounded-full border transition-all duration-700 shadow-xl",
           showResult ? "border-emerald-500/50 shadow-[0_0_30px_rgba(16,185,129,0.2)]" : "border-white/10"
         )}>
-          <Building2 className={cn("h-8 w-8", showResult ? "text-emerald-400" : "text-purple-400")} />
+          <Building2 className={cn("h-8 w-8", showResult ? "text-emerald-400" : "text-[#FF6B6B]")} />
           <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-xs font-bold text-zinc-500 whitespace-nowrap">Brend DNK</div>
         </div>
 
@@ -116,9 +116,9 @@ export function SiteScanner({ onScanComplete, isScanning, onScan }: SiteScannerP
           <div className="relative w-full group">
             <div className={cn(
               "absolute inset-0 rounded-xl blur-md transition-opacity duration-300",
-              isScanning ? "bg-indigo-500/30 opacity-100" : "bg-white/5 opacity-0 group-hover:opacity-100"
+              isScanning ? "bg-[#FB3640]/30 opacity-100" : "bg-white/5 opacity-0 group-hover:opacity-100"
             )} />
-            <div className="relative flex items-center bg-[#111] border border-[#333] rounded-xl overflow-hidden focus-within:border-indigo-500/50 transition-colors">
+            <div className="relative flex items-center bg-[#111] border border-[#333] rounded-xl overflow-hidden focus-within:border-[#FB3640]/50 transition-colors">
               <span className="pl-4 text-zinc-500 font-medium">🌐 https://</span>
               <input
                 type="text"
@@ -144,13 +144,13 @@ export function SiteScanner({ onScanComplete, isScanning, onScan }: SiteScannerP
               </ShimmerButton>
             ) : (
               <div className="w-full space-y-3 flex flex-col items-center">
-                <div className="text-sm font-semibold text-indigo-400 flex items-center gap-2">
+                <div className="text-sm font-semibold text-[#FF6B6B] flex items-center gap-2">
                   <Loader2 className="h-4 w-4 animate-spin" />
                   ⚡ AI saytni tahlil qilmoqda... {progress}%
                 </div>
                 <div className="w-full h-2 bg-[#222] rounded-full overflow-hidden">
                   <div 
-                    className="h-full bg-gradient-to-r from-indigo-500 to-purple-500 transition-all duration-150 ease-out"
+                    className="h-full bg-gradient-to-r from-[#FB3640] to-[#FB3640] transition-all duration-150 ease-out"
                     style={{ width: `${progress}%` }}
                   />
                 </div>
