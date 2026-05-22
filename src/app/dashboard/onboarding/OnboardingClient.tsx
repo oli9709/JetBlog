@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { ShimmerButton } from '@/components/magicui/shimmer-button';
 import { TypingAnimation } from '@/components/magicui/typing-animation';
 import { Check, Copy, Key, Link as LinkIcon, Loader2, RefreshCw } from 'lucide-react';
-import { SupabaseCompleteOnboarding } from '@/lib/API/Database/profile/mutations';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import confetti from 'canvas-confetti';
 import { toast } from 'react-toastify';
 
@@ -27,9 +27,22 @@ export default function OnboardingClient({ userId }: { userId: string }) {
   const [genLoadingStep, setGenLoadingStep] = useState(0); // 0: input, 1: AI, 2: Image, 3: Publishing
 
   const handleSkip = async () => {
-    await SupabaseCompleteOnboarding(userId);
-    router.push('/dashboard/main');
-    router.refresh();
+    try {
+      const supabase = createClientComponentClient();
+      const { data: { user } } = await supabase.auth.getUser();
+
+      if (user) {
+        await supabase
+          .from('profiles')
+          .update({ onboarding_completed: true })
+          .eq('id', user.id);
+      }
+    } catch (error) {
+      console.error('Skip error:', error);
+    } finally {
+      // Xato bo'lsa ham redirect qil
+      window.location.href = '/dashboard/main';
+    }
   };
 
   const nextStep = () => {
@@ -99,7 +112,18 @@ export default function OnboardingClient({ userId }: { userId: string }) {
       });
 
       // Update profile
-      await SupabaseCompleteOnboarding(userId);
+      try {
+        const supabase = createClientComponentClient();
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          await supabase
+            .from('profiles')
+            .update({ onboarding_completed: true })
+            .eq('id', user.id);
+        }
+      } catch (e) {
+        console.error('Onboarding complete error:', e);
+      }
       
       toast.success("Ajoyib! Birinchi maqolangiz tayyor!");
       
