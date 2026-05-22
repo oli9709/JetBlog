@@ -30,17 +30,15 @@ export default function OnboardingClient({ userId }: { userId: string }) {
     try {
       const supabase = createClientComponentClient();
       const { data: { user } } = await supabase.auth.getUser();
-
       if (user) {
         await supabase
           .from('profiles')
           .update({ onboarding_completed: true })
           .eq('id', user.id);
       }
-    } catch (error) {
-      console.error('Skip error:', error);
+    } catch (e) {
+      console.error(e);
     } finally {
-      // Xato bo'lsa ham redirect qil
       window.location.href = '/dashboard/main';
     }
   };
@@ -198,7 +196,7 @@ export default function OnboardingClient({ userId }: { userId: string }) {
               </ShimmerButton>
               <button
                 onClick={handleSkip}
-                className="text-sm text-zinc-500 hover:text-zinc-300 border border-white/10 hover:border-white/20 px-5 py-2.5 rounded-full transition-all duration-200"
+                className="px-6 py-3 text-sm text-white/60 border border-white/10 rounded-full hover:text-white hover:border-white/30 transition-all duration-200"
               >
                 Keyinroq →
               </button>
