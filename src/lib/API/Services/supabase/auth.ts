@@ -31,13 +31,7 @@ export const SupabaseSignOut = async () => {
   return res;
 };
 
-export const SupabaseSignInWithGoogle = async () => {
-  const client = await supabase();
-  const res = await client.auth.signInWithOAuth({
-    provider: 'google'
-  });
-  return res;
-};
+// NOTE: signInWithOAuth must be called client-side — use supabaseBrowser() in components directly
 
 export const SupabaseSignInWithMagicLink = async (email: string) => {
   const client = await supabase();
