@@ -64,7 +64,7 @@ export default function AuthForm() {
     const supabase = supabaseBrowser()
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
-      options: { redirectTo: `${window.location.origin}/api/auth-callback` }
+      options: { redirectTo: 'https://jet-blog-zeta.vercel.app/api/auth-callback' }
     })
 
     if (error) {
