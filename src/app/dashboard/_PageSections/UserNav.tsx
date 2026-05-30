@@ -38,8 +38,8 @@ export function UserNav({ email, display_name, avatar_url }) {
 
 
   const signOut = async () => {
-    const supabase = createClientComponentClient();
-    await supabase.auth.signOut();
+    // Server-side logout — @supabase/ssr cookie larini to'g'ri tozalaydi
+    await fetch('/api/auth/logout', { method: 'POST' });
     window.location.href = '/auth/login';
   };
 
