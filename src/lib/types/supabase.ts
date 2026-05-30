@@ -20,12 +20,21 @@ export type SubscriptionT = {
   status: string;
 };
 
+export type PlatformType = 'wordpress' | 'ghost' | 'webhook';
+
+export type WordPressAdapterConfig = Record<string, never>;
+export type GhostAdapterConfig = { apiUrl: string; adminApiKey: string };
+export type WebhookAdapterConfig = { endpointUrl: string; secretKey: string };
+export type AdapterConfig = WordPressAdapterConfig | GhostAdapterConfig | WebhookAdapterConfig;
+
 export type SiteT = {
   id: string;
   user_id: string;
   url: string;
   wp_username: string;
-  wp_password?: string; // Shifrlangan REST API paroli (faqat serverda ishlatiladi)
+  wp_password?: string;       // Shifrlangan (AES-256-GCM) — faqat WordPress uchun
+  platform_type: PlatformType;
+  adapter_config: AdapterConfig;
   brand_voice: {
     voice_description?: string;
     tone?: string;
@@ -60,11 +69,14 @@ export type ArticleT = {
   content: string;
   featured_image_url?: string | null;
   wp_post_id?: number | null;
-  status: 'draft' | 'scheduled' | 'published' | 'error';
+  status: 'draft' | 'scheduled' | 'published' | 'error' | 'queued' | 'generating' | 'imaging' | 'publishing' | 'failed';
   scheduled_for?: string | null;
   published_at?: string | null;
   ai_tokens_used: number;
   error_message?: string | null;
+  generation_error?: string | null;
+  generation_started_at?: string | null;
+  generation_completed_at?: string | null;
   created_at: string;
 };
 

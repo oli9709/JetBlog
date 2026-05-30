@@ -35,6 +35,7 @@ import { SupabaseUpdateArticle, SupabaseDeleteArticle } from '@/lib/API/Database
 import { TipTapEditor } from '@/components/ui/TipTapEditor';
 import { ContentQueue } from './ContentQueue';
 import { ArticleEditor } from './ArticleEditor';
+import { GenerationProgressModal } from '@/components/content/GenerationProgressModal';
 
 interface ContentClientPropsI {
   initialSites: SiteT[];
@@ -62,6 +63,10 @@ export default function ContentClient({ initialSites, userId }: ContentClientPro
   const [isSaving, setIsSaving] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
   const [aiGenerating, setAiGenerating] = useState(false);
+
+  const [generationModalOpen, setGenerationModalOpen] = useState(false);
+  const [generatingArticleId, setGeneratingArticleId] = useState<string | null>(null);
+  const [generationError, setGenerationError] = useState<string | null>(null);
 
   // Sayt maqolalarini yuklash
   useEffect(() => {
@@ -130,6 +135,41 @@ export default function ContentClient({ initialSites, userId }: ContentClientPro
     setAiGenerating(false);
   };
 
+  const handleGenerate = async (keywordId: string) => {
+    setGenerationError(null);
+    try {
+      const res = await fetch('/api/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ keywordId }),
+      });
+      const data = await res.json();
+      if (!res.ok || data.error) throw new Error(data.error ?? 'Generatsiya xatosi');
+      if (data.articleId) {
+        setGeneratingArticleId(data.articleId);
+        setGenerationModalOpen(true);
+      }
+    } catch (err) {
+      setGenerationError(err instanceof Error ? err.message : 'Noma\'lum xato');
+    }
+  };
+
+  const handleGenerationComplete = (article: ArticleT) => {
+    setGenerationModalOpen(false);
+    setGeneratingArticleId(null);
+    setArticles((prev) => {
+      const exists = prev.find((a) => a.id === article.id);
+      return exists ? prev.map((a) => (a.id === article.id ? article : a)) : [article, ...prev];
+    });
+    handleSelectArticle(article);
+  };
+
+  const handleGenerationError = (error: string) => {
+    setGenerationModalOpen(false);
+    setGeneratingArticleId(null);
+    setGenerationError(error);
+  };
+
   // Maqolani WordPress saytiga REST API orqali yuborish
   const handlePublishNow = async (idToPublish?: string) => {
     const targetId = idToPublish || selectedArticle?.id;
@@ -196,6 +236,7 @@ export default function ContentClient({ initialSites, userId }: ContentClientPro
   });
 
   return (
+    <>
     <div className="w-full max-w-7xl px-4 space-y-6">
       
       {/* Sarlavha & Sayt selector */}
@@ -284,5 +325,15 @@ export default function ContentClient({ initialSites, userId }: ContentClientPro
       )}
 
     </div>
+
+      {generatingArticleId && (
+        <GenerationProgressModal
+          open={generationModalOpen}
+          articleId={generatingArticleId}
+          onComplete={handleGenerationComplete}
+          onError={handleGenerationError}
+        />
+      )}
+    </>
   );
 }

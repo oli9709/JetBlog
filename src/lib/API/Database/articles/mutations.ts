@@ -12,11 +12,14 @@ interface InsertArticlePropsI {
   content: string;
   featured_image_url?: string | null;
   wp_post_id?: number | null;
-  status?: 'draft' | 'scheduled' | 'published' | 'error';
+  status?: ArticleT['status'];
   scheduled_for?: string | null;
   published_at?: string | null;
   ai_tokens_used?: number;
   error_message?: string | null;
+  generation_error?: string | null;
+  generation_started_at?: string | null;
+  generation_completed_at?: string | null;
 }
 
 /**
@@ -40,7 +43,10 @@ export const SupabaseInsertArticle = async (
         scheduled_for: props.scheduled_for || null,
         published_at: props.published_at || null,
         ai_tokens_used: props.ai_tokens_used || 0,
-        error_message: props.error_message || null
+        error_message: props.error_message || null,
+        generation_error: props.generation_error || null,
+        generation_started_at: props.generation_started_at || null,
+        generation_completed_at: props.generation_completed_at || null,
       }
     ])
     .select()

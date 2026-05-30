@@ -1,4 +1,5 @@
 import Dashboard from './_PageSections/Dashboard';
+import { ActiveGenerationBanner } from '@/components/dashboard/ActiveGenerationBanner';
 import { GetProfileByUserId } from '@/lib/API/Database/profile/queries';
 import { GetSitesByUser } from '@/lib/API/Database/sites/queries';
 import { SupabaseServerClient as supabaseClient } from '@/lib/API/Services/init/supabase';
@@ -56,6 +57,7 @@ export default async function DashboardPage() {
   return (
     <div>
       <Dashboard stats={stats} />
+      <ActiveGenerationBanner userId={userId} />
     </div>
   );
 }

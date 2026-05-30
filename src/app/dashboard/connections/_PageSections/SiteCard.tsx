@@ -7,11 +7,19 @@ import { Switch } from '@/components/ui/Switch';
 import { cn } from '@/lib/utils/helpers';
 import { ShimmerButton } from '@/components/magicui/shimmer-button';
 
+const PLATFORM_BADGE: Record<string, { label: string; className: string }> = {
+  wordpress: { label: 'WordPress', className: 'bg-blue-500/15 text-blue-400 border-blue-500/25' },
+  ghost: { label: 'Ghost', className: 'bg-amber-500/15 text-amber-400 border-amber-500/25' },
+  webflow: { label: 'Webflow', className: 'bg-indigo-500/15 text-indigo-400 border-indigo-500/25' },
+  webhook: { label: 'Webhook', className: 'bg-zinc-700/50 text-zinc-400 border-zinc-600/40' },
+};
+
 interface SiteCardProps {
   site: {
     id: string;
     url: string;
     wp_username: string;
+    platform_type?: string;
     is_active: boolean;
     publish_days: string[];
     publish_time: string;
@@ -75,7 +83,17 @@ export const SiteCard: React.FC<SiteCardProps> = ({ site, onDelete, onToggle, on
             <h3 className="text-base font-bold bg-clip-text text-transparent bg-gradient-to-r from-zinc-100 to-zinc-500 truncate max-w-[200px]">
               {site.url.replace(/^https?:\/\//, '')}
             </h3>
-            <p className="text-xs text-zinc-500 mt-0.5">@{site.wp_username}</p>
+            <div className="flex items-center gap-2 mt-0.5">
+              <p className="text-xs text-zinc-500">@{site.wp_username}</p>
+              {site.platform_type && PLATFORM_BADGE[site.platform_type] && (
+                <span className={cn(
+                  'text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border',
+                  PLATFORM_BADGE[site.platform_type].className
+                )}>
+                  {PLATFORM_BADGE[site.platform_type].label}
+                </span>
+              )}
+            </div>
           </div>
         </div>
         

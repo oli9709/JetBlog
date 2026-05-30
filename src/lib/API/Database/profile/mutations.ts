@@ -26,3 +26,16 @@ export const SupabaseCompleteOnboarding = async (
 
   return res;
 };
+
+export const SupabaseUpdateOnboardingPlatform = async (
+  userId: string,
+  platformType: string
+): Promise<PostgrestSingleResponse<null>> => {
+  const client = await supabase();
+  const res = await client
+    .from('profiles')
+    .update({ onboarding_platform: platformType })
+    .eq('id', userId);
+
+  return res;
+};

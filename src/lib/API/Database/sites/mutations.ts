@@ -15,6 +15,8 @@ interface InsertSitePropsI {
   publish_time?: string;
   telegram_chat_id?: string | null;
   is_active?: boolean;
+  platform_type?: 'wordpress' | 'ghost' | 'webhook';
+  adapter_config?: Record<string, unknown>;
 }
 
 /**
@@ -36,7 +38,9 @@ export const SupabaseInsertSite = async (
         publish_days: props.publish_days || [],
         publish_time: props.publish_time || '09:00:00',
         telegram_chat_id: props.telegram_chat_id || null,
-        is_active: props.is_active !== undefined ? props.is_active : true
+        is_active: props.is_active !== undefined ? props.is_active : true,
+        platform_type: props.platform_type || 'wordpress',
+        adapter_config: props.adapter_config || {}
       }
     ])
     .select()

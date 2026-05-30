@@ -49,13 +49,23 @@ const config: Config = {
         sans: ['var(--font-inter)']
       },
       animation: {
-        fadeIn: 'fadeIn 700ms ease-in-out'
+        fadeIn: 'fadeIn 700ms ease-in-out',
+        'accordion-down': 'accordion-down 200ms ease-out',
+        'accordion-up': 'accordion-up 200ms ease-out',
       },
       keyframes: () => ({
         fadeIn: {
           '0%': { opacity: '0' },
           '100%': { opacity: '1' }
-        }
+        },
+        'accordion-down': {
+          from: { height: '0px' },
+          to: { height: 'var(--radix-accordion-content-height)' },
+        },
+        'accordion-up': {
+          from: { height: 'var(--radix-accordion-content-height)' },
+          to: { height: '0px' },
+        },
       })
     }
   },
