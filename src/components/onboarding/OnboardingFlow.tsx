@@ -67,9 +67,11 @@ export function OnboardingFlow({ userId, initialStep = 1 }: OnboardingFlowProps)
   };
 
   const handleSkip = async () => {
-    await completeOnboarding();
-    router.push('/dashboard/main');
-    router.refresh();
+    await supabase
+      .from('profiles')
+      .update({ onboarding_completed: true })
+      .eq('id', userId);
+    window.location.href = '/dashboard/main';
   };
 
   const handlePlatformSelect = (platform: PlatformType) => {
@@ -93,9 +95,11 @@ export function OnboardingFlow({ userId, initialStep = 1 }: OnboardingFlowProps)
   };
 
   const handleSuccessFinish = async () => {
-    await completeOnboarding();
-    router.push('/dashboard/main');
-    router.refresh();
+    await supabase
+      .from('profiles')
+      .update({ onboarding_completed: true })
+      .eq('id', userId);
+    window.location.href = '/dashboard/main';
   };
 
   const endpointUrl =
