@@ -31,14 +31,14 @@ export default function Hero() {
           {/* Sarlavha */}
           <ScrollReveal delay="200" className="space-y-4">
             <h1 className="text-4xl md:text-7xl font-extrabold tracking-tight text-white leading-[1.1] md:leading-[1.05]">
-              WordPress saytingiz uchun{' '}
+              Har kuni yangi maqola.{' '}
             </h1>
             <div className="h-[48px] md:h-[80px] flex items-center justify-center">
               <TypingAnimation
                 className="text-4xl md:text-7xl font-extrabold bg-gradient-to-r from-[#FB3640] to-[#FF8A8F] bg-clip-text text-transparent"
                 duration={100}
               >
-                AI SEO Autopilot
+                Siz yozmaysiz — biz yozamiz.
               </TypingAnimation>
             </div>
           </ScrollReveal>
@@ -46,7 +46,9 @@ export default function Hero() {
           {/* Tavsif */}
           <ScrollReveal delay="300">
             <p className="max-w-[42rem] text-zinc-400 text-base md:text-xl leading-relaxed mt-4">
-              JetBlog - bu kalit so'zlarni avtomatik tahlil qiluvchi, Claude 3.5 yordamida SEO-optimallashgan maqolalar yozuvchi va rasmlari bilan bir zumda WordPress saytingizga avtomat nashr qiluvchi sun'iy intellekt tizimidir.
+              Kalit so'z bering — maqolani biz yozamiz.<br />
+              Rasm, SEO, nashr — hammasi avtomatik.<br />
+              WordPress, Ghost, Webflow — istalgan saytga.
             </p>
           </ScrollReveal>
 
@@ -87,7 +89,7 @@ export default function Hero() {
                   <span className="w-3 h-3 rounded-full bg-rose-500/80 shadow-[0_0_10px_rgba(244,63,94,0.5)]" />
                   <span className="w-3 h-3 rounded-full bg-amber-500/80 shadow-[0_0_10px_rgba(245,158,11,0.5)]" />
                   <span className="w-3 h-3 rounded-full bg-emerald-500/80 shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
-                  <span className="text-xs text-zinc-500 font-medium font-mono ml-2">app.jetblog.app/dashboard</span>
+                  <span className="text-xs text-zinc-500 font-medium font-mono ml-2">jet-blog-zeta.vercel.app/dashboard</span>
                 </div>
                 <div className="flex items-center gap-2 text-[10px] font-bold text-emerald-400 bg-emerald-400/10 px-2 py-0.5 rounded-full border border-emerald-400/20">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" /> Autopilot Active
@@ -160,10 +162,10 @@ export default function Hero() {
                     <div className="group p-4 rounded-2xl border border-zinc-800 bg-zinc-900/40 space-y-4 hover:border-[#FB3640]/50 hover:bg-zinc-900/60 transition-all duration-300">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                          <div className="w-8 h-8 rounded-xl bg-[#FB3640]/10 border border-[#FB3640]/20 flex items-center justify-center text-[#FF8A8F] font-bold text-xs group-hover:scale-110 transition-transform">WP</div>
+                          <div className="w-8 h-8 rounded-xl bg-[#FB3640]/10 border border-[#FB3640]/20 flex items-center justify-center text-[#FF8A8F] font-bold text-xs group-hover:scale-110 transition-transform">GH</div>
                           <div>
                             <h4 className="text-xs font-bold text-white">marketingdna.com</h4>
-                            <span className="text-[10px] text-zinc-500">WordPress REST API v2</span>
+                            <span className="text-[10px] text-zinc-500">Ghost CMS Admin API</span>
                           </div>
                         </div>
                         <span className="text-[9px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center gap-1">

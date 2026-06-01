@@ -37,7 +37,7 @@ export default function CTA() {
               </div>
 
               <p className="mx-auto max-w-xl text-sm md:text-base text-zinc-400 leading-relaxed">
-                Hozir ulaning va 1 daqiqa ichida birinchi kalit so'zlaringiz uchun avtomatlashtirilgan AI maqolalaringizni WordPress-ga yuklang. Saytingiz organik trafik bo'yicha yuqorilasin!
+                Bugun boshlang — ertaga saytingizda yangi maqola bo'lsin.
               </p>
 
               <div className="pt-8 flex flex-col sm:flex-row gap-4 justify-center w-full sm:w-auto">

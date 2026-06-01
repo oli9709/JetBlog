@@ -60,7 +60,7 @@ function TerminalMockup() {
           Avtomatik ishlamoqda
         </div>
         <div className="flex items-center gap-1 text-xs font-bold text-white/60">
-          <NumberTicker value={1247} className="text-white font-mono" />
+          <NumberTicker value={127} className="text-white font-mono" />
           <span className="text-zinc-500 ml-1">maqola nashr qilindi</span>
         </div>
       </div>
@@ -70,9 +70,9 @@ function TerminalMockup() {
 
 // ── KARTA 1: Kalit So'zlar ────────────────────────────────────────────────────
 const KEYWORDS = [
-  { kw: "toshkentda stomatolog", vol: 3768, diff: "Oson",    dot: "#22c55e", delay: 0 },
-  { kw: "ingliz tili kurslari",  vol: 8500, diff: "O'rta",   dot: "#eab308", delay: 800 },
-  { kw: "uy-joy narxlari",       vol: 12400, diff: "Qiyin",  dot: "#ef4444", delay: 1600 },
+  { kw: "toshkentda stomatolog", vol: 2400,  diff: "Oson",    dot: "#22c55e", delay: 0 },
+  { kw: "ingliz tili kurslari",  vol: 8100,  diff: "O'rta",   dot: "#eab308", delay: 800 },
+  { kw: "uy-joy narxlari",       vol: 5600,  diff: "Qiyin",   dot: "#ef4444", delay: 1600 },
 ];
 
 function KeywordCard() {
@@ -251,7 +251,7 @@ function TelegramCard() {
 
   useEffect(() => {
     // Delay start so NumberTicker animates visibly
-    const t = setTimeout(() => setViews(247), 600);
+    const t = setTimeout(() => setViews(1247), 600);
     return () => clearTimeout(t);
   }, []);
 

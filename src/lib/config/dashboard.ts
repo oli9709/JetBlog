@@ -83,14 +83,14 @@ const configuration = {
         {
           name: 'Pro Monthly',
           interval: IntervalE.MONTHLY,
-          price: '19',
+          price: '29',
           price_id: 'plan_pro_monthly',
           isPopular: true
         },
         {
           name: 'Pro Annual',
           interval: IntervalE.YEARLY,
-          price: '15',
+          price: '23',
           price_id: 'plan_pro_yearly',
           isPopular: false
         }
@@ -113,14 +113,14 @@ const configuration = {
         {
           name: 'Agency Monthly',
           interval: IntervalE.MONTHLY,
-          price: '49',
+          price: '79',
           price_id: 'plan_agency_monthly',
           isPopular: false
         },
         {
           name: 'Agency Annual',
           interval: IntervalE.YEARLY,
-          price: '39',
+          price: '63',
           price_id: 'plan_agency_yearly',
           isPopular: false
         }

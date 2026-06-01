@@ -133,13 +133,13 @@ export default function Feature() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
           <div className="flex flex-col items-center justify-center p-8 rounded-3xl border border-zinc-800/50 bg-zinc-900/30">
             <div className="text-4xl md:text-5xl font-extrabold text-white mb-2 flex">
-              <NumberTicker value={1200} />+
+              <NumberTicker value={500} />+
             </div>
             <span className="text-zinc-500 text-sm font-semibold uppercase tracking-wider">Nashr Qilingan Maqolalar</span>
           </div>
           <div className="flex flex-col items-center justify-center p-8 rounded-3xl border border-zinc-800/50 bg-zinc-900/30">
             <div className="text-4xl md:text-5xl font-extrabold text-white mb-2 flex">
-              <NumberTicker value={3} />
+              <NumberTicker value={2} />
             </div>
             <span className="text-zinc-500 text-sm font-semibold uppercase tracking-wider">Daqiqada tayyor bo'ladi</span>
           </div>

@@ -128,7 +128,7 @@ export default function Footer() {
         <div className="mt-12 pt-6 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-4">
           <MainLogoText />
           <p className="text-xs text-zinc-600">
-            © 2026 JetBlog. All rights reserved.
+            © 2026 JetBlog. Barcha huquqlar himoyalangan.
           </p>
         </div>
       </div>
