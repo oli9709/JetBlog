@@ -1,6 +1,7 @@
 import { TypingAnimation } from '@/components/magicui/typing-animation';
 import { ScrollReveal } from '@/components/ScrollReveal';
 import { HeroCTALinks } from './HeroCTALinks';
+import { MockConnectionsTitle } from './MockConnectionsTitle';
 import { Bot, Globe, Key, FileText, Check, Zap, Shield } from 'lucide-react';
 
 export default function Hero() {
@@ -100,15 +101,7 @@ export default function Hero() {
 
                 {/* Main Panel Mock */}
                 <div className="col-span-3 p-6 space-y-6 relative z-10">
-                  <div className="flex items-center justify-between border-b border-zinc-900/60 pb-4">
-                    <div>
-                      <h3 className="text-md font-bold text-white">WordPress Connections</h3>
-                      <p className="text-xs text-zinc-500">Active blogs and automated publishing schedules</p>
-                    </div>
-                    <span className="text-xs font-bold text-[#FB3640] bg-[#FB3640]/10 border border-[#FB3640]/20 px-3 py-1 rounded-xl cursor-default hover:bg-[#FB3640]/20 transition-colors">
-                      + Add Site
-                    </span>
-                  </div>
+                  <MockConnectionsTitle />
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="group p-4 rounded-2xl border border-zinc-800 bg-zinc-900/40 space-y-4 hover:border-emerald-500/50 hover:bg-zinc-900/60 transition-all duration-300">
