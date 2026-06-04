@@ -1,55 +1,54 @@
 'use client';
 
-import { useLocale } from 'next-intl';
 import { usePathname } from 'next/navigation';
-import { cn } from '@/lib/utils/helpers';
-import { type Locale } from '@/i18n/routing';
 
-const LOCALES: { code: Locale; flag: string }[] = [
-  { code: 'uz', flag: '🇺🇿' },
-  { code: 'ru', flag: '🇷🇺' },
-  { code: 'en', flag: '🇬🇧' },
+const LOCALES = [
+  { code: 'uz', flag: '🇺🇿', label: 'UZ' },
+  { code: 'ru', flag: '🇷🇺', label: 'RU' },
+  { code: 'en', flag: '🇬🇧', label: 'EN' },
 ];
 
-const LOCALE_LIST = ['uz', 'ru', 'en'];
+const LOCALE_CODES = ['uz', 'ru', 'en'];
 
 export function LocaleSwitcher() {
-  const locale = useLocale() as Locale;
   const pathname = usePathname();
 
-  const switchLocale = (newLocale: Locale) => {
-    if (newLocale === locale) return;
+  // /uz/pricing → 'uz' | /pricing → 'uz' (default)
+  const currentLocale =
+    LOCALE_CODES.find(
+      (loc) => pathname.startsWith(`/${loc}/`) || pathname === `/${loc}`
+    ) ?? 'uz';
 
-    // Cookie (1 yil)
-    document.cookie = `NEXT_LOCALE=${newLocale};path=/;max-age=${60 * 60 * 24 * 365};SameSite=Lax`;
+  const handleSwitch = (newLocale: string) => {
+    if (newLocale === currentLocale) return;
 
-    // URL dagi locale segmentini almashtirish
-    const segments = pathname.split('/');
-    if (LOCALE_LIST.includes(segments[1])) {
-      segments[1] = newLocale;
-    } else {
-      segments.splice(1, 0, newLocale);
-    }
+    const hasLocale = LOCALE_CODES.some(
+      (loc) => pathname.startsWith(`/${loc}/`) || pathname === `/${loc}`
+    );
 
-    // window.location — to'liq reload, messages yangilanadi
-    window.location.href = segments.join('/') || `/${newLocale}`;
+    // /uz/pricing → /en/pricing  |  /pricing → /en/pricing
+    const newPath = hasLocale
+      ? `/${newLocale}${pathname.slice(3)}`
+      : `/${newLocale}${pathname}`;
+
+    window.location.href = newPath;
   };
 
   return (
-    <div className="flex gap-0.5 items-center">
-      {LOCALES.map((l) => (
+    <div className="flex items-center gap-0.5">
+      {LOCALES.map(({ code, flag, label }) => (
         <button
-          key={l.code}
-          onClick={() => switchLocale(l.code)}
-          title={l.code.toUpperCase()}
-          className={cn(
-            'px-2 py-1 rounded text-xs font-semibold transition-colors',
-            locale === l.code
+          key={code}
+          onClick={() => handleSwitch(code)}
+          className={[
+            'flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium transition-all',
+            currentLocale === code
               ? 'bg-[#FB3640] text-white'
-              : 'text-zinc-400 hover:text-white hover:bg-zinc-800'
-          )}
+              : 'text-zinc-400 hover:text-white hover:bg-white/10',
+          ].join(' ')}
         >
-          {l.flag} {l.code.toUpperCase()}
+          <span>{flag}</span>
+          <span>{label}</span>
         </button>
       ))}
     </div>

@@ -5,7 +5,6 @@ export default createMiddleware(routing);
 
 export const config = {
   matcher: [
-    // api, _next, _vercel, monitoring-tunnel va kengaytmali fayllarni o'tkazib yuborish
-    '/((?!api|_next|_vercel|monitoring-tunnel|.*\\..*).*)',
+    '/((?!api|_next/static|_next/image|favicon.ico|.*\\..*).*)',
   ],
 };
