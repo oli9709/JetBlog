@@ -1,23 +1,30 @@
-import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs';
+import createMiddleware from 'next-intl/middleware';
+import { routing } from '@/i18n/routing';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
+const intlMiddleware = createMiddleware(routing);
+
 export async function middleware(req: NextRequest) {
-  const res = NextResponse.next();
-  const supabase = createMiddlewareClient({ req, res });
+  const { pathname } = req.nextUrl;
 
-  const { data: { session } } = await supabase.auth.getSession();
-
-  // /admin/* — faqat login qilgan user o'ta oladi (is_admin layout da tekshiriladi)
-  if (req.nextUrl.pathname.startsWith('/admin')) {
-    if (!session) {
-      return NextResponse.redirect(new URL('/auth/login', req.url));
-    }
+  // Skip API routes, static files, Sentry tunnel
+  if (
+    pathname.startsWith('/api/') ||
+    pathname.startsWith('/_next/') ||
+    pathname.startsWith('/monitoring-tunnel') ||
+    pathname.includes('.')
+  ) {
+    return NextResponse.next();
   }
 
-  return res;
+  // Run next-intl middleware for locale detection & routing
+  return intlMiddleware(req);
 }
 
 export const config = {
-  matcher: ['/admin/:path*']
+  matcher: [
+    // Match everything except api, _next, static files
+    '/((?!api|_next|_vercel|monitoring-tunnel|.*\\..*).*)',
+  ],
 };

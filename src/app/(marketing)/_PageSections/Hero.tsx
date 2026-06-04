@@ -1,11 +1,15 @@
 import { cn } from '@/lib/utils/helpers';
 import Link from 'next/link';
-import { Sparkles, Globe, Key, FileText, Bot, ArrowRight, Zap, Shield, Check } from 'lucide-react';
+import { ArrowRight, Zap, Shield, Bot, Globe, Key, FileText, Check } from 'lucide-react';
 import { ShimmerButton } from '@/components/magicui/shimmer-button';
 import { TypingAnimation } from '@/components/magicui/typing-animation';
 import { ScrollReveal } from '@/components/ScrollReveal';
+import { getTranslations, getLocale } from 'next-intl/server';
 
-export default function Hero() {
+export default async function Hero() {
+  const t = await getTranslations('hero');
+  const locale = await getLocale();
+
   return (
     <div className="relative overflow-hidden pt-12 pb-20 md:pb-28">
 
@@ -17,9 +21,9 @@ export default function Hero() {
             key={i}
             className="particle"
             style={{
-              left: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 15}s`,
-              animationDuration: `${10 + Math.random() * 10}s`
+              left: `${(i * 7.3) % 100}%`,
+              animationDelay: `${(i * 1.1) % 15}s`,
+              animationDuration: `${10 + (i * 0.7) % 10}s`
             }}
           />
         ))}
@@ -31,45 +35,43 @@ export default function Hero() {
           {/* Sarlavha */}
           <ScrollReveal delay="200" className="space-y-4">
             <h1 className="text-4xl md:text-7xl font-extrabold tracking-tight text-white leading-[1.1] md:leading-[1.05]">
-              Har kuni yangi maqola.{' '}
+              {t('title')}{' '}
             </h1>
             <div className="h-[48px] md:h-[80px] flex items-center justify-center">
               <TypingAnimation
                 className="text-4xl md:text-7xl font-extrabold bg-gradient-to-r from-[#FB3640] to-[#FF8A8F] bg-clip-text text-transparent"
                 duration={100}
               >
-                Siz yozmaysiz — biz yozamiz.
+                {t('subtitle')}
               </TypingAnimation>
             </div>
           </ScrollReveal>
 
           {/* Tavsif */}
           <ScrollReveal delay="300">
-            <p className="max-w-[42rem] text-zinc-400 text-base md:text-xl leading-relaxed mt-4">
-              Kalit so'z bering — maqolani biz yozamiz.<br />
-              Rasm, SEO, nashr — hammasi avtomatik.<br />
-              WordPress, Ghost, Webflow — istalgan saytga.
+            <p className="max-w-[42rem] text-zinc-400 text-base md:text-xl leading-relaxed mt-4 whitespace-pre-line">
+              {t('description')}
             </p>
           </ScrollReveal>
 
           {/* CTA tugmalari */}
           <ScrollReveal delay="400" className="mt-8">
             <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto items-center justify-center">
-              <Link href="/auth/signup" className="w-full sm:w-auto">
+              <Link href={`/${locale}/auth/signup`} className="w-full sm:w-auto">
                 <ShimmerButton
                   background="rgba(251, 54, 64, 1)"
                   className="shadow-2xl shadow-[#FB3640]/30 h-14 px-8 text-sm font-bold w-full sm:w-auto"
                 >
                   <span className="whitespace-pre-wrap text-center text-sm font-medium leading-none tracking-tight text-white lg:text-base flex items-center gap-2">
-                    Bepul Boshlash <ArrowRight className="w-4 h-4" />
+                    {t('cta_primary')} <ArrowRight className="w-4 h-4" />
                   </span>
                 </ShimmerButton>
               </Link>
               <Link
-                href="/pricing"
+                href={`/${locale}/pricing`}
                 className="group relative inline-flex h-14 items-center justify-center overflow-hidden rounded-full border border-zinc-700/50 bg-zinc-900/50 px-8 text-sm font-bold text-zinc-300 backdrop-blur-md transition-all hover:bg-zinc-800 hover:text-white hover:border-zinc-700 w-full sm:w-auto"
               >
-                <span className="relative z-10 flex items-center gap-2">Narxlar bilan tanishish</span>
+                <span className="relative z-10 flex items-center gap-2">{t('cta_secondary')}</span>
               </Link>
             </div>
           </ScrollReveal>
@@ -124,11 +126,11 @@ export default function Hero() {
 
                   <div className="flex items-center justify-between border-b border-zinc-900/60 pb-4">
                     <div>
-                      <h3 className="text-md font-bold text-white">WordPress Ulanishlari</h3>
-                      <p className="text-xs text-zinc-500">Faol ulangan bloglar va avtomat nashr qilish jadvallari</p>
+                      <h3 className="text-md font-bold text-white">WordPress Connections</h3>
+                      <p className="text-xs text-zinc-500">Active blogs and automated publishing schedules</p>
                     </div>
                     <span className="text-xs font-bold text-[#FB3640] bg-[#FB3640]/10 border border-[#FB3640]/20 px-3 py-1 rounded-xl cursor-default hover:bg-[#FB3640]/20 transition-colors">
-                      + Yangi Sayt Ulamoq
+                      + Add Site
                     </span>
                   </div>
 
@@ -144,16 +146,16 @@ export default function Hero() {
                           </div>
                         </div>
                         <span className="text-[9px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center gap-1">
-                          <Check className="w-2.5 h-2.5" /> Faol
+                          <Check className="w-2.5 h-2.5" /> Active
                         </span>
                       </div>
                       <div className="space-y-1.5 pt-2 border-t border-zinc-800/60">
                         <div className="flex items-center justify-between text-[10px]">
-                          <span className="text-zinc-500 font-semibold">Haftalik reja:</span>
-                          <span className="text-zinc-300 font-bold">Har Dushanba, Chorshanba</span>
+                          <span className="text-zinc-500 font-semibold">Schedule:</span>
+                          <span className="text-zinc-300 font-bold">Mon, Wed</span>
                         </div>
                         <div className="flex items-center justify-between text-[10px]">
-                          <span className="text-zinc-500 font-semibold">Nashr vaqti:</span>
+                          <span className="text-zinc-500 font-semibold">Publish time:</span>
                           <span className="text-zinc-300 font-bold">09:00 UTC</span>
                         </div>
                       </div>
@@ -169,16 +171,16 @@ export default function Hero() {
                           </div>
                         </div>
                         <span className="text-[9px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center gap-1">
-                          <Check className="w-2.5 h-2.5" /> Faol
+                          <Check className="w-2.5 h-2.5" /> Active
                         </span>
                       </div>
                       <div className="space-y-1.5 pt-2 border-t border-zinc-800/60">
                         <div className="flex items-center justify-between text-[10px]">
-                          <span className="text-zinc-500 font-semibold">Haftalik reja:</span>
-                          <span className="text-zinc-300 font-bold">Har Payshanba, Shanba</span>
+                          <span className="text-zinc-500 font-semibold">Schedule:</span>
+                          <span className="text-zinc-300 font-bold">Thu, Sat</span>
                         </div>
                         <div className="flex items-center justify-between text-[10px]">
-                          <span className="text-zinc-500 font-semibold">Nashr vaqti:</span>
+                          <span className="text-zinc-500 font-semibold">Publish time:</span>
                           <span className="text-zinc-300 font-bold">14:00 UTC</span>
                         </div>
                       </div>
@@ -191,7 +193,7 @@ export default function Hero() {
                       <div className="p-1.5 rounded-lg bg-[#FB3640]/10 border border-[#FB3640]/20 text-[#FB3640] group-hover:scale-110 transition-transform">
                         <Zap className="w-3.5 h-3.5" />
                       </div>
-                      <span className="text-[10px] text-zinc-400 font-bold group-hover:text-zinc-300 transition-colors">100% Avtomatik</span>
+                      <span className="text-[10px] text-zinc-400 font-bold group-hover:text-zinc-300 transition-colors">100% Automated</span>
                     </div>
                     <div className="flex items-center gap-2 group">
                       <div className="p-1.5 rounded-lg bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 group-hover:scale-110 transition-transform">
@@ -203,7 +205,7 @@ export default function Hero() {
                       <div className="p-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 group-hover:scale-110 transition-transform">
                         <Shield className="w-3.5 h-3.5" />
                       </div>
-                      <span className="text-[10px] text-zinc-400 font-bold group-hover:text-zinc-300 transition-colors">Xavfsiz Integratsiya</span>
+                      <span className="text-[10px] text-zinc-400 font-bold group-hover:text-zinc-300 transition-colors">Secure Integration</span>
                     </div>
                   </div>
 

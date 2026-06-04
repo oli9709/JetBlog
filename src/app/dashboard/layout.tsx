@@ -15,16 +15,17 @@ export default async function DashboardLayout({ children }: LayoutProps) {
   if (!user?.id) redirect('/auth/login');
 
   const profile = await GetProfileByUserId(user.id);
+  const profileData = profile?.data?.[0];
 
-  const display_name: string = profile?.data?.[0]?.display_name ?? '';
+  const display_name: string = profileData?.display_name ?? '';
   const email: string = user.email ?? '';
   const avatar_url: string = (user.user_metadata?.avatar_url as string) ?? '';
-  const onboarding_completed: boolean = profile?.data?.[0]?.onboarding_completed ?? false;
+  const onboarding_completed: boolean = profileData?.onboarding_completed ?? false;
+  const plan: string = profileData?.plan ?? 'FREE';
+  const credits_remaining: number = profileData?.credits_remaining ?? 0;
 
   // Server-side onboarding redirect — YAGONA joy
   const headersList = await headers();
-  // x-invoke-path — Vercel da avtomatik set bo'ladi, localhost da bo'lishi mumkin emas.
-  // pathname bo'sh bo'lsa redirect qilmaymiz — infinite loop oldini oladi.
   const pathname = headersList.get('x-invoke-path') ?? '';
   if (!onboarding_completed && pathname && !pathname.includes('onboarding')) {
     redirect('/dashboard/onboarding');
@@ -34,7 +35,13 @@ export default async function DashboardLayout({ children }: LayoutProps) {
     <main className="grid md:grid-cols-[auto_1fr]">
       <SideBar />
       <div>
-        <Header email={email} display_name={display_name} avatar_url={avatar_url} />
+        <Header
+          email={email}
+          display_name={display_name}
+          avatar_url={avatar_url}
+          plan={plan}
+          credits_remaining={credits_remaining}
+        />
         <div className="m-6">{children}</div>
       </div>
     </main>

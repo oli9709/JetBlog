@@ -10,9 +10,11 @@ interface HeaderProps {
   display_name: string;
   email: string;
   avatar_url: string;
+  plan: string;
+  credits_remaining: number;
 }
 
-const Header = ({ display_name, email, avatar_url }: HeaderProps) => {
+const Header = ({ display_name, email, avatar_url, plan, credits_remaining }: HeaderProps) => {
   const [headerText, setHeaderText] = useState('');
   const pathname = usePathname().split('/');
   const { routes } = configuration;
@@ -20,8 +22,14 @@ const Header = ({ display_name, email, avatar_url }: HeaderProps) => {
   useEffect(() => {
     if (pathname.includes('main')) {
       setHeaderText('Dashboard');
-    } else if (pathname.includes('todos')) {
-      setHeaderText('Todos');
+    } else if (pathname.includes('connections')) {
+      setHeaderText('Connections');
+    } else if (pathname.includes('keywords')) {
+      setHeaderText('Keywords');
+    } else if (pathname.includes('content')) {
+      setHeaderText('Content Queue');
+    } else if (pathname.includes('brand-voice')) {
+      setHeaderText('Brand Voice');
     } else if (pathname.includes('settings')) {
       setHeaderText('Settings');
     } else {
@@ -35,10 +43,15 @@ const Header = ({ display_name, email, avatar_url }: HeaderProps) => {
         <div className="mr-8">
           <MobileNav items={routes} />
         </div>
-
         <div className="hidden md:inline-block text-lg ml-3">{headerText}</div>
         <div className="ml-auto flex items-center space-x-4">
-          <UserNav avatar_url={avatar_url} display_name={display_name} email={email} />
+          <UserNav
+            avatar_url={avatar_url}
+            display_name={display_name}
+            email={email}
+            plan={plan}
+            credits_remaining={credits_remaining}
+          />
         </div>
       </div>
     </div>
