@@ -22,20 +22,29 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: 'Ruxsat berilmagan (Unauthorized)' }, { status: 401 });
       }
 
-      const body = await req.json();
-      const { keyword, language } = body;
-
-      if (!keyword) {
-        return NextResponse.json({ error: 'keyword parametri talab qilinadi!' }, { status: 400 });
+      // Body parse — bo'sh yoki noto'g'ri JSON bo'lsa 400 qaytarish
+      let body: { keyword?: unknown; language?: unknown; siteId?: unknown };
+      try {
+        body = await req.json();
+      } catch {
+        return NextResponse.json({ error: 'Kalit so\'z kiritilmagan' }, { status: 400 });
       }
 
-      const lang = language || 'uz';
+      const { keyword, language } = body;
 
-      const seoData = await fetchKeywordData(keyword, lang);
+      // keyword: mavjud, string, bo'sh emas
+      if (!keyword || typeof keyword !== 'string' || keyword.trim() === '') {
+        return NextResponse.json({ error: 'Kalit so\'z kiritilmagan' }, { status: 400 });
+      }
+
+      const cleanKeyword = keyword.trim();
+      const lang = (typeof language === 'string' && language) ? language : 'uz';
+
+      const seoData = await fetchKeywordData(cleanKeyword, lang);
 
       return NextResponse.json({
         success: true,
-        keyword,
+        keyword: cleanKeyword,
         language: lang,
         searchVolume: seoData.search_volume,
         difficulty: seoData.difficulty,
