@@ -1,15 +1,9 @@
-import { cn } from '@/lib/utils/helpers';
-import Link from 'next/link';
-import { ArrowRight, Zap, Shield, Bot, Globe, Key, FileText, Check } from 'lucide-react';
-import { ShimmerButton } from '@/components/magicui/shimmer-button';
 import { TypingAnimation } from '@/components/magicui/typing-animation';
 import { ScrollReveal } from '@/components/ScrollReveal';
-import { getTranslations, getLocale } from 'next-intl/server';
+import { HeroCTALinks } from './HeroCTALinks';
+import { Bot, Globe, Key, FileText, Check, Zap, Shield } from 'lucide-react';
 
-export default async function Hero() {
-  const t = await getTranslations('hero');
-  const locale = await getLocale();
-
+export default function Hero() {
   return (
     <div className="relative overflow-hidden pt-12 pb-20 md:pb-28">
 
@@ -32,48 +26,33 @@ export default async function Hero() {
       <section className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
         <div className="flex flex-col items-center gap-6 text-center max-w-4xl mx-auto">
 
-          {/* Sarlavha */}
+          {/* Title */}
           <ScrollReveal delay="200" className="space-y-4">
             <h1 className="text-4xl md:text-7xl font-extrabold tracking-tight text-white leading-[1.1] md:leading-[1.05]">
-              {t('title')}{' '}
+              Har kuni yangi maqola.{' '}
             </h1>
             <div className="h-[48px] md:h-[80px] flex items-center justify-center">
               <TypingAnimation
                 className="text-4xl md:text-7xl font-extrabold bg-gradient-to-r from-[#FB3640] to-[#FF8A8F] bg-clip-text text-transparent"
                 duration={100}
               >
-                {t('subtitle')}
+                Siz yozmaysiz — biz yozamiz.
               </TypingAnimation>
             </div>
           </ScrollReveal>
 
-          {/* Tavsif */}
+          {/* Description */}
           <ScrollReveal delay="300">
-            <p className="max-w-[42rem] text-zinc-400 text-base md:text-xl leading-relaxed mt-4 whitespace-pre-line">
-              {t('description')}
+            <p className="max-w-[42rem] text-zinc-400 text-base md:text-xl leading-relaxed mt-4">
+              Kalit so&apos;z bering — maqolani biz yozamiz.<br />
+              Rasm, SEO, nashr — hammasi avtomatik.<br />
+              WordPress, Ghost, Webflow — istalgan saytga.
             </p>
           </ScrollReveal>
 
-          {/* CTA tugmalari */}
+          {/* CTA — locale-aware client component */}
           <ScrollReveal delay="400" className="mt-8">
-            <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto items-center justify-center">
-              <Link href={`/${locale}/auth/signup`} className="w-full sm:w-auto">
-                <ShimmerButton
-                  background="rgba(251, 54, 64, 1)"
-                  className="shadow-2xl shadow-[#FB3640]/30 h-14 px-8 text-sm font-bold w-full sm:w-auto"
-                >
-                  <span className="whitespace-pre-wrap text-center text-sm font-medium leading-none tracking-tight text-white lg:text-base flex items-center gap-2">
-                    {t('cta_primary')} <ArrowRight className="w-4 h-4" />
-                  </span>
-                </ShimmerButton>
-              </Link>
-              <Link
-                href={`/${locale}/pricing`}
-                className="group relative inline-flex h-14 items-center justify-center overflow-hidden rounded-full border border-zinc-700/50 bg-zinc-900/50 px-8 text-sm font-bold text-zinc-300 backdrop-blur-md transition-all hover:bg-zinc-800 hover:text-white hover:border-zinc-700 w-full sm:w-auto"
-              >
-                <span className="relative z-10 flex items-center gap-2">{t('cta_secondary')}</span>
-              </Link>
-            </div>
+            <HeroCTALinks />
           </ScrollReveal>
         </div>
 
@@ -82,7 +61,6 @@ export default async function Hero() {
           <div className="mt-16 md:mt-24 p-2 rounded-3xl border border-zinc-800/80 bg-zinc-950/60 backdrop-blur-xl shadow-[0_0_50px_rgba(251,54,64,0.1)] max-w-5xl mx-auto overflow-hidden transition-transform duration-500 hover:scale-[1.01]">
             <div className="rounded-2xl border border-zinc-900 bg-zinc-950/90 overflow-hidden shadow-inner relative">
 
-              {/* Glass reflection */}
               <div className="absolute inset-0 bg-gradient-to-tr from-white/5 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
 
               {/* Window Header */}
@@ -107,7 +85,6 @@ export default async function Hero() {
                     <Bot className="w-5 h-5 text-[#FB3640]" />
                     <span className="text-sm font-bold text-white tracking-tight">JetBlog.app</span>
                   </div>
-
                   <div className="space-y-1.5">
                     <div className="flex items-center gap-2.5 px-3 py-2 rounded-xl bg-[#FB3640]/10 text-[#FF8A8F] text-xs font-bold border border-[#FB3640]/20 shadow-[0_0_15px_rgba(251,54,64,0.15)]">
                       <Globe className="w-4 h-4" /> Connections
@@ -123,7 +100,6 @@ export default async function Hero() {
 
                 {/* Main Panel Mock */}
                 <div className="col-span-3 p-6 space-y-6 relative z-10">
-
                   <div className="flex items-center justify-between border-b border-zinc-900/60 pb-4">
                     <div>
                       <h3 className="text-md font-bold text-white">WordPress Connections</h3>
@@ -135,7 +111,6 @@ export default async function Hero() {
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-
                     <div className="group p-4 rounded-2xl border border-zinc-800 bg-zinc-900/40 space-y-4 hover:border-emerald-500/50 hover:bg-zinc-900/60 transition-all duration-300">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
@@ -185,7 +160,6 @@ export default async function Hero() {
                         </div>
                       </div>
                     </div>
-
                   </div>
 
                   <div className="grid grid-cols-3 gap-4 pt-4 border-t border-zinc-900/80">
@@ -193,22 +167,21 @@ export default async function Hero() {
                       <div className="p-1.5 rounded-lg bg-[#FB3640]/10 border border-[#FB3640]/20 text-[#FB3640] group-hover:scale-110 transition-transform">
                         <Zap className="w-3.5 h-3.5" />
                       </div>
-                      <span className="text-[10px] text-zinc-400 font-bold group-hover:text-zinc-300 transition-colors">100% Automated</span>
+                      <span className="text-[10px] text-zinc-400 font-bold">100% Automated</span>
                     </div>
                     <div className="flex items-center gap-2 group">
                       <div className="p-1.5 rounded-lg bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 group-hover:scale-110 transition-transform">
                         <Bot className="w-3.5 h-3.5" />
                       </div>
-                      <span className="text-[10px] text-zinc-400 font-bold group-hover:text-zinc-300 transition-colors">Claude 3.5 Sonnet</span>
+                      <span className="text-[10px] text-zinc-400 font-bold">Claude 3.5 Sonnet</span>
                     </div>
                     <div className="flex items-center gap-2 group">
                       <div className="p-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 group-hover:scale-110 transition-transform">
                         <Shield className="w-3.5 h-3.5" />
                       </div>
-                      <span className="text-[10px] text-zinc-400 font-bold group-hover:text-zinc-300 transition-colors">Secure Integration</span>
+                      <span className="text-[10px] text-zinc-400 font-bold">Secure Integration</span>
                     </div>
                   </div>
-
                 </div>
               </div>
             </div>
