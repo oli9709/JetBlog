@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /dashboard/
+Disallow: /api/
+Disallow: /auth/
+
+Sitemap: https://jet-blog-zeta.vercel.app/sitemap.xml
