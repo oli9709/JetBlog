@@ -1,10 +1,18 @@
 'use client';
 
-import React, { useState } from 'react';
-import * as TabsPrimitive from '@radix-ui/react-tabs';
-import { Eye, EyeOff, RefreshCw, Globe, Key, User, Link, Hash } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Eye, EyeOff, Globe, Key, User, Hash } from 'lucide-react';
 import { cn } from '@/lib/utils/helpers';
 import type { PlatformType } from './PlatformSelector';
+import { AIBuilderPrompt } from './AIBuilderPrompt';
+
+const WEBHOOK_RECEIVE_URL = 'https://jet-blog-zeta.vercel.app/api/webhooks/receive';
+
+function generateSecret(): string {
+  return Array.from(crypto.getRandomValues(new Uint8Array(16)))
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('');
+}
 
 export interface ConnectionFormData {
   platform: PlatformType;
@@ -93,43 +101,27 @@ function HintBox({ children }: { children: React.ReactNode }) {
   );
 }
 
-const NODE_SNIPPET = `// Express.js
-app.post('/webhook', (req, res) => {
-  const sig = req.headers['x-textpilot-signature'];
-  // Verify signature with your secret
-  const payload = req.body;
-  console.log('New article:', payload.title);
-  res.sendStatus(200);
-});`;
-
-const PHP_SNIPPET = `<?php
-// Verify signature
-$sig = $_SERVER['HTTP_X_TEXTPILOT_SIGNATURE'];
-$payload = file_get_contents('php://input');
-$expected = hash_hmac('sha256', $payload, YOUR_SECRET);
-
-if (!hash_equals($expected, $sig)) {
-  http_response_code(401); exit;
-}
-$data = json_decode($payload, true);
-error_log('New article: ' . $data['title']);
-http_response_code(200);`;
 
 export function ConnectionForm({ platform, data, onChange }: ConnectionFormProps) {
   const [showPassword, setShowPassword] = useState(false);
-  const [showToken, setShowToken] = useState(false);
-  const [showApiKey, setShowApiKey] = useState(false);
+  const [showToken, setShowToken]       = useState(false);
+  const [showApiKey, setShowApiKey]     = useState(false);
+  const [secretKey]                     = useState(() => generateSecret());
 
   const update = (patch: Partial<ConnectionFormData>) => onChange({ ...data, ...patch });
 
-  const generateSecret = () => {
-    const arr = new Uint8Array(32);
-    crypto.getRandomValues(arr);
-    const secret = Array.from(arr)
-      .map((b) => b.toString(16).padStart(2, '0'))
-      .join('');
-    update({ webhookSecret: secret });
-  };
+  // Webhook platformi tanlanganida form maydonlarini avtomatik to'ldirish
+  // (wizard canNext() validatsiyasi uchun)
+  useEffect(() => {
+    if (platform === 'webhook') {
+      update({
+        siteUrl:         WEBHOOK_RECEIVE_URL,
+        webhookEndpoint: WEBHOOK_RECEIVE_URL,
+        webhookSecret:   secretKey,
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [platform]);
 
   if (platform === 'wordpress') {
     return (
@@ -255,70 +247,11 @@ export function ConnectionForm({ platform, data, onChange }: ConnectionFormProps
     );
   }
 
-  // webhook
+  // webhook → AI Builder Prompt
   return (
-    <div className="flex flex-col gap-4">
-      <FloatingInput
-        id="wh-endpoint"
-        label="Endpoint URL"
-        type="url"
-        value={data.webhookEndpoint ?? ''}
-        onChange={(v) => update({ webhookEndpoint: v })}
-        icon={<Link className="w-5 h-5" />}
-        required
-      />
-      <div className="relative group">
-        <FloatingInput
-          id="wh-secret"
-          label="Secret Key"
-          value={data.webhookSecret ?? ''}
-          onChange={(v) => update({ webhookSecret: v })}
-          icon={<Key className="w-5 h-5" />}
-          suffix={
-            <button
-              type="button"
-              onClick={generateSecret}
-              className="text-zinc-500 hover:text-[#FB3640] transition-colors"
-              title="Auto-generate"
-            >
-              <RefreshCw className="w-4 h-4" />
-            </button>
-          }
-        />
-      </div>
-
-      <div className="mt-2">
-        <p className="text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-3">
-          Namuna kod snippet
-        </p>
-        <TabsPrimitive.Root defaultValue="node">
-          <TabsPrimitive.List className="flex gap-1 mb-3 bg-zinc-900 p-1 rounded-xl w-fit">
-            {['node', 'php'].map((tab) => (
-              <TabsPrimitive.Trigger
-                key={tab}
-                value={tab}
-                className={cn(
-                  'px-4 py-1.5 text-xs font-semibold rounded-lg transition-all duration-200',
-                  'text-zinc-400 hover:text-white',
-                  'data-[state=active]:bg-[#FB3640] data-[state=active]:text-white data-[state=active]:shadow'
-                )}
-              >
-                {tab === 'node' ? 'Node.js' : 'PHP'}
-              </TabsPrimitive.Trigger>
-            ))}
-          </TabsPrimitive.List>
-          <TabsPrimitive.Content value="node">
-            <pre className="text-[11px] bg-zinc-950 border border-zinc-800 rounded-xl p-4 text-zinc-300 overflow-x-auto leading-relaxed">
-              {NODE_SNIPPET}
-            </pre>
-          </TabsPrimitive.Content>
-          <TabsPrimitive.Content value="php">
-            <pre className="text-[11px] bg-zinc-950 border border-zinc-800 rounded-xl p-4 text-zinc-300 overflow-x-auto leading-relaxed">
-              {PHP_SNIPPET}
-            </pre>
-          </TabsPrimitive.Content>
-        </TabsPrimitive.Root>
-      </div>
-    </div>
+    <AIBuilderPrompt
+      webhookUrl={WEBHOOK_RECEIVE_URL}
+      secretKey={secretKey}
+    />
   );
 }

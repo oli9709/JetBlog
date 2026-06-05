@@ -6,7 +6,11 @@ import { generatePrompt, PLATFORM_META, type AIPlatform } from '@/lib/ai-builder
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface AIBuilderPromptProps {
-  userId: string;
+  /** Dashboard tab rejimida userId orqali API dan webhook olinadi */
+  userId?: string;
+  /** Wizard rejimi: to'g'ridan-to'g'ri props berilganda API chaqirilmaydi */
+  webhookUrl?: string;
+  secretKey?: string;
 }
 
 interface WebhookData {
@@ -32,17 +36,25 @@ const STEPS = [
 ];
 
 // ─── Component ────────────────────────────────────────────────────────────────
-export function AIBuilderPrompt({ userId }: AIBuilderPromptProps) {
+export function AIBuilderPrompt({ userId, webhookUrl, secretKey: secretKeyProp }: AIBuilderPromptProps) {
+  // Agar webhookUrl + secretKey to'g'ridan-to'g'ri berilgan bo'lsa — static rejim
+  const isStaticMode = !!(webhookUrl && secretKeyProp);
+
   const [platform, setPlatform] = useState<AIPlatform>('nextjs');
-  const [webhook, setWebhook]   = useState<WebhookData | null>(null);
-  const [loading, setLoading]   = useState(false);
+  const [webhook, setWebhook]   = useState<WebhookData | null>(
+    isStaticMode
+      ? { id: 'wizard', endpoint_url: webhookUrl!, secret_key: secretKeyProp!, source_platform: 'nextjs', connection_tested: false }
+      : null
+  );
+  const [loading, setLoading]   = useState(!isStaticMode);
   const [testing, setTesting]   = useState(false);
   const [copied, setCopied]     = useState(false);
   const [tested, setTested]     = useState(false);
   const [error, setError]       = useState<string | null>(null);
 
-  // Auto-create webhook on mount
+  // API dan webhook olish — faqat dashboard rejimida
   useEffect(() => {
+    if (isStaticMode) return;
     void initWebhook();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -123,16 +135,18 @@ export function AIBuilderPrompt({ userId }: AIBuilderPromptProps) {
     await navigator.clipboard.writeText(code);
     setCopied(true);
 
-    // platform ni webhookda yangilash
-    await fetch('/api/webhooks', {
-      method:  'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        id:                 webhook.id,
-        source_platform:    platform,
-        prompt_generated_at: new Date().toISOString(),
-      }),
-    }).catch(() => null);
+    // Faqat dashboard rejimida (wizard rejimida webhook.id = 'wizard') PATCH yuboriladi
+    if (!isStaticMode && webhook.id !== 'wizard') {
+      await fetch('/api/webhooks', {
+        method:  'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id:                  webhook.id,
+          source_platform:     platform,
+          prompt_generated_at: new Date().toISOString(),
+        }),
+      }).catch(() => null);
+    }
 
     setTimeout(() => setCopied(false), 2000);
   }, [webhook, platform]);
@@ -328,31 +342,47 @@ export function AIBuilderPrompt({ userId }: AIBuilderPromptProps) {
         </div>
       </div>
 
-      {/* Test */}
-      <div>
-        <p className="text-xs font-bold text-zinc-400 uppercase tracking-widest mb-3">4. Ulanishni sinab ko&apos;ring</p>
-        <div className="flex items-center gap-4">
-          <button
-            onClick={handleTest}
-            disabled={testing || !webhook}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-[#FB3640] hover:from-cyan-400 text-white font-semibold text-sm transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_0_15px_rgba(6,182,212,0.15)]"
-          >
-            {testing ? (
-              <RefreshCw className="w-4 h-4 animate-spin" />
-            ) : (
-              <Zap className="w-4 h-4" />
-            )}
-            {testing ? 'Yuborilmoqda…' : 'Test so\'rov yuborish'}
-          </button>
+      {/* Test — faqat dashboard rejimida */}
+      {!isStaticMode && (
+        <div>
+          <p className="text-xs font-bold text-zinc-400 uppercase tracking-widest mb-3">4. Ulanishni sinab ko&apos;ring</p>
+          <div className="flex items-center gap-4">
+            <button
+              onClick={handleTest}
+              disabled={testing || !webhook}
+              className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-[#FB3640] hover:from-cyan-400 text-white font-semibold text-sm transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_0_15px_rgba(6,182,212,0.15)]"
+            >
+              {testing ? (
+                <RefreshCw className="w-4 h-4 animate-spin" />
+              ) : (
+                <Zap className="w-4 h-4" />
+              )}
+              {testing ? 'Yuborilmoqda…' : 'Test so\'rov yuborish'}
+            </button>
 
-          {tested && (
-            <span className="flex items-center gap-1.5 text-sm font-bold text-emerald-400">
-              <Check className="w-4 h-4" /> Ulanish muvaffaqiyatli!
-            </span>
-          )}
+            {tested && (
+              <span className="flex items-center gap-1.5 text-sm font-bold text-emerald-400">
+                <Check className="w-4 h-4" /> Ulanish muvaffaqiyatli!
+              </span>
+            )}
+          </div>
+          <p className="text-[11px] text-zinc-500 mt-2">
+            Serveringiz 200 javob qaytarsa, ulanish tayyor. Docs da to&apos;liq qo&apos;llanma:{' '}
+            <a
+              href="/docs/ai-builders"
+              target="_blank"
+              className="text-[#FB3640] hover:underline inline-flex items-center gap-0.5"
+            >
+              docs/ai-builders <ExternalLink className="w-2.5 h-2.5" />
+            </a>
+          </p>
         </div>
-        <p className="text-[11px] text-zinc-500 mt-2">
-          Serveringiz 200 javob qaytarsa, ulanish tayyor. Docs da to&apos;liq qo&apos;llanma:{' '}
+      )}
+
+      {/* Wizard rejimida docs linkini ko'rsatish */}
+      {isStaticMode && (
+        <p className="text-[11px] text-zinc-500">
+          To&apos;liq qo&apos;llanma:{' '}
           <a
             href="/docs/ai-builders"
             target="_blank"
@@ -361,7 +391,7 @@ export function AIBuilderPrompt({ userId }: AIBuilderPromptProps) {
             docs/ai-builders <ExternalLink className="w-2.5 h-2.5" />
           </a>
         </p>
-      </div>
+      )}
 
     </div>
   );
