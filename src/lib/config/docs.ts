@@ -40,6 +40,7 @@ export const docsSitemap: DocSection[] = [
       { slug: 'google-search-console', title: 'Google Search Console' },
       { slug: 'telegram', title: 'Telegram bildirish' },
       { slug: 'webhooks', title: 'Webhooks' },
+      { slug: 'ai-builders', title: 'AI Builder Prompts' },
     ],
   },
   {

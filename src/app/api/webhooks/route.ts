@@ -56,6 +56,37 @@ export async function POST(req: Request) {
   return NextResponse.json({ success: true, webhook: data });
 }
 
+export async function PATCH(req: Request) {
+  const cookieStore = await cookies();
+  const supabase = createRouteHandlerClient<any>({ cookies: () => cookieStore as any });
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+  const { id, ...fields } = await req.json();
+  if (!id) return NextResponse.json({ error: 'id talab qilinadi' }, { status: 400 });
+
+  // Faqat ruxsat etilgan maydonlarni yangilash
+  const allowed = ['source_platform', 'prompt_generated_at', 'connection_tested', 'is_active'];
+  const update: Record<string, any> = {};
+  for (const key of allowed) {
+    if (key in fields) update[key] = fields[key];
+  }
+
+  if (Object.keys(update).length === 0) {
+    return NextResponse.json({ error: 'Yangilanadigan maydon yo\'q' }, { status: 400 });
+  }
+
+  const { data, error } = await supabase
+    .from('webhooks')
+    .update(update)
+    .eq('id', id)
+    .select()
+    .single();
+
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  return NextResponse.json({ success: true, webhook: data });
+}
+
 export async function DELETE(req: Request) {
   const cookieStore = await cookies();
   const supabase = createRouteHandlerClient<any>({ cookies: () => cookieStore as any });

@@ -1,19 +1,30 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Globe, Calendar, Plus, X } from 'lucide-react';
+import { Globe, Calendar, Plus, X, Zap } from 'lucide-react';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
+import * as Tabs from '@radix-ui/react-tabs';
 import { SiteT } from '@/lib/types/supabase';
 import { SupabaseUpdateSite, SupabaseDeleteSite } from '@/lib/API/Database/sites/mutations';
 import { toast } from 'react-toastify';
 import { SiteCard } from './SiteCard';
 import { AddConnectionWizard } from '@/components/connections/AddConnectionWizard';
+import { AIBuilderPrompt } from '@/components/connections/AIBuilderPrompt';
 import { cn } from '@/lib/utils/helpers';
 
 interface ConnectionsClientPropsI {
   initialSites: SiteT[];
   userId: string;
 }
+
+// ─── Tab styles helper ────────────────────────────────────────────────────────
+const tabTriggerCls = (active = false) =>
+  cn(
+    'flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200',
+    active
+      ? 'bg-zinc-800 text-white shadow-sm'
+      : 'text-zinc-400 hover:text-zinc-300 hover:bg-zinc-800/50'
+  );
 
 export default function ConnectionsClient({ initialSites, userId }: ConnectionsClientPropsI) {
   const [sites, setSites] = useState<SiteT[]>(initialSites);
@@ -95,57 +106,91 @@ export default function ConnectionsClient({ initialSites, userId }: ConnectionsC
         </button>
       </div>
 
-      {/* STATS */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-zinc-900/30 backdrop-blur-md border border-zinc-800/60 p-6 rounded-2xl">
-          <div className="text-zinc-400 text-sm font-semibold uppercase tracking-wider">Jami ulanishlar</div>
-          <div className="text-4xl font-extrabold text-white mt-2">{sites.length} ta</div>
-        </div>
-        <div className="bg-zinc-900/30 backdrop-blur-md border border-zinc-800/60 p-6 rounded-2xl">
-          <div className="text-zinc-400 text-sm font-semibold uppercase tracking-wider">Faol autopilotlar</div>
-          <div className="text-4xl font-extrabold text-cyan-400 mt-2">
-            {sites.filter((s) => s.is_active).length} ta
-          </div>
-        </div>
-        <div className="bg-zinc-900/30 backdrop-blur-md border border-zinc-800/60 p-6 rounded-2xl">
-          <div className="text-zinc-400 text-sm font-semibold uppercase tracking-wider">Navbatdagi nashr kuni</div>
-          <div className="text-lg font-semibold text-zinc-300 mt-3 flex items-center gap-2">
-            <Calendar className="w-5 h-5 text-[#FF6B6B]" />
-            Har kuni soat 03:00 UTC
-          </div>
-        </div>
-      </div>
-
-      {/* SITES LIST */}
-      {sites.length === 0 ? (
-        <div className="flex flex-col items-center justify-center p-12 bg-zinc-900/20 backdrop-blur-md border border-zinc-800/60 rounded-3xl text-center">
-          <Globe className="w-16 h-16 text-zinc-600 mb-4 animate-pulse" />
-          <h3 className="text-xl font-bold text-zinc-300">Hech qanday sayt ulanmagan</h3>
-          <p className="text-zinc-500 mt-2 max-w-md">
-            TextPilot.AI yordamida saytingizga avtomatik AI SEO maqolalarni yuklash uchun birinchi saytingizni bog&apos;lang.
-          </p>
-          <button
-            onClick={() => setShowWizard(true)}
-            className="mt-6 flex items-center gap-2 px-5 py-2.5 rounded-xl border border-cyan-500/30 hover:border-cyan-500 text-cyan-400 hover:text-cyan-300 font-semibold transition-all duration-300"
+      {/* TABS */}
+      <Tabs.Root defaultValue="sites" className="space-y-6">
+        {/* Tab list */}
+        <Tabs.List className="flex items-center gap-1 p-1 bg-zinc-900/40 backdrop-blur-md border border-zinc-800/60 rounded-2xl w-fit">
+          <Tabs.Trigger
+            value="sites"
+            className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 text-zinc-400 hover:text-zinc-300 data-[state=active]:bg-zinc-800 data-[state=active]:text-white data-[state=active]:shadow-sm"
           >
-            <Plus className="w-5 h-5" />
-            Birinchi saytni ulash
-          </button>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-          {sites.map((site) => (
-            <SiteCard
-              key={site.id}
-              site={site}
-              onDelete={handleDeleteSite}
-              onToggle={handleToggleActive}
-              onConnectTelegram={handleConnectTelegram}
-              onDisconnectTelegram={handleDisconnectTelegram}
-            />
-          ))}
-        </div>
-      )}
+            <Globe className="w-4 h-4" />
+            Saytlar
+          </Tabs.Trigger>
+          <Tabs.Trigger
+            value="ai-builder"
+            className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 text-zinc-400 hover:text-zinc-300 data-[state=active]:bg-zinc-800 data-[state=active]:text-white data-[state=active]:shadow-sm"
+          >
+            <Zap className="w-4 h-4 text-[#FB3640]" />
+            AI Builder
+            <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded-full bg-[#FB3640]/20 text-[#FF8A8F] border border-[#FB3640]/30">
+              NEW
+            </span>
+          </Tabs.Trigger>
+        </Tabs.List>
+
+        {/* ─── Sites tab ─── */}
+        <Tabs.Content value="sites" className="space-y-6">
+          {/* STATS */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="bg-zinc-900/30 backdrop-blur-md border border-zinc-800/60 p-6 rounded-2xl">
+              <div className="text-zinc-400 text-sm font-semibold uppercase tracking-wider">Jami ulanishlar</div>
+              <div className="text-4xl font-extrabold text-white mt-2">{sites.length} ta</div>
+            </div>
+            <div className="bg-zinc-900/30 backdrop-blur-md border border-zinc-800/60 p-6 rounded-2xl">
+              <div className="text-zinc-400 text-sm font-semibold uppercase tracking-wider">Faol autopilotlar</div>
+              <div className="text-4xl font-extrabold text-cyan-400 mt-2">
+                {sites.filter((s) => s.is_active).length} ta
+              </div>
+            </div>
+            <div className="bg-zinc-900/30 backdrop-blur-md border border-zinc-800/60 p-6 rounded-2xl">
+              <div className="text-zinc-400 text-sm font-semibold uppercase tracking-wider">Navbatdagi nashr kuni</div>
+              <div className="text-lg font-semibold text-zinc-300 mt-3 flex items-center gap-2">
+                <Calendar className="w-5 h-5 text-[#FF6B6B]" />
+                Har kuni soat 03:00 UTC
+              </div>
+            </div>
+          </div>
+
+          {/* SITES LIST */}
+          {sites.length === 0 ? (
+            <div className="flex flex-col items-center justify-center p-12 bg-zinc-900/20 backdrop-blur-md border border-zinc-800/60 rounded-3xl text-center">
+              <Globe className="w-16 h-16 text-zinc-600 mb-4 animate-pulse" />
+              <h3 className="text-xl font-bold text-zinc-300">Hech qanday sayt ulanmagan</h3>
+              <p className="text-zinc-500 mt-2 max-w-md">
+                TextPilot.AI yordamida saytingizga avtomatik AI SEO maqolalarni yuklash uchun birinchi saytingizni bog&apos;lang.
+              </p>
+              <button
+                onClick={() => setShowWizard(true)}
+                className="mt-6 flex items-center gap-2 px-5 py-2.5 rounded-xl border border-cyan-500/30 hover:border-cyan-500 text-cyan-400 hover:text-cyan-300 font-semibold transition-all duration-300"
+              >
+                <Plus className="w-5 h-5" />
+                Birinchi saytni ulash
+              </button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+              {sites.map((site) => (
+                <SiteCard
+                  key={site.id}
+                  site={site}
+                  onDelete={handleDeleteSite}
+                  onToggle={handleToggleActive}
+                  onConnectTelegram={handleConnectTelegram}
+                  onDisconnectTelegram={handleDisconnectTelegram}
+                />
+              ))}
+            </div>
+          )}
+        </Tabs.Content>
+
+        {/* ─── AI Builder tab ─── */}
+        <Tabs.Content value="ai-builder">
+          <div className="bg-zinc-900/30 backdrop-blur-md border border-zinc-800/60 p-6 md:p-8 rounded-2xl">
+            <AIBuilderPrompt userId={userId} />
+          </div>
+        </Tabs.Content>
+      </Tabs.Root>
 
       {/* WIZARD DIALOG */}
       <DialogPrimitive.Root open={showWizard} onOpenChange={setShowWizard}>

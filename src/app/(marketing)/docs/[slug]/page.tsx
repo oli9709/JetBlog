@@ -19,6 +19,7 @@ import { WebhooksIntPage } from '@/components/docs/content/WebhooksIntPage';
 import { ApiAuthPage } from '@/components/docs/content/ApiAuthPage';
 import { ApiEndpointsPage } from '@/components/docs/content/ApiEndpointsPage';
 import { ApiErrorsPage } from '@/components/docs/content/ApiErrorsPage';
+import { AIBuilders } from '@/components/docs/content/AIBuilders';
 
 const CONTENT_MAP: Record<string, React.ReactNode> = {
   'nima': <NimaPage />,
@@ -37,6 +38,7 @@ const CONTENT_MAP: Record<string, React.ReactNode> = {
   'api-auth': <ApiAuthPage />,
   'api-endpoints': <ApiEndpointsPage />,
   'api-errors': <ApiErrorsPage />,
+  'ai-builders': <AIBuilders />,
 };
 
 export function generateStaticParams() {
