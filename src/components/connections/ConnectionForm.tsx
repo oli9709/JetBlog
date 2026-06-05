@@ -9,7 +9,8 @@ import { AIBuilderPrompt } from './AIBuilderPrompt';
 const WEBHOOK_RECEIVE_URL = 'https://jet-blog-zeta.vercel.app/api/webhooks/receive';
 
 function generateSecret(): string {
-  return Array.from(crypto.getRandomValues(new Uint8Array(16)))
+  // 32 byte = 64 hex char — server crypto.randomBytes(32) bilan mos
+  return Array.from(crypto.getRandomValues(new Uint8Array(32)))
     .map((b) => b.toString(16).padStart(2, '0'))
     .join('');
 }

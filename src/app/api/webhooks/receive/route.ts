@@ -13,12 +13,17 @@ export async function POST(req: Request) {
   try {
     const rawBody = await req.text();
 
+    // 0. Bo'sh payload tekshiruvi
+    if (!rawBody) {
+      return NextResponse.json({ error: 'Empty payload' }, { status: 400 });
+    }
+
     // 1. Webhook ID headerdan olish
     const webhookId = req.headers.get('x-jetblog-webhook-id');
     const signature  = req.headers.get('x-jetblog-signature');
 
     if (!webhookId) {
-      return NextResponse.json({ error: 'X-JetBlog-Webhook-Id header talab qilinadi' }, { status: 400 });
+      return NextResponse.json({ error: 'Missing webhook ID' }, { status: 400 });
     }
 
     // 2. Webhook ma'lumotlarini olish
@@ -43,13 +48,22 @@ export async function POST(req: Request) {
         .update(rawBody)
         .digest('hex');
 
-      const isValid = crypto.timingSafeEqual(
-        Buffer.from(signature.replace(/^sha256=/, ''), 'hex'),
-        Buffer.from(expected, 'hex')
-      );
+      const sigHex = signature.replace(/^sha256=/, '');
+
+      // timingSafeEqual bir xil uzunlikdagi bufferlar talab qiladi
+      // noto'g'ri hex bo'lsa 401 qaytarish
+      let isValid = false;
+      try {
+        const sigBuf      = Buffer.from(sigHex, 'hex');
+        const expectedBuf = Buffer.from(expected, 'hex');
+        isValid = sigBuf.length === expectedBuf.length &&
+          crypto.timingSafeEqual(sigBuf, expectedBuf);
+      } catch {
+        isValid = false;
+      }
 
       if (!isValid) {
-        return NextResponse.json({ error: 'Noto\'g\'ri imzo' }, { status: 401 });
+        return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
       }
     }
 
