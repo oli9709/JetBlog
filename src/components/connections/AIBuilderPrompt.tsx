@@ -1,14 +1,15 @@
 'use client';
 
 import React, { useState, useCallback, useEffect } from 'react';
-import { Copy, Check, Zap, RefreshCw, ExternalLink, ChevronRight } from 'lucide-react';
-import { generatePrompt, PLATFORM_META, type AIPlatform } from '@/lib/ai-builder-prompts';
+import { Copy, Check, Zap, RefreshCw, ExternalLink } from 'lucide-react';
+import { generateUniversalPrompt } from '@/lib/ai-builder-prompts';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
+
 interface AIBuilderPromptProps {
-  /** Dashboard tab rejimida userId orqali API dan webhook olinadi */
+  /** Dashboard tab rejimi — API dan webhook olinadi */
   userId?: string;
-  /** Wizard rejimi: to'g'ridan-to'g'ri props berilganda API chaqirilmaydi */
+  /** Wizard rejimi — to'g'ridan-to'g'ri props, API chaqirilmaydi */
   webhookUrl?: string;
   secretKey?: string;
 }
@@ -17,42 +18,50 @@ interface WebhookData {
   id: string;
   endpoint_url: string;
   secret_key: string;
-  source_platform: AIPlatform;
   connection_tested: boolean;
 }
+
+// ─── Constants ────────────────────────────────────────────────────────────────
 
 const RECEIVE_URL =
   typeof window !== 'undefined'
     ? `${window.location.origin}/api/webhooks/receive`
     : '/api/webhooks/receive';
 
-const PLATFORMS: AIPlatform[] = ['nextjs', 'laravel', 'django', 'nuxt'];
+const AI_BUILDERS: { name: string; url: string; icon: string; color: string }[] = [
+  { name: 'Bolt',     url: 'https://bolt.new',     icon: '⚡', color: 'from-yellow-500/20 to-yellow-600/10 border-yellow-500/30 text-yellow-300' },
+  { name: 'Lovable',  url: 'https://lovable.dev',  icon: '💜', color: 'from-purple-500/20 to-purple-600/10 border-purple-500/30 text-purple-300' },
+  { name: 'v0',       url: 'https://v0.dev',       icon: '▲',  color: 'from-zinc-500/20 to-zinc-600/10 border-zinc-500/30 text-zinc-200' },
+  { name: 'Cursor',   url: 'https://cursor.sh',    icon: '🖱️', color: 'from-blue-500/20 to-blue-600/10 border-blue-500/30 text-blue-300' },
+];
 
-const STEPS = [
-  'Platformani tanlang',
-  'Kodni nusxalang',
-  'Serveringizga joylashtiring',
-  'Ulanishni sinab ko\'ring',
+const STEPS: { num: string; title: string; desc: string }[] = [
+  { num: '1', title: 'Promptni nusxalang',           desc: '"Nusxalash" tugmasini bosing' },
+  { num: '2', title: 'AI Builder ni oching',          desc: 'Bolt, v0, Lovable yoki Cursor' },
+  { num: '3', title: 'Loyihangizni yuklang',          desc: 'Mavjud kodni import qiling yoki yangi yarating' },
+  { num: '4', title: 'Promptni chat ga joylashtiring', desc: 'Nusxalangan matnni to\'g\'ridan-to\'g\'ri yuboring' },
+  { num: '5', title: 'AI deploy qiladi',              desc: 'Barcha fayllar avtomatik yaratiladi' },
+  { num: '6', title: 'Ulanishni sinab ko\'ring',      desc: '"Test so\'rov" tugmasi bilan tekshiring' },
 ];
 
 // ─── Component ────────────────────────────────────────────────────────────────
+
 export function AIBuilderPrompt({ userId, webhookUrl, secretKey: secretKeyProp }: AIBuilderPromptProps) {
-  // Agar webhookUrl + secretKey to'g'ridan-to'g'ri berilgan bo'lsa — static rejim
   const isStaticMode = !!(webhookUrl && secretKeyProp);
 
-  const [platform, setPlatform] = useState<AIPlatform>('nextjs');
-  const [webhook, setWebhook]   = useState<WebhookData | null>(
+  const [webhook, setWebhook] = useState<WebhookData | null>(
     isStaticMode
-      ? { id: 'wizard', endpoint_url: webhookUrl!, secret_key: secretKeyProp!, source_platform: 'nextjs', connection_tested: false }
+      ? { id: 'wizard', endpoint_url: webhookUrl!, secret_key: secretKeyProp!, connection_tested: false }
       : null
   );
   const [loading, setLoading]   = useState(!isStaticMode);
   const [testing, setTesting]   = useState(false);
+  const [testError, setTestError] = useState<string | null>(null);
   const [copied, setCopied]     = useState(false);
   const [tested, setTested]     = useState(false);
-  const [error, setError]       = useState<string | null>(null);
+  const [initError, setInitError] = useState<string | null>(null);
 
-  // API dan webhook olish — faqat dashboard rejimida
+  // Dashboard rejimida — mount da webhook avtomatik olinadi / yaratiladi
   useEffect(() => {
     if (isStaticMode) return;
     void initWebhook();
@@ -61,157 +70,129 @@ export function AIBuilderPrompt({ userId, webhookUrl, secretKey: secretKeyProp }
 
   const initWebhook = async () => {
     setLoading(true);
-    setError(null);
+    setInitError(null);
     try {
-      // Avval mavjud AI builder webhookini tekshirish
-      const listRes = await fetch('/api/webhooks');
-      const listJson = await listRes.json();
+      const listRes  = await fetch('/api/webhooks');
+      const listJson = await listRes.json() as { webhooks?: WebhookData[] };
       const existing = (listJson.webhooks ?? []).find(
-        (w: any) => w.endpoint_url === RECEIVE_URL
+        (w) => w.endpoint_url === RECEIVE_URL
       );
 
       if (existing) {
-        setWebhook({
-          id:                existing.id,
-          endpoint_url:      existing.endpoint_url,
-          secret_key:        existing.secret_key,
-          source_platform:   existing.source_platform ?? 'nextjs',
-          connection_tested: existing.connection_tested ?? false,
-        });
-        setPlatform(existing.source_platform ?? 'nextjs');
+        setWebhook(existing);
         setTested(existing.connection_tested ?? false);
         return;
       }
 
-      // Yangi webhook yaratish — avval birinchi saytni topish kerak
-      const sitesRes = await fetch('/api/sites');
-      const sitesJson = await sitesRes.json();
+      const sitesRes  = await fetch('/api/sites');
+      const sitesJson = await sitesRes.json() as { sites?: { id: string }[] };
       const firstSite = sitesJson.sites?.[0];
 
       if (!firstSite) {
-        setError('Avval kamida bitta sayt uling (Connections → Sayt qo\'shish)');
+        setInitError('Avval kamida bitta sayt uling (Connections → Sayt qo\'shish)');
         return;
       }
 
-      const createRes = await fetch('/api/webhooks', {
-        method: 'POST',
+      const createRes  = await fetch('/api/webhooks', {
+        method:  'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          site_id:         firstSite.id,
-          endpoint_url:    RECEIVE_URL,
-          events:          ['article.published'],
-          source_platform: platform,
+          site_id:      firstSite.id,
+          endpoint_url: RECEIVE_URL,
+          events:       ['article.published'],
         }),
       });
+      const createJson = await createRes.json() as { webhook?: WebhookData; error?: string };
 
-      const createJson = await createRes.json();
       if (!createRes.ok || !createJson.webhook) {
-        setError(createJson.error ?? 'Webhook yaratishda xatolik');
+        setInitError(createJson.error ?? 'Webhook yaratishda xatolik');
         return;
       }
-
-      setWebhook({
-        id:                createJson.webhook.id,
-        endpoint_url:      createJson.webhook.endpoint_url,
-        secret_key:        createJson.webhook.secret_key,
-        source_platform:   createJson.webhook.source_platform ?? platform,
-        connection_tested: false,
-      });
-    } catch (e: any) {
-      setError(e?.message ?? 'Kutilmagan xatolik');
+      setWebhook(createJson.webhook);
+    } catch (e: unknown) {
+      setInitError(e instanceof Error ? e.message : 'Kutilmagan xatolik');
     } finally {
       setLoading(false);
     }
   };
 
+  const prompt = webhook
+    ? generateUniversalPrompt(webhook.endpoint_url, webhook.secret_key)
+    : '';
+
   const handleCopy = useCallback(async () => {
-    if (!webhook) return;
-    const code = generatePrompt({
-      platform,
-      webhookUrl:  webhook.endpoint_url,
-      secretKey:   webhook.secret_key,
-      webhookId:   webhook.id,
-    });
-    await navigator.clipboard.writeText(code);
+    if (!prompt) return;
+    await navigator.clipboard.writeText(prompt);
     setCopied(true);
 
-    // Faqat dashboard rejimida (wizard rejimida webhook.id = 'wizard') PATCH yuboriladi
-    if (!isStaticMode && webhook.id !== 'wizard') {
+    if (!isStaticMode && webhook && webhook.id !== 'wizard') {
       await fetch('/api/webhooks', {
         method:  'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           id:                  webhook.id,
-          source_platform:     platform,
           prompt_generated_at: new Date().toISOString(),
         }),
       }).catch(() => null);
     }
 
-    setTimeout(() => setCopied(false), 2000);
-  }, [webhook, platform]);
+    setTimeout(() => setCopied(false), 2500);
+  }, [prompt, webhook, isStaticMode]);
 
   const handleTest = async () => {
     if (!webhook) return;
     setTesting(true);
+    setTestError(null);
     try {
-      const testBody = JSON.stringify({
+      const body = JSON.stringify({
         event: 'article.published',
         data: {
-          id:              'test-article-id',
-          title:           'Test maqola — JetBlog AI Builder',
-          keyword:         'test keyword',
-          content:         '<h1>Test</h1><p>Bu test so\'rov.</p>',
+          id:               'test-article-id',
+          title:            'Test maqola — JetBlog AI Builder',
+          keyword:          'test keyword',
+          content:          '<h1>Test</h1><p>Bu test so\'rov.</p>',
           featuredImageUrl: null,
-          publishedAt:     new Date().toISOString(),
+          publishedAt:      new Date().toISOString(),
         },
         timestamp: new Date().toISOString(),
       });
 
       const res = await fetch(webhook.endpoint_url, {
-        method: 'POST',
+        method:  'POST',
         headers: {
-          'Content-Type':          'application/json',
-          'X-JetBlog-Webhook-Id':  webhook.id,
+          'Content-Type':         'application/json',
+          'X-JetBlog-Webhook-Id': webhook.id,
         },
-        body: testBody,
+        body,
       });
 
       if (res.ok) {
         setTested(true);
         setWebhook((prev) => prev ? { ...prev, connection_tested: true } : prev);
       } else {
-        setError(`Test so'rov xatolik: HTTP ${res.status}`);
+        setTestError(`HTTP ${res.status} — serveringizda xatolik`);
       }
     } catch {
-      setError('Test so\'rov yuborib bo\'lmadi. Server ishlamayapti?');
+      setTestError('Server javob bermadi. Deploy qilinganmi?');
     } finally {
       setTesting(false);
     }
   };
 
-  const prompt = webhook
-    ? generatePrompt({
-        platform,
-        webhookUrl:  webhook.endpoint_url,
-        secretKey:   webhook.secret_key,
-        webhookId:   webhook.id,
-      })
-    : '';
-
-  // ─── Render ──────────────────────────────────────────────────────────────────
+  // ─── Loading ─────────────────────────────────────────────────────────────────
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-24">
-        <div className="w-8 h-8 border-2 border-[#FB3640]/40 border-t-[#FB3640] rounded-full animate-spin" />
+      <div className="flex items-center justify-center py-20">
+        <div className="w-8 h-8 border-2 border-[#FB3640]/30 border-t-[#FB3640] rounded-full animate-spin" />
       </div>
     );
   }
 
-  if (error) {
+  // ─── Init error ───────────────────────────────────────────────────────────────
+  if (initError) {
     return (
       <div className="rounded-2xl border border-red-500/30 bg-red-500/10 p-6 text-center space-y-4">
-        <p className="text-red-400 text-sm">{error}</p>
+        <p className="text-red-400 text-sm">{initError}</p>
         <button
           onClick={initWebhook}
           className="px-4 py-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-sm transition-colors"
@@ -222,141 +203,140 @@ export function AIBuilderPrompt({ userId, webhookUrl, secretKey: secretKeyProp }
     );
   }
 
+  // ─── Main render ─────────────────────────────────────────────────────────────
   return (
     <div className="space-y-8">
 
-      {/* Intro */}
-      <div className="rounded-2xl border border-zinc-800/80 bg-zinc-900/40 p-6 flex items-start gap-4">
-        <div className="p-2 rounded-xl bg-[#FB3640]/10 border border-[#FB3640]/20 text-[#FB3640] shrink-0">
+      {/* ── Header ── */}
+      <div className="flex items-start gap-4 rounded-2xl border border-zinc-800/80 bg-zinc-900/40 p-5">
+        <div className="p-2 rounded-xl bg-[#FB3640]/10 border border-[#FB3640]/20 text-[#FB3640] shrink-0 mt-0.5">
           <Zap className="w-5 h-5" />
         </div>
         <div>
-          <h3 className="text-sm font-bold text-white">AI Builder Prompts nima?</h3>
+          <h3 className="text-sm font-bold text-white">AI Builder Prompts</h3>
           <p className="text-xs text-zinc-400 mt-1 leading-relaxed">
-            Maxsus kod snippet yordamida JetBlog bilan o&apos;z serveringizni ulang. Maqola nashr bo&apos;lganda sizning
-            serveringiz avtomatik xabardor qilinadi — WordPress kerak emas.
+            Quyidagi universal promptni AI Builder ga bering — loyihangizni avtomatik
+            skanlab, blog tizimini to&apos;liq sozlab beradi. WordPress kerak emas.
           </p>
         </div>
       </div>
 
-      {/* Step indicator */}
-      <div className="flex items-center gap-0 overflow-x-auto pb-1">
-        {STEPS.map((step, i) => (
-          <React.Fragment key={step}>
-            <div className="flex items-center gap-2 shrink-0">
-              <span
-                className={`w-6 h-6 rounded-full text-[10px] font-extrabold flex items-center justify-center border
-                  ${i === 0 ? 'bg-[#FB3640]/20 border-[#FB3640]/40 text-[#FF8A8F]' : 'bg-zinc-800 border-zinc-700 text-zinc-500'}`}
-              >
-                {i + 1}
-              </span>
-              <span className={`text-xs font-semibold whitespace-nowrap ${i === 0 ? 'text-zinc-300' : 'text-zinc-600'}`}>
-                {step}
-              </span>
-            </div>
-            {i < STEPS.length - 1 && (
-              <ChevronRight className="w-3 h-3 text-zinc-700 mx-2 shrink-0" />
-            )}
-          </React.Fragment>
-        ))}
-      </div>
-
-      {/* Platform selector */}
+      {/* ── Prompt box ── */}
       <div>
-        <p className="text-xs font-bold text-zinc-400 uppercase tracking-widest mb-3">1. Platformangizni tanlang</p>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          {PLATFORMS.map((p) => {
-            const meta = PLATFORM_META[p];
-            const active = platform === p;
-            return (
-              <button
-                key={p}
-                onClick={() => setPlatform(p)}
-                className={`flex flex-col items-center gap-2 p-4 rounded-2xl border transition-all duration-200 font-semibold text-sm
-                  ${active
-                    ? 'border-[#FB3640]/50 bg-[#FB3640]/10 text-white shadow-[0_0_15px_rgba(251,54,64,0.1)]'
-                    : 'border-zinc-800 bg-zinc-900/40 text-zinc-400 hover:border-zinc-700 hover:text-zinc-300'
-                  }`}
-              >
-                <span className="text-2xl">{meta.icon}</span>
-                <span>{meta.label}</span>
-              </button>
-            );
-          })}
+        <div className="flex items-center justify-between mb-3">
+          <p className="text-xs font-bold text-zinc-400 uppercase tracking-widest">
+            Tayyor prompt
+          </p>
+          <button
+            onClick={handleCopy}
+            disabled={!webhook}
+            className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold transition-all duration-200 disabled:opacity-40
+              ${copied
+                ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                : 'bg-[#FB3640] hover:bg-[#FF6B6B] text-white shadow-[0_0_15px_rgba(251,54,64,0.25)]'
+              }`}
+          >
+            {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+            {copied ? 'Nusxalandi!' : 'Nusxalash'}
+          </button>
+        </div>
+
+        <div className="relative rounded-2xl border border-zinc-800 bg-zinc-950 overflow-hidden">
+          {/* Window bar */}
+          <div className="flex items-center gap-1.5 px-4 py-3 border-b border-zinc-800 bg-zinc-900/60">
+            <span className="w-2.5 h-2.5 rounded-full bg-rose-500/70" />
+            <span className="w-2.5 h-2.5 rounded-full bg-amber-500/70" />
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/70" />
+            <span className="text-[10px] text-zinc-500 font-mono ml-2">
+              AI Builder Prompt — JetBlog Universal
+            </span>
+          </div>
+          <pre className="overflow-x-auto p-5 text-[11px] text-zinc-300 font-mono leading-relaxed max-h-[280px] whitespace-pre-wrap">
+            <code>{prompt || 'Yuklanmoqda…'}</code>
+          </pre>
+          {/* Fade bottom */}
+          <div className="absolute bottom-0 left-0 right-0 h-10 bg-gradient-to-t from-zinc-950 to-transparent pointer-events-none" />
         </div>
       </div>
 
-      {/* Code block */}
-      {webhook && (
-        <div>
-          <div className="flex items-center justify-between mb-3">
-            <p className="text-xs font-bold text-zinc-400 uppercase tracking-widest">2. Kodni nusxalang</p>
-            <div className="flex items-center gap-2">
-              {webhook.id && (
-                <span className="text-[10px] text-zinc-500 font-mono">ID: {webhook.id.slice(0, 8)}…</span>
-              )}
-              <button
-                onClick={handleCopy}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-200
-                  ${copied
-                    ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
-                    : 'bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border border-zinc-700'
-                  }`}
-              >
-                {copied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
-                {copied ? 'Nusxalandi!' : 'Nusxalash'}
-              </button>
-            </div>
-          </div>
-          <div className="relative rounded-2xl border border-zinc-800 bg-zinc-950 overflow-hidden">
-            {/* Window bar */}
-            <div className="flex items-center gap-1.5 px-4 py-3 border-b border-zinc-800 bg-zinc-900/50">
-              <span className="w-2.5 h-2.5 rounded-full bg-rose-500/70" />
-              <span className="w-2.5 h-2.5 rounded-full bg-amber-500/70" />
-              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/70" />
-              <span className="text-[10px] text-zinc-500 font-mono ml-2">
-                {platform === 'nextjs'  && 'app/api/jetblog/route.ts'}
-                {platform === 'laravel' && 'app/Http/Controllers/JetBlogController.php'}
-                {platform === 'django'  && 'views.py'}
-                {platform === 'nuxt'    && 'server/api/jetblog/receive.post.ts'}
-              </span>
-            </div>
-            <pre className="overflow-x-auto p-5 text-xs text-zinc-300 font-mono leading-relaxed max-h-[360px]">
-              <code>{prompt}</code>
-            </pre>
-          </div>
+      {/* ── AI Builder links ── */}
+      <div>
+        <p className="text-xs font-bold text-zinc-400 uppercase tracking-widest mb-3">
+          Qaysi AI Builder ga joylashtirasiz?
+        </p>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          {AI_BUILDERS.map(({ name, url, icon, color }) => (
+            <a
+              key={name}
+              href={url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`flex flex-col items-center gap-2 p-4 rounded-2xl border bg-gradient-to-b ${color} font-semibold text-sm transition-all duration-200 hover:scale-[1.03] hover:shadow-lg`}
+            >
+              <span className="text-2xl">{icon}</span>
+              <span>{name}</span>
+              <ExternalLink className="w-3 h-3 opacity-50" />
+            </a>
+          ))}
         </div>
-      )}
+      </div>
 
-      {/* Env hint */}
+      {/* ── 6-qadam yo'riqnoma ── */}
+      <div>
+        <p className="text-xs font-bold text-zinc-400 uppercase tracking-widest mb-4">
+          Qanday ishlaydi?
+        </p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {STEPS.map(({ num, title, desc }) => (
+            <div
+              key={num}
+              className="flex items-start gap-3 p-4 rounded-xl border border-zinc-800/60 bg-zinc-900/30"
+            >
+              <span className="w-6 h-6 rounded-full bg-[#FB3640]/20 border border-[#FB3640]/30 text-[#FF8A8F] text-[10px] font-extrabold flex items-center justify-center shrink-0 mt-0.5">
+                {num}
+              </span>
+              <div>
+                <p className="text-xs font-bold text-white">{title}</p>
+                <p className="text-[11px] text-zinc-500 mt-0.5">{desc}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ── Env hint ── */}
       <div className="rounded-xl border border-amber-500/20 bg-amber-500/5 p-4 flex items-start gap-3">
-        <span className="text-amber-400 text-lg shrink-0">⚠️</span>
+        <span className="text-amber-400 shrink-0">⚠️</span>
         <div className="space-y-1">
-          <p className="text-xs font-bold text-amber-300">Secret keyni muhit o&apos;zgaruvchisiga ko&apos;chiring</p>
+          <p className="text-xs font-bold text-amber-300">
+            Secret keyni muhit o&apos;zgaruvchisiga ko&apos;chiring
+          </p>
           <p className="text-[11px] text-zinc-400 leading-relaxed">
-            Kod ichidagi secret keyni to&apos;g&apos;ridan-to&apos;g&apos;ri ishlatmang.{' '}
-            <code className="bg-zinc-800 px-1 rounded text-zinc-300">.env</code> faylga{' '}
-            <code className="bg-zinc-800 px-1 rounded text-zinc-300">JETBLOG_SECRET={webhook?.secret_key ?? '...'}</code>{' '}
-            ko&apos;rinishida saqlang.
+            <code className="bg-zinc-800 px-1 rounded text-zinc-300">.env.local</code> faylga{' '}
+            <code className="bg-zinc-800 px-1 rounded text-zinc-300">
+              JETBLOG_SECRET={webhook?.secret_key ?? '…'}
+            </code>{' '}
+            qo&apos;shing. Hech qachon kodni to&apos;g&apos;ridan-to&apos;g&apos;ri ishlatmang.
           </p>
         </div>
       </div>
 
-      {/* Test — faqat dashboard rejimida */}
+      {/* ── Test tugmasi — faqat dashboard rejimida ── */}
       {!isStaticMode && (
-        <div>
-          <p className="text-xs font-bold text-zinc-400 uppercase tracking-widest mb-3">4. Ulanishni sinab ko&apos;ring</p>
-          <div className="flex items-center gap-4">
+        <div className="space-y-3">
+          <p className="text-xs font-bold text-zinc-400 uppercase tracking-widest">
+            Ulanishni sinab ko&apos;ring
+          </p>
+          <div className="flex items-center gap-4 flex-wrap">
             <button
               onClick={handleTest}
               disabled={testing || !webhook}
               className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-[#FB3640] hover:from-cyan-400 text-white font-semibold text-sm transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_0_15px_rgba(6,182,212,0.15)]"
             >
-              {testing ? (
-                <RefreshCw className="w-4 h-4 animate-spin" />
-              ) : (
-                <Zap className="w-4 h-4" />
-              )}
+              {testing
+                ? <RefreshCw className="w-4 h-4 animate-spin" />
+                : <Zap className="w-4 h-4" />
+              }
               {testing ? 'Yuborilmoqda…' : 'Test so\'rov yuborish'}
             </button>
 
@@ -366,20 +346,27 @@ export function AIBuilderPrompt({ userId, webhookUrl, secretKey: secretKeyProp }
               </span>
             )}
           </div>
-          <p className="text-[11px] text-zinc-500 mt-2">
-            Serveringiz 200 javob qaytarsa, ulanish tayyor. Docs da to&apos;liq qo&apos;llanma:{' '}
+
+          {testError && (
+            <p className="text-xs text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">
+              {testError}
+            </p>
+          )}
+
+          <p className="text-[11px] text-zinc-500">
+            Serveringiz 200 javob qaytarsa, ulanish tayyor.{' '}
             <a
               href="/docs/ai-builders"
               target="_blank"
               className="text-[#FB3640] hover:underline inline-flex items-center gap-0.5"
             >
-              docs/ai-builders <ExternalLink className="w-2.5 h-2.5" />
+              To&apos;liq qo&apos;llanma <ExternalLink className="w-2.5 h-2.5" />
             </a>
           </p>
         </div>
       )}
 
-      {/* Wizard rejimida docs linkini ko'rsatish */}
+      {/* Wizard rejimida — faqat docs link ── */}
       {isStaticMode && (
         <p className="text-[11px] text-zinc-500">
           To&apos;liq qo&apos;llanma:{' '}
