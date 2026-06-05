@@ -5,7 +5,8 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/Avatar';
 import { Button } from '@/components/ui/Button';
 import Link from 'next/link';
 import { Icons } from '@/components/Icons';
-import { useTheme } from 'next-themes';
+
+
 
 // ─── Plan badge config ──────────────────────────────────────────────────────────
 const PLAN_STYLES: Record<string, { bg: string; text: string; label: string }> = {
@@ -33,18 +34,12 @@ interface UserNavProps {
 }
 
 export function UserNav({ email, display_name, avatar_url, plan, credits_remaining }: UserNavProps) {
-  const { setTheme } = useTheme();
-
-  const [isThemeOpen, setIsThemeOpen] = useState(false);
-  const themeRef = useRef<HTMLDivElement>(null);
-
   const [isUserOpen, setIsUserOpen] = useState(false);
   const userRef = useRef<HTMLDivElement>(null);
 
-  // Close dropdowns on click outside
+  // Close dropdown on click outside
   useEffect(() => {
     const handler = (e: MouseEvent) => {
-      if (themeRef.current && !themeRef.current.contains(e.target as Node)) setIsThemeOpen(false);
       if (userRef.current && !userRef.current.contains(e.target as Node)) setIsUserOpen(false);
     };
     document.addEventListener('mousedown', handler);
@@ -81,34 +76,6 @@ export function UserNav({ email, display_name, avatar_url, plan, credits_remaini
 
   return (
     <div className="flex items-center space-x-4">
-      {/* ── Theme Toggle ─────────────────────────────────── */}
-      <div className="relative" ref={themeRef}>
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={() => setIsThemeOpen(!isThemeOpen)}
-          className="h-9 w-9 rounded-lg focus-visible:ring-0 focus-visible:ring-offset-0"
-        >
-          <Icons.Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-          <Icons.Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-          <span className="sr-only">Toggle theme</span>
-        </Button>
-
-        {isThemeOpen && (
-          <div className="absolute right-0 mt-1.5 z-50 w-36 rounded-lg border bg-popover text-popover-foreground shadow-md p-1 animate-in fade-in slide-in-from-top-2 duration-150">
-            {(['light', 'dark', 'system'] as const).map((t) => (
-              <button
-                key={t}
-                onClick={() => { setTheme(t); setIsThemeOpen(false); }}
-                className="w-full flex items-center px-3 py-2 text-sm rounded-md hover:bg-accent hover:text-accent-foreground text-left transition-colors"
-              >
-                {t.charAt(0).toUpperCase() + t.slice(1)}
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
-
       {/* ── User Menu ─────────────────────────────────────── */}
       <div className="relative" ref={userRef}>
         <Button
