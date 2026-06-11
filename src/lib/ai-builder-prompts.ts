@@ -34,7 +34,7 @@ JETBLOG CREDENTIALS (do not change)
 Webhook endpoint (JetBlog will POST here):
 POST /api/jetblog
 
-Secret key: ${secretKey}
+Secret key: YOUR_JETBLOG_SECRET (see credentials below)
 Signature header: X-JetBlog-Signature (HMAC-SHA256)
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -73,7 +73,7 @@ Create webhook endpoint that:
 1. Accepts POST /api/jetblog
 2. Verifies HMAC-SHA256 signature:
    - Get raw request body as text
-   - Compute: HMAC-SHA256(body, "${secretKey}")
+   - Compute: HMAC-SHA256(body, YOUR_JETBLOG_SECRET)
    - Compare with X-JetBlog-Signature header
    - Return 401 if mismatch
 3. On event "article.published":
@@ -195,13 +195,40 @@ Tell me when done and show me:
 - Any environment variables I need to add
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+STEP 8: DEPLOY TO PRODUCTION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+After implementation, deploy the project
+so JetBlog can test the webhook.
+
+Detect hosting platform automatically:
+- vercel.json exists → run: vercel --prod
+- netlify.toml exists → run: netlify deploy --prod
+- package.json has "build" script → build first
+- Other → use existing deploy method
+
+After deploy, the webhook URL will be:
+https://YOUR-DOMAIN.com/api/jetblog
+
+IMPORTANT:
+- Webhook does NOT work on localhost
+- Must be deployed to public URL first
+- Add JETBLOG_SECRET to your hosting
+  environment variables (not just .env.local)
+
+For Vercel:
+  vercel env add JETBLOG_SECRET
+
+For Netlify:
+  Site settings → Environment variables → Add
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ENVIRONMENT VARIABLE NEEDED
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Add to your .env.local file:
-JETBLOG_SECRET=${secretKey}
+JETBLOG_SECRET=YOUR_JETBLOG_SECRET
 
 Then in your webhook file use:
-process.env.JETBLOG_SECRET
+const SECRET = process.env.JETBLOG_SECRET!
 (never hardcode the secret key)`;
 }
 

@@ -94,6 +94,7 @@ export default function ForgotPasswordPage() {
           <CardTitle className="text-2xl">Parolni tiklash</CardTitle>
           <CardDescription>
             Email manzilingizni kiriting — parolni tiklash havolasi yuboramiz.
+            Google orqali ro&apos;yxatdan o&apos;tgan bo&apos;lsangiz ham — email orqali parol o&apos;rnatishingiz mumkin.
           </CardDescription>
         </CardHeader>
 

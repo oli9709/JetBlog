@@ -36,12 +36,13 @@ const AI_BUILDERS: { name: string; url: string; icon: string; color: string }[] 
 ];
 
 const STEPS: { num: string; title: string; desc: string }[] = [
-  { num: '1', title: 'Promptni nusxalang',           desc: '"Nusxalash" tugmasini bosing' },
-  { num: '2', title: 'AI Builder ni oching',          desc: 'Bolt, v0, Lovable yoki Cursor' },
-  { num: '3', title: 'Loyihangizni yuklang',          desc: 'Mavjud kodni import qiling yoki yangi yarating' },
-  { num: '4', title: 'Promptni chat ga joylashtiring', desc: 'Nusxalangan matnni to\'g\'ridan-to\'g\'ri yuboring' },
-  { num: '5', title: 'AI deploy qiladi',              desc: 'Barcha fayllar avtomatik yaratiladi' },
-  { num: '6', title: 'Ulanishni sinab ko\'ring',      desc: '"Test so\'rov" tugmasi bilan tekshiring' },
+  { num: '1', title: 'Promptni nusxalang',              desc: 'Yuqoridagi "Nusxalash" tugmasini bosing' },
+  { num: '2', title: 'AI Builder ni oching',             desc: 'Bolt, Cursor, v0 yoki Lovable' },
+  { num: '3', title: 'Promptni paste qiling',            desc: 'Nusxalangan matnni to\'g\'ridan-to\'g\'ri yuboring' },
+  { num: '4', title: 'AI fayllarni yaratadi',            desc: 'Barcha fayllar avtomatik sozlanadi — tasdiqlang' },
+  { num: '5', title: 'Secret keyni .env.local ga qo\'shing', desc: 'Pastdagi credentials bo\'limidan nusxalang' },
+  { num: '6', title: 'Saytni deploy qiling',             desc: 'Vercel, Netlify... (localhost da ishlamaydi!)' },
+  { num: '7', title: 'Ulanishni sinab ko\'ring',         desc: 'Quyidagi "Test so\'rov" tugmasi bilan tekshiring' },
 ];
 
 // ─── Component ────────────────────────────────────────────────────────────────
@@ -58,6 +59,7 @@ export function AIBuilderPrompt({ userId, webhookUrl, secretKey: secretKeyProp }
   const [testing, setTesting]   = useState(false);
   const [testError, setTestError] = useState<string | null>(null);
   const [copied, setCopied]     = useState(false);
+  const [copiedEnv, setCopiedEnv] = useState(false);
   const [tested, setTested]     = useState(false);
   const [initError, setInitError] = useState<string | null>(null);
 
@@ -304,19 +306,33 @@ export function AIBuilderPrompt({ userId, webhookUrl, secretKey: secretKeyProp }
         </div>
       </div>
 
-      {/* ── Env hint ── */}
-      <div className="rounded-xl border border-amber-500/20 bg-amber-500/5 p-4 flex items-start gap-3">
-        <span className="text-amber-400 shrink-0">⚠️</span>
-        <div className="space-y-1">
-          <p className="text-xs font-bold text-amber-300">
-            Secret keyni muhit o&apos;zgaruvchisiga ko&apos;chiring
-          </p>
-          <p className="text-[11px] text-zinc-400 leading-relaxed">
-            <code className="bg-zinc-800 px-1 rounded text-zinc-300">.env.local</code> faylga{' '}
-            <code className="bg-zinc-800 px-1 rounded text-zinc-300">
-              JETBLOG_SECRET={webhook?.secret_key ?? '…'}
-            </code>{' '}
-            qo&apos;shing. Hech qachon kodni to&apos;g&apos;ridan-to&apos;g&apos;ri ishlatmang.
+      {/* ── Credentials karta ── */}
+      <div className="rounded-xl border border-zinc-700/60 bg-zinc-900/50 p-4 space-y-3">
+        <p className="text-xs text-gray-400">
+          🔑 Sizning maxfiy kalitingiz — <code className="bg-zinc-800 px-1 rounded text-zinc-300">.env.local</code> ga qo&apos;shing:
+        </p>
+        <div className="flex items-center justify-between bg-black/40 border border-white/10 rounded-lg px-4 py-3 font-mono text-xs">
+          <span className="text-gray-300 truncate mr-3">
+            JETBLOG_SECRET={webhook?.secret_key ?? '…'}
+          </span>
+          <button
+            onClick={() => {
+              if (!webhook?.secret_key) return;
+              navigator.clipboard.writeText(`JETBLOG_SECRET=${webhook.secret_key}`).catch(() => null);
+              setCopiedEnv(true);
+              setTimeout(() => setCopiedEnv(false), 2000);
+            }}
+            disabled={!webhook?.secret_key}
+            className="flex-shrink-0 text-xs px-2 py-1 rounded bg-white/10 hover:bg-white/20 text-gray-300 transition-colors disabled:opacity-40"
+          >
+            {copiedEnv ? '✓ Nusxalandi' : 'Nusxalash'}
+          </button>
+        </div>
+        <div className="flex items-start gap-2 text-xs text-amber-400/80">
+          <span className="shrink-0">⚠️</span>
+          <p>
+            Webhook faqat deploy qilingan saytda ishlaydi.
+            Localhost da test qilib bo&apos;lmaydi.
           </p>
         </div>
       </div>

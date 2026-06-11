@@ -23,7 +23,7 @@ function mapAuthError(message: string): string {
   if (message.includes('Email not confirmed'))
     return 'Email tasdiqlanmagan. Pochtangizni tekshiring.';
   if (message.includes('Invalid login credentials') || message.includes('invalid_credentials'))
-    return "Email yoki parol noto'g'ri.";
+    return "Email yoki parol noto'g'ri. Agar ilgari Google orqali ro'yxatdan o'tgan bo'lsangiz, pastdagi \"Google orqali kirish\" tugmasini bosing.";
   if (message.includes('Too many requests') || message.includes('rate limit'))
     return "Juda ko'p urinish. 5 daqiqa kuting.";
   if (message.includes('User not found'))
