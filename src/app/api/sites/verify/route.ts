@@ -9,6 +9,35 @@ import { WebhookAdapter } from '@/lib/adapters/webhook';
 import { withRateLimit } from '@/lib/withRateLimit';
 import { rateLimiters } from '@/lib/ratelimit';
 
+function normalizeUrl(raw: string): string {
+  const u = (raw ?? '').trim();
+  if (!u) return u;
+  if (!u.startsWith('http://') && !u.startsWith('https://')) return 'https://' + u;
+  return u;
+}
+
+function isLocalhost(url: string): boolean {
+  try {
+    const { hostname } = new URL(url);
+    return hostname === 'localhost' || hostname === '127.0.0.1' || hostname.endsWith('.local');
+  } catch { return false; }
+}
+
+function wpErrorCode(error: string): string {
+  if (/401|403|unauthorized|forbidden/i.test(error)) return 'wp_auth_failed';
+  return 'wp_not_found';
+}
+
+function ghostErrorCode(error: string): string {
+  if (/401|403|unauthorized/i.test(error)) return 'ghost_auth_failed';
+  return 'dns_not_found';
+}
+
+function webhookErrorCode(error: string): string {
+  if (/401|403|signature/i.test(error)) return 'webhook_invalid_signature';
+  return 'webhook_not_found';
+}
+
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
@@ -46,36 +75,36 @@ export async function POST(request: NextRequest) {
 
       // ── WordPress ────────────────────────────────────────────────────────────
       if (platform === 'wordpress') {
-        const { url, wp_username, wp_password } = body;
+        let { url, wp_username, wp_password } = body as { url: string; wp_username: string; wp_password: string };
+        url = normalizeUrl(url);
         if (!url || !wp_username || !wp_password) {
-          return NextResponse.json({ success: false, error: 'url, wp_username va wp_password kerak!' }, { status: 400 });
+          return NextResponse.json({ success: false, errorCode: 'dns_invalid_url', error: 'url, wp_username va wp_password kerak!' }, { status: 400 });
+        }
+        try { new URL(url); } catch {
+          return NextResponse.json({ success: false, errorCode: 'dns_invalid_url', error: "URL format noto'g'ri", hint: 'Masalan: https://saytingiz.com' }, { status: 400 });
         }
 
         // Local sayt — API tekshiruvini o'tkazib yuborish
-        try {
-          const hostname = new URL(url).hostname;
-          const isLocal = hostname.endsWith('.local') || hostname === 'localhost' || hostname === '127.0.0.1';
-          if (isLocal) {
-            const insertResult = await SupabaseInsertSite({
-              user_id: userId, url, wp_username,
-              wp_password: encryptText(wp_password),
-              brand_voice: { tone: 'professional', voice_description: '', target_audience: '', rules: [] },
-              publish_days: ['Monday', 'Wednesday', 'Friday'],
-              publish_time: '09:00:00',
-              is_active: true,
-              platform_type: 'wordpress',
-              adapter_config: {},
-            });
-            if (insertResult.error) return NextResponse.json({ success: false, error: 'Bazaga saqlashda xatolik' }, { status: 500 });
-            return NextResponse.json({ success: true, message: 'Local sayt ulandi!', site: insertResult.data });
-          }
-        } catch { /* URL parse xatosi */ }
+        if (isLocalhost(url)) {
+          const insertResult = await SupabaseInsertSite({
+            user_id: userId, url, wp_username,
+            wp_password: encryptText(wp_password),
+            brand_voice: { tone: 'professional', voice_description: '', target_audience: '', rules: [] },
+            publish_days: ['Monday', 'Wednesday', 'Friday'],
+            publish_time: '09:00:00',
+            is_active: true,
+            platform_type: 'wordpress',
+            adapter_config: {},
+          });
+          if (insertResult.error) return NextResponse.json({ success: false, errorCode: 'unknown', error: 'Bazaga saqlashda xatolik' }, { status: 500 });
+          return NextResponse.json({ success: true, message: 'Local sayt ulandi!', site: insertResult.data });
+        }
 
         const encryptedPassword = encryptText(wp_password);
         const adapter = new WordPressAdapter(url, wp_username, encryptedPassword);
         const verify = await adapter.verify();
         if (!verify.ok) {
-          return NextResponse.json({ success: false, error: verify.error }, { status: 400 });
+          return NextResponse.json({ success: false, errorCode: wpErrorCode(verify.error ?? ''), error: verify.error }, { status: 400 });
         }
 
         const insertResult = await SupabaseInsertSite({
@@ -95,20 +124,27 @@ export async function POST(request: NextRequest) {
 
       // ── Ghost ─────────────────────────────────────────────────────────────────
       if (platform === 'ghost') {
-        const { url, adapter_config } = body;
-        if (!url || !adapter_config?.apiUrl || !adapter_config?.adminApiKey) {
-          return NextResponse.json({ success: false, error: 'url, adapter_config.apiUrl va adapter_config.adminApiKey kerak!' }, { status: 400 });
+        const { adapter_config } = body as { adapter_config?: { apiUrl?: string; adminApiKey?: string } };
+        let url = normalizeUrl((body as { url?: string }).url ?? '');
+        const apiUrl = normalizeUrl(adapter_config?.apiUrl ?? url);
+        const adminApiKey = adapter_config?.adminApiKey ?? '';
+        if (!apiUrl || !adminApiKey) {
+          return NextResponse.json({ success: false, errorCode: 'dns_invalid_url', error: 'url va adapter_config.adminApiKey kerak!' }, { status: 400 });
         }
+        try { new URL(apiUrl); } catch {
+          return NextResponse.json({ success: false, errorCode: 'dns_invalid_url', error: "URL format noto'g'ri" }, { status: 400 });
+        }
+        url = url || apiUrl;
 
         let adapter: GhostAdapter;
         try {
-          adapter = new GhostAdapter(adapter_config.apiUrl, adapter_config.adminApiKey);
+          adapter = new GhostAdapter(apiUrl, adminApiKey);
         } catch (err: unknown) {
-          return NextResponse.json({ success: false, error: err instanceof Error ? err.message : 'Ghost config xatosi' }, { status: 400 });
+          return NextResponse.json({ success: false, errorCode: 'ghost_auth_failed', error: err instanceof Error ? err.message : 'Ghost config xatosi' }, { status: 400 });
         }
 
         const verify = await adapter.verify();
-        if (!verify.ok) return NextResponse.json({ success: false, error: verify.error }, { status: 400 });
+        if (!verify.ok) return NextResponse.json({ success: false, errorCode: ghostErrorCode(verify.error ?? ''), error: verify.error }, { status: 400 });
 
         const insertResult = await SupabaseInsertSite({
           user_id: userId, url, wp_username: '', wp_password: '',
@@ -117,7 +153,7 @@ export async function POST(request: NextRequest) {
           publish_time: '09:00:00',
           is_active: true,
           platform_type: 'ghost',
-          adapter_config: { apiUrl: adapter_config.apiUrl, adminApiKey: adapter_config.adminApiKey },
+          adapter_config: { apiUrl, adminApiKey },
         });
 
         if (insertResult.error) return NextResponse.json({ success: false, error: 'Bazaga saqlashda xatolik yuz berdi.' }, { status: 500 });
@@ -126,23 +162,32 @@ export async function POST(request: NextRequest) {
 
       // ── Webhook ───────────────────────────────────────────────────────────────
       if (platform === 'webhook') {
-        const { url, adapter_config } = body;
-        if (!url || !adapter_config?.endpointUrl || !adapter_config?.secretKey) {
-          return NextResponse.json({ success: false, error: 'url, adapter_config.endpointUrl va adapter_config.secretKey kerak!' }, { status: 400 });
+        const { adapter_config } = body as { adapter_config?: { endpointUrl?: string; secretKey?: string } };
+        const endpointUrl = normalizeUrl(adapter_config?.endpointUrl ?? (body as { url?: string }).url ?? '');
+        const secretKey   = adapter_config?.secretKey ?? '';
+
+        if (!endpointUrl || !secretKey) {
+          return NextResponse.json({ success: false, errorCode: 'dns_invalid_url', error: 'endpointUrl va secretKey kerak!' }, { status: 400 });
+        }
+        try { new URL(endpointUrl); } catch {
+          return NextResponse.json({ success: false, errorCode: 'dns_invalid_url', error: "URL format noto'g'ri", hint: 'Masalan: https://saytingiz.com/api/jetblog' }, { status: 400 });
+        }
+        if (isLocalhost(endpointUrl)) {
+          return NextResponse.json({ success: false, errorCode: 'webhook_localhost', error: 'Localhost tekshirib bo\'lmaydi' }, { status: 400 });
         }
 
-        const adapter = new WebhookAdapter(adapter_config.endpointUrl, adapter_config.secretKey);
+        const adapter = new WebhookAdapter(endpointUrl, secretKey);
         const verify = await adapter.verify();
-        if (!verify.ok) return NextResponse.json({ success: false, error: verify.error }, { status: 400 });
+        if (!verify.ok) return NextResponse.json({ success: false, errorCode: webhookErrorCode(verify.error ?? ''), error: verify.error }, { status: 400 });
 
         const insertResult = await SupabaseInsertSite({
-          user_id: userId, url, wp_username: '', wp_password: '',
+          user_id: userId, url: endpointUrl, wp_username: '', wp_password: '',
           brand_voice: { voice_description: '', tone: 'professional', target_audience: 'umumiylik', rules: [] },
           publish_days: ['Monday', 'Wednesday', 'Friday'],
           publish_time: '09:00:00',
           is_active: true,
           platform_type: 'webhook',
-          adapter_config: { endpointUrl: adapter_config.endpointUrl, secretKey: adapter_config.secretKey },
+          adapter_config: { endpointUrl, secretKey },
         });
 
         if (insertResult.error) return NextResponse.json({ success: false, error: 'Bazaga saqlashda xatolik yuz berdi.' }, { status: 500 });
