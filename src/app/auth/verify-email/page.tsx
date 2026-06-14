@@ -36,7 +36,7 @@ export default function VerifyEmailPage() {
       type: 'signup',
       email,
       options: {
-        emailRedirectTo: 'https://jet-blog-zeta.vercel.app/api/auth-callback'
+        emailRedirectTo: 'https://jetblog.app/api/auth-callback'
       }
     });
 

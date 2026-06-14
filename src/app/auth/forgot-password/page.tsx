@@ -36,7 +36,7 @@ export default function ForgotPasswordPage() {
   const onSubmit = async (values: EmailFormValues) => {
     const supabase = supabaseBrowser();
     const { error } = await supabase.auth.resetPasswordForEmail(values.email, {
-      redirectTo: 'https://jet-blog-zeta.vercel.app/auth/reset-password'
+      redirectTo: 'https://jetblog.app/auth/reset-password'
     });
 
     if (error) {

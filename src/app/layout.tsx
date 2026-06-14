@@ -7,7 +7,7 @@ import NextTopLoader from 'nextjs-toploader';
 import config from '@/lib/config/site';
 import type { Metadata } from 'next';
 
-const BASE_URL = 'https://jet-blog-zeta.vercel.app';
+const BASE_URL = 'https://jetblog.app';
 const OG_IMAGE = `${BASE_URL}/og-image.png`;
 
 export const metadata: Metadata = {

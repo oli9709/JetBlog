@@ -69,7 +69,7 @@ export default function LoginPage() {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: 'https://jet-blog-zeta.vercel.app/api/auth-callback',
+        redirectTo: 'https://jetblog.app/api/auth-callback',
         queryParams: { access_type: 'offline', prompt: 'consent' }
       }
     });

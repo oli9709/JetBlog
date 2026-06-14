@@ -43,7 +43,7 @@ export default function SignupPage() {
       email: values.email,
       password: values.password,
       options: {
-        emailRedirectTo: 'https://jet-blog-zeta.vercel.app/api/auth-callback'
+        emailRedirectTo: 'https://jetblog.app/api/auth-callback'
       }
     });
 
@@ -75,7 +75,7 @@ export default function SignupPage() {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: 'https://jet-blog-zeta.vercel.app/api/auth-callback',
+        redirectTo: 'https://jetblog.app/api/auth-callback',
         queryParams: { access_type: 'offline', prompt: 'consent' }
       }
     });

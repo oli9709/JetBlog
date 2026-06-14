@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils/helpers';
 import type { PlatformType } from './PlatformSelector';
 import { AIBuilderPrompt } from './AIBuilderPrompt';
 
-const WEBHOOK_RECEIVE_URL = 'https://jet-blog-zeta.vercel.app/api/webhooks/receive';
+const WEBHOOK_RECEIVE_URL = 'https://jetblog.app/api/webhooks/receive';
 
 function generateSecret(): string {
   // 32 byte = 64 hex char — server crypto.randomBytes(32) bilan mos

@@ -85,7 +85,7 @@ export default function Hero() {
                   <span className="w-3 h-3 rounded-full bg-rose-500/80 shadow-[0_0_10px_rgba(244,63,94,0.5)]" />
                   <span className="w-3 h-3 rounded-full bg-amber-500/80 shadow-[0_0_10px_rgba(245,158,11,0.5)]" />
                   <span className="w-3 h-3 rounded-full bg-emerald-500/80 shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
-                  <span className="text-xs text-zinc-500 font-medium font-mono ml-2">jet-blog-zeta.vercel.app/dashboard</span>
+                  <span className="text-xs text-zinc-500 font-medium font-mono ml-2">jetblog.app/dashboard</span>
                 </div>
                 <div className="flex items-center gap-2 text-[10px] font-bold text-emerald-400 bg-emerald-400/10 px-2 py-0.5 rounded-full border border-emerald-400/20">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" /> Autopilot Faol
