@@ -1,5 +1,10 @@
 import { getAnthropicClient } from '../init/anthropic';
 
+export interface PriorArticleRef {
+  title: string;
+  url: string;
+}
+
 interface GenerateArticlePropsI {
   keyword: string;
   brandVoice: {
@@ -9,13 +14,70 @@ interface GenerateArticlePropsI {
     rules?: string[];
   };
   language: 'uz' | 'ru' | 'en';
+  /** Ichki havolalar uchun avval nashr etilgan maqolalar (min 2 bo'lsa ishlatiladi) */
+  priorArticles?: PriorArticleRef[];
 }
 
 interface GeneratedArticleResultI {
   title: string;
   content: string;
+  seoTitle: string;
+  seoDescription: string;
+  tags: string[];
   tokensUsed: number;
 }
+
+/**
+ * Maqola HTML matnidan SEO meta ma'lumotlarini chiqaradi.
+ *
+ * seoTitle  — sarlavha (≤60 belgi)
+ * seoDescription — 150–160 belgilik ta'rif (Google snippet uchun optimal)
+ *                  Birinchi paragrafdan olinadi; qisqa bo'lsa keyingi paragraflar qo'shiladi.
+ * tags       — kalit so'zdan (vergul/slash bo'yicha) ajratilgan, max 5 ta
+ *
+ * H1 nazorat: content ichida bir nechta <h1> bo'lsa birinchisidan tashqarisi <h2> ga aylanadi.
+ */
+const deriveSeoMeta = (
+  title: string,
+  content: string,
+  keyword: string
+): { seoTitle: string; seoDescription: string; tags: string[]; cleanContent: string } => {
+  const stripHtml = (s: string) => s.replace(/<\/?[^>]+(>|$)/g, '').replace(/\s+/g, ' ').trim();
+
+  // seoTitle — max 60 belgi
+  const seoTitle = title.length > 60 ? title.slice(0, 57).trim() + '…' : title;
+
+  // seoDescription — paragraflardan 150–160 belgi jam qilish
+  const pRegex = /<p>([\s\S]*?)<\/p>/gi;
+  const paragraphs: string[] = [];
+  let pm: RegExpExecArray | null;
+  while ((pm = pRegex.exec(content)) !== null) paragraphs.push(stripHtml(pm[1]));
+  let desc = '';
+  for (const p of paragraphs) {
+    if (!p) continue;
+    desc = desc ? desc + ' ' + p : p;
+    if (desc.length >= 150) break;
+  }
+  if (!desc) desc = stripHtml(content);
+  const seoDescription = desc.length > 160 ? desc.slice(0, 157).trim() + '…' : desc;
+
+  // Bitta H1 kafolati — qo'shimcha <h1> larni <h2> ga aylantirish
+  let h1Count = 0;
+  const cleanContent = content.replace(/<h1([^>]*)>([\s\S]*?)<\/h1>/gi, (_match, attrs, inner) => {
+    h1Count++;
+    if (h1Count === 1) return `<h1${attrs}>${inner}</h1>`;
+    return `<h2${attrs}>${inner}</h2>`;
+  });
+
+  // Tags — kalit so'zdan ajratilgan, max 5 ta
+  const tags = keyword
+    .split(/[,/]+/)
+    .map((t) => t.trim())
+    .filter(Boolean)
+    .slice(0, 5);
+
+  return { seoTitle, seoDescription, tags, cleanContent };
+};
 
 /**
  * Generates an extremely detailed, 1200+ word professional SEO article in HTML format.
@@ -152,7 +214,8 @@ const GetPremiumFallbackArticle = (keyword: string, language: 'uz' | 'ru' | 'en'
 export const GenerateArticleWithClaude = async ({
   keyword,
   brandVoice,
-  language
+  language,
+  priorArticles = [],
 }: GenerateArticlePropsI): Promise<GeneratedArticleResultI> => {
   const anthropic = getAnthropicClient();
   const tone = brandVoice.tone || 'professional';
@@ -230,17 +293,30 @@ QATTIQ QOIDALAR:
 - Kalit so'zni har 150-200 so'zda 1 marta natural ishlatish
 - H1 sarlavhani content ichiga YOZMA — WordPress o'zi qo'yadi
 - "albatta", "shubhasiz", "qisqacha" kabi so'zlarni ISHLATMA
-- Faqat HTML teglari: h2, p, ul, li, strong, em
-- Hech qanday markdown (**, ##) ishlatma — faqat HTML`;
+- Faqat HTML teglari: h2, p, ul, li, strong, em, a
+- Hech qanday markdown (**, ##) ishlatma — faqat HTML${priorArticles.length >= 2 ? `
+
+ICHKI HAVOLALAR (MAJBURIY):
+Quyidagi maqolalar bu saytda allaqachon nashr etilgan:
+${priorArticles.map((a) => `- "${a.title}" → ${a.url}`).join('\n')}
+
+Maqola ichida yuqoridagi ro'yxatdan 2-4 ta tegishli maqolaga kontekstual ichki havola qo'sh.
+Format: <a href="URL">tavsiflovchi matn</a>
+FAQAT yuqoridagi ro'yxatdagi haqiqiy URL lardan foydalaning — URL o'ylab topmang.
+Havolalar matn oqimida natural ko'rinishi kerak.` : ''}`;
 
   // Agar dummy API key bo'lsa yoki bo'sh bo'lsa, SDK chaqiruvini simulyatsiya qilib chiroyli o'zbekcha maqola qaytaramiz
   if (!process.env.ANTHROPIC_API_KEY || process.env.ANTHROPIC_API_KEY.includes('dummy')) {
     await new Promise((resolve) => setTimeout(resolve, 2000)); // Simulyatsiya kutish
 
     const premiumArticle = GetPremiumFallbackArticle(keyword, language);
+    const seo = deriveSeoMeta(premiumArticle.title, premiumArticle.content, keyword);
     return {
       title: premiumArticle.title,
-      content: premiumArticle.content,
+      content: seo.cleanContent,
+      seoTitle: seo.seoTitle,
+      seoDescription: seo.seoDescription,
+      tags: seo.tags,
       tokensUsed: 12500
     };
   }
@@ -261,23 +337,32 @@ QATTIQ QOIDALAR:
     const title = titleMatch ? titleMatch[1].replace(/<\/?[^>]+(>|$)/g, "").trim() : `${keyword} haqida maqola`;
 
     // WordPress o'zi sarlavhani H1 qilib qo'yganligi sababli, content ichidan birinchi <h1> sarlavhani olib tashlaymiz
-    let cleanContent = text;
+    let strippedContent = text;
     if (titleMatch && text.toLowerCase().includes('<h1>')) {
-      cleanContent = text.replace(titleMatch[0], '').trim();
+      strippedContent = text.replace(titleMatch[0], '').trim();
     }
 
+    // SEO meta + H1 kafolati (qo'shimcha <h1> lar <h2> ga aylanadi)
+    const seo = deriveSeoMeta(title, strippedContent, keyword);
     return {
       title: title,
-      content: cleanContent,
+      content: seo.cleanContent,
+      seoTitle: seo.seoTitle,
+      seoDescription: seo.seoDescription,
+      tags: seo.tags,
       tokensUsed: response.usage ? response.usage.input_tokens + response.usage.output_tokens : 15000
     };
   } catch (error) {
     console.warn('Claude API chaqiruvida xatolik yuz berdi. Offline rejimda premium zaxira maqolasi generatsiya qilinmoqda:', error);
     
     const premiumArticle = GetPremiumFallbackArticle(keyword, language);
+    const seo = deriveSeoMeta(premiumArticle.title, premiumArticle.content, keyword);
     return {
       title: premiumArticle.title,
-      content: premiumArticle.content,
+      content: seo.cleanContent,
+      seoTitle: seo.seoTitle,
+      seoDescription: seo.seoDescription,
+      tags: seo.tags,
       tokensUsed: 12500
     };
   }

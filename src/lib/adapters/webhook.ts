@@ -24,8 +24,8 @@ export class WebhookAdapter implements SiteAdapter {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'X-TextPilot-Signature': signature,
-          'X-TextPilot-Event': 'ping',
+          'X-JetBlog-Signature': signature,
+          'X-JetBlog-Event': 'ping',
         },
         body,
         signal: AbortSignal.timeout(8000),
@@ -60,8 +60,8 @@ export class WebhookAdapter implements SiteAdapter {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-TextPilot-Signature': signature,
-        'X-TextPilot-Event': 'article.published',
+        'X-JetBlog-Signature': signature,
+        'X-JetBlog-Event': 'article.published',
       },
       body,
       signal: AbortSignal.timeout(15000),

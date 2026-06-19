@@ -7,90 +7,139 @@ import { CodeBlock, InlineCode } from '../CodeBlock';
 import { Callout } from '../Callout';
 import { PlatformTabs } from '../PlatformTabs';
 
+// ─── Canonical contract ────────────────────────────────────────────────────────
+// Header  : X-JetBlog-Signature  value "sha256=<hex>"
+// Header  : X-JetBlog-Event      value e.g. "article.published" | "ping"
+// Body    : { event, data, timestamp }
+// Signing : HMAC-SHA256 over the EXACT raw request body bytes (NOT re-stringified)
+// ──────────────────────────────────────────────────────────────────────────────
+
+// Node.js — express.raw() to capture the exact bytes JetBlog signed
 const NODE_CODE = `const express = require('express')
 const crypto = require('crypto')
 const app = express()
-app.use(express.json())
+
+// Raw bytes ni saqlash — HMAC raw body ustida hisoblanadi (JSON.parse/stringify qilinmaydi)
+app.use(express.raw({ type: 'application/json' }))
 
 app.post('/jetblog-webhook', (req, res) => {
-  const sig = req.headers['x-jetblog-signature']
+  const sig     = (req.headers['x-jetblog-signature'] ?? '').toString()
+  const rawBody = req.body  // Buffer
+
+  // 1. sha256= prefiksini olib tashlash
+  const sigHex  = sig.replace(/^sha256=/, '')
+
+  // 2. HMAC raw bytes ustida hisoblash
   const expected = crypto
     .createHmac('sha256', process.env.JETBLOG_SECRET)
-    .update(JSON.stringify(req.body))
+    .update(rawBody)
     .digest('hex')
 
-  if (sig !== expected) return res.status(401).json({ error: 'Invalid signature' })
+  // 3. Timing-safe taqqoslash
+  let valid = false
+  try {
+    const a = Buffer.from(sigHex,   'hex')
+    const b = Buffer.from(expected, 'hex')
+    valid = a.length === b.length && crypto.timingSafeEqual(a, b)
+  } catch { valid = false }
 
-  const { event, data } = req.body
+  if (!valid) return res.status(401).json({ error: 'Invalid signature' })
+
+  const body = JSON.parse(rawBody)
+  const { event, data } = body
+
   if (event === 'article.published') {
-    // data.title, data.content (HTML), data.featuredImageUrl
+    // data.title, data.content (HTML), data.featuredImageUrl, data.seoTitle, data.tags
     console.log('Yangi maqola:', data.title)
   }
+
   res.json({ received: true })
 })
 
 app.listen(3000)`;
 
+// PHP — php://input raw bytes (timing-safe hash_equals, sha256= stripped)
 const PHP_CODE = `<?php
-$secret = getenv('JETBLOG_SECRET');
-$payload = file_get_contents('php://input');
-$sig = $_SERVER['HTTP_X_JETBLOG_SIGNATURE'] ?? '';
-$expected = hash_hmac('sha256', $payload, $secret);
+$secret  = getenv('JETBLOG_SECRET');
+$rawBody = file_get_contents('php://input');  // raw bytes — JSON decode qilinmaydi
+$sig     = $_SERVER['HTTP_X_JETBLOG_SIGNATURE'] ?? '';
 
-if (!hash_equals($expected, $sig)) {
+// sha256= prefiksini olib tashlash
+$sigHex   = preg_replace('/^sha256=/', '', $sig);
+$expected = hash_hmac('sha256', $rawBody, $secret);
+
+// hash_equals timing-safe taqqoslash
+if (!hash_equals($expected, $sigHex)) {
     http_response_code(401);
-    exit('Invalid signature');
+    exit(json_encode(['error' => 'Invalid signature']));
 }
 
-$data = json_decode($payload, true);
-if ($data['event'] === 'article.published') {
-    $title = $data['data']['title'];
-    $content = $data['data']['content'];
+$body = json_decode($rawBody, true);
+
+if ($body['event'] === 'article.published') {
+    $title   = $body['data']['title'];
+    $content = $body['data']['content'];  // HTML
     // O'z mantiging...
 }
+
+header('Content-Type: application/json');
 echo json_encode(['received' => true]);`;
 
+// Python / Flask — request.get_data() raw bytes, sha256= stripped, compare_digest
 const PYTHON_CODE = `import hmac
 import hashlib
-import json
+import os
 from flask import Flask, request, jsonify
 
 app = Flask(__name__)
-JETBLOG_SECRET = os.environ.get('JETBLOG_SECRET')
+JETBLOG_SECRET = os.environ.get('JETBLOG_SECRET', '')
 
 @app.route('/jetblog-webhook', methods=['POST'])
 def webhook():
-    sig = request.headers.get('X-JetBlog-Signature', '')
-    payload = request.get_data()
+    sig      = request.headers.get('X-JetBlog-Signature', '')
+    raw_body = request.get_data()  # raw bytes — decode qilinmaydi
+
+    # sha256= prefiksini olib tashlash
+    sig_hex  = sig.replace('sha256=', '', 1)
+
     expected = hmac.new(
         JETBLOG_SECRET.encode(),
-        payload,
+        raw_body,
         hashlib.sha256
     ).hexdigest()
 
-    if not hmac.compare_digest(sig, expected):
+    # hmac.compare_digest timing-safe taqqoslash
+    if not hmac.compare_digest(sig_hex, expected):
         return jsonify({'error': 'Invalid signature'}), 401
 
-    data = request.json
-    if data.get('event') == 'article.published':
-        print(f"Yangi maqola: {data['data']['title']}")
+    body = request.json
+    if body.get('event') == 'article.published':
+        print(f"Yangi maqola: {body['data']['title']}")
 
     return jsonify({'received': True})
 
 if __name__ == '__main__':
     app.run(port=3000)`;
 
-const PAYLOAD_CODE = `{
+// Actual payload shape sent by WebhookAdapter
+const PAYLOAD_CODE = `// Test so'rov (ping)
+{
+  "event": "ping",
+  "data": {},
+  "timestamp": "2026-05-31T09:00:00.000Z"
+}
+
+// Haqiqiy nashr (article.published)
+{
   "event": "article.published",
-  "timestamp": "2026-05-31T09:00:00Z",
-  "site_url": "https://yoursite.com",
+  "timestamp": "2026-05-31T09:00:00.000Z",
   "data": {
-    "id": "uuid-string",
     "title": "Maqola sarlavhasi",
-    "keyword": "wordpress seo 2026",
-    "content": "<h1>...</h1><p>...</p>",
+    "content": "<h2>...</h2><p>...</p>",
     "featuredImageUrl": "https://cdn.example.com/image.jpg",
-    "publishedAt": "2026-05-31T09:00:00Z"
+    "seoTitle": "SEO sarlavha (≤60 belgi)",
+    "seoDescription": "Meta tavsif (150-160 belgi)",
+    "tags": ["wordpress", "seo"]
   }
 }`;
 
@@ -135,9 +184,17 @@ export function WebhookPage() {
 
       <DocsH2>Imzo tekshirish</DocsH2>
       <DocsPara>
-        JetBlog har bir so&apos;rovga <InlineCode>X-JetBlog-Signature</InlineCode> header qo&apos;shadi.
-        Bu so&apos;rov haqiqatan JetBlog dan kelganini tasdiqlaydi.
+        JetBlog har bir so&apos;rovga <InlineCode>X-JetBlog-Signature: sha256=&lt;hex&gt;</InlineCode> va{' '}
+        <InlineCode>X-JetBlog-Event</InlineCode> headerlarini qo&apos;shadi.
+        Imzo so&apos;rovning <strong>aynan raw body baytlari</strong> ustida HMAC-SHA256 orqali hisoblanadi —
+        JSON.parse/stringify qilinmaydi. Shu sababli receiver da ham raw body ishlatilishi shart.
       </DocsPara>
+
+      <Callout variant="warning" className="mb-6" title="Muhim: raw body ishlatilishi shart">
+        Node.js da <InlineCode>express.json()</InlineCode> body ni parse qilib qayta stringify qiladi —
+        HMAC mos kelmaydi. O&apos;rniga <InlineCode>express.raw(&#123; type: &apos;application/json&apos; &#125;)</InlineCode> ishlating.
+        PHP va Python da raw body avtomatik o&apos;qiladi.
+      </Callout>
 
       <PlatformTabs
         className="mb-8"

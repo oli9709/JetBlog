@@ -65,10 +65,13 @@ export class GhostAdapter implements SiteAdapter {
       ],
     };
 
-    const res = await fetch(`${this.apiUrl}/ghost/api/admin/posts/`, {
+    // ?source=html — Ghost ga HTML sifatida qabul qilishni buyuradi,
+    // aks holda mobilizer content ni tashlashi mumkin
+    const res = await fetch(`${this.apiUrl}/ghost/api/admin/posts/?source=html`, {
       method: 'POST',
       headers: this.headers,
       body: JSON.stringify(postBody),
+      signal: AbortSignal.timeout(15000),
     });
 
     if (!res.ok) {

@@ -4,4 +4,4 @@ Disallow: /dashboard/
 Disallow: /api/
 Disallow: /auth/
 
-Sitemap: https://jet-blog-zeta.vercel.app/sitemap.xml
+Sitemap: https://jetblog.app/sitemap.xml

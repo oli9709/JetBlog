@@ -149,7 +149,8 @@ export async function POST(request: NextRequest) {
                 publish_time: '09:00:00',
                 is_active: true,
                 platform_type: 'webhook',
-                adapter_config: { endpointUrl, secretKey },
+                // secretKey DB da shifrlangan saqlanadi
+                adapter_config: { endpointUrl, secretKey: secretKey ? encryptText(secretKey) : '' },
               });
               if (insert.error) {
                 return NextResponse.json({ ok: false, errorCode: 'unknown', error: 'Bazaga saqlashda xatolik' });
@@ -283,7 +284,8 @@ export async function POST(request: NextRequest) {
             publish_time: '09:00:00',
             is_active: true,
             platform_type: 'ghost',
-            adapter_config: { apiUrl, adminApiKey },
+            // adminApiKey DB da shifrlangan saqlanadi
+            adapter_config: { apiUrl, adminApiKey: encryptText(adminApiKey) },
           });
           if (insert.error) {
             return NextResponse.json({ ok: false, errorCode: 'unknown', error: 'Bazaga saqlashda xatolik' });
@@ -296,32 +298,45 @@ export async function POST(request: NextRequest) {
 
       // ── Webflow ───────────────────────────────────────────────────────────
       if (platform === 'webflow') {
-        const token        = adapterCfg.token ?? '';
-        const collectionId = adapterCfg.collectionId ?? adapterCfg.collection_id ?? '';
+        // adapter_config dan maydonlarni olish (ConnectionTest tomonidan yuboriladi)
+        const token          = adapterCfg.apiToken ?? adapterCfg.token ?? '';
+        const siteId         = adapterCfg.siteId ?? '';
+        const collectionId   = adapterCfg.collectionId ?? adapterCfg.collection_id ?? '';
+        const collectionSlug = adapterCfg.collectionSlug ?? 'posts';
+        const siteDomain     = adapterCfg.siteDomain ?? '';
+        const fieldMap       = (adapterCfg.fieldMap ?? {}) as Record<string, string>;
 
         if (!token) {
           return NextResponse.json({ ok: false, errorCode: 'webflow_auth_failed', step: 'auth', error: 'API token kiritilmagan' });
         }
+        if (!collectionId) {
+          return NextResponse.json({ ok: false, errorCode: 'webflow_auth_failed', step: 'auth', error: 'Kolleksiya tanlanmagan' });
+        }
+        if (!fieldMap.body) {
+          return NextResponse.json({ ok: false, errorCode: 'webflow_auth_failed', step: 'auth', error: "Kontent maydoni (body) xaritasiz bo'lmaydi" });
+        }
 
         try {
-          const res = await fetch('https://api.webflow.com/v2/sites', {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              accept: 'application/json',
-            },
-            signal: AbortSignal.timeout(15_000),
+          // Kolleksiyani GET qilib tekshirish — token + ID ni bir vaqtda validates qiladi
+          const res = await fetch(`https://api.webflow.com/v2/collections/${collectionId}`, {
+            headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' },
+            signal: AbortSignal.timeout(10_000),
           });
 
           if (res.status === 401 || res.status === 403) {
-            return NextResponse.json({ ok: false, errorCode: 'webflow_auth_failed', step: 'auth', error: "API token noto'g'ri" });
+            return NextResponse.json({ ok: false, errorCode: 'webflow_auth_failed', step: 'auth', error: "API token noto'g'ri yoki ruxsat yo'q" });
           }
           if (res.status === 402) {
-            return NextResponse.json({ ok: false, errorCode: 'webflow_free_plan', step: 'auth', error: 'Webflow bepul plan CMS API ni qo\'llab-quvvatlamaydi' });
+            return NextResponse.json({ ok: false, errorCode: 'webflow_free_plan', step: 'auth', error: "Webflow bepul plan CMS API ni qo'llab-quvvatlamaydi" });
+          }
+          if (res.status === 404) {
+            return NextResponse.json({ ok: false, errorCode: 'webflow_auth_failed', step: 'auth', error: 'Kolleksiya topilmadi. Collection ID ni tekshiring' });
           }
           if (!res.ok) {
             return NextResponse.json({ ok: false, errorCode: 'webflow_auth_failed', step: 'auth', error: `Webflow API xatosi: ${res.status}` });
           }
 
+          // DB ga saqlash — apiToken shifrlangan holda
           const insert = await SupabaseInsertSite({
             user_id: userId,
             url: rawUrl,
@@ -331,15 +346,23 @@ export async function POST(request: NextRequest) {
             publish_days: ['Monday', 'Wednesday', 'Friday'],
             publish_time: '09:00:00',
             is_active: true,
-            platform_type: 'webhook', // webflow DB'da webhook tipida saqlanadi
-            adapter_config: { token, collectionId },
+            platform_type: 'webflow',
+            adapter_config: {
+              apiToken:       encryptText(token),
+              siteId,
+              collectionId,
+              collectionSlug,
+              siteDomain,
+              fieldMap,
+            },
           });
           if (insert.error) {
             return NextResponse.json({ ok: false, errorCode: 'unknown', error: 'Bazaga saqlashda xatolik' });
           }
           return NextResponse.json({ ok: true, success: true, steps: { dns: true, auth: true, write: true }, site: insert.data });
-        } catch {
-          return NextResponse.json({ ok: false, errorCode: 'webflow_auth_failed', step: 'auth', error: "Webflow ga ulanib bo'lmadi" });
+        } catch (err: unknown) {
+          const msg = err instanceof Error ? err.message : "Webflow ga ulanib bo'lmadi";
+          return NextResponse.json({ ok: false, errorCode: 'webflow_auth_failed', step: 'auth', error: msg });
         }
       }
 

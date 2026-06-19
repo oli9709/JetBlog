@@ -10,13 +10,15 @@ export function WebflowPage() {
       <DocsPageHeader
         badge="Platformalar"
         title="Webflow"
-        description="Webflow CMS Collection API orqali maqolalarni nashr qiling. Webflow Starter plan ($14/oy) talab qilinadi."
+        description="Webflow CMS Collection Data API v2 orqali maqolalarni avtomatik nashr qiling."
       />
 
       <Callout variant="warning" title="Plan talabi" className="mb-8">
-        Webflow <strong>Free plan</strong> da CMS API mavjud emas. CMS API faqat <strong>Starter ($14/oy)</strong> va undan yuqori planlarda ishlaydi.
+        Webflow <strong>Free plan</strong> da CMS API mavjud emas.
+        CMS API faqat <strong>Basic ($14/oy)</strong> va undan yuqori planlarda ishlaydi.
       </Callout>
 
+      {/* ── API Token ─────────────────────────────────────────────────────── */}
       <DocsH2>API Token olish</DocsH2>
       <StepList
         className="mb-8"
@@ -26,76 +28,176 @@ export function WebflowPage() {
             description: <><InlineCode>webflow.com</InlineCode> → loyihangizni oching</>,
           },
           {
-            title: 'Project Settings',
-            description: <>Yuqori o&apos;ngdagi &quot;...&quot; menu → <strong className="text-white">Project Settings</strong></>,
+            title: 'Site Settings → Integrations',
+            description: <>Loyiha sozlamalari → <strong className="text-white">Integrations → API Access</strong></>,
           },
           {
-            title: 'Integrations bo\'limiga o\'ting',
-            description: <><strong className="text-white">Integrations → API Access</strong> bo&apos;limini toping</>,
+            title: "Token yarating — to'g'ri ruxsatlar bilan",
+            description: (
+              <>
+                <strong className="text-white">Generate API Token</strong> → ruxsatlar:
+                <ul className="mt-1 space-y-0.5 list-disc list-inside text-xs">
+                  <li><InlineCode>sites:read</InlineCode> — saytlar ro&apos;yxati</li>
+                  <li><InlineCode>cms:read</InlineCode> — kolleksiya va maydon ma&apos;lumotlari</li>
+                  <li><InlineCode>cms:write</InlineCode> — maqola yaratish va nashr qilish</li>
+                </ul>
+              </>
+            ),
           },
           {
-            title: 'Token yarating',
-            description: <><strong className="text-white">Generate API Token</strong> tugmasini bosing → nusxalab oling</>,
+            title: 'Token ni nusxalab oling',
+            description: 'Token faqat bir marta ko\'rsatiladi — darhol saqlang.',
           },
         ]}
       />
 
-      <DocsH2>Collection ID topish</DocsH2>
-      <DocsPara>Collection ID — maqolalar saqlanadigan CMS kolleksiyangizning identifikatori.</DocsPara>
-      <StepList
-        className="mb-8"
-        steps={[
-          {
-            description: <>Webflow Designer → <strong className="text-white">CMS</strong> bo&apos;limiga o&apos;ting</>,
-          },
-          {
-            description: 'Maqolalar uchun mo\'ljallangan kolleksiyangizni oching (masalan: "Blog Posts")',
-          },
-          {
-            description: <>Brauzer URL siga qarang: <InlineCode>webflow.com/dashboard/sites/[site-id]/cms/collections/<strong>[collection-id]</strong></InlineCode></>,
-          },
-          {
-            description: 'URL dagi so\'nggi qism — bu sizning Collection ID ingiz',
-          },
-        ]}
-      />
-
-      <DocsH2>API orqali tekshirish</DocsH2>
-      <CodeBlock
-        language="bash"
-        filename="terminal"
-        code={`# Kolleksiyani tekshirish
-curl -H "Authorization: Bearer YOUR_API_TOKEN" \\
-  https://api.webflow.com/collections/YOUR_COLLECTION_ID \\
-  -X GET`}
-        className="mb-8"
-      />
-
+      {/* ── Ulanish jarayoni ─────────────────────────────────────────────── */}
       <DocsH2>JetBlog da ulash</DocsH2>
       <StepList
         className="mb-8"
         steps={[
           {
-            description: <>Dashboard → <strong className="text-white">Connections → Sayt qo&apos;shish</strong> → <strong className="text-white">Webflow</strong> tanlang</>,
+            title: 'Connections → Sayt qo\'shish → Webflow',
+            description: <>Dashboard → <strong className="text-white">Connections → Sayt qo&apos;shish → Webflow</strong> tanlang</>,
           },
           {
-            description: <><strong className="text-white">Site URL</strong>: <InlineCode>https://yoursite.webflow.io</InlineCode> yoki custom domain</>,
+            title: 'API Token kiriting',
+            description: (
+              <>Yuqorida yaratgan tokenni kiriting → <strong className="text-white">Saytlarni yuklash</strong> tugmasini bosing</>
+            ),
           },
           {
-            description: <><strong className="text-white">API Token</strong>: Yuqorida nusxalagan token</>,
+            title: 'Sayt va Kolleksiyani tanlang',
+            description: (
+              <>Tokenga ulangan saytlar ro&apos;yxatidan keraklisini → keyin blog maqolalari uchun CMS kolleksiyasini tanlang</>
+            ),
           },
           {
-            description: <><strong className="text-white">Collection ID</strong>: Maqolalar kolleksiyasining ID si</>,
+            title: 'Maydonlarni xaritang',
+            description: (
+              <>
+                Kolleksiya maydonlari ko&apos;rsatiladi. Xaritalash:
+                <ul className="mt-1 space-y-0.5 list-disc list-inside text-xs">
+                  <li><strong className="text-white">Kontent maydoni</strong> (majburiy) — HTML maqola matni uchun RichText maydoni</li>
+                  <li><strong className="text-white">Sarlavha maydoni</strong> (ixtiyoriy) — <InlineCode>name</InlineCode> tizim maydoni doim to&apos;ldiriladi</li>
+                  <li><strong className="text-white">Xulosa maydoni</strong> (ixtiyoriy) — SEO meta tavsifi</li>
+                  <li><strong className="text-white">Rasm maydoni</strong> (ixtiyoriy) — muqova rasm</li>
+                </ul>
+              </>
+            ),
           },
           {
-            description: <><strong className="text-white">Test connection</strong> → Muvaffaqiyatli!</>,
+            title: 'Test Connection → Tayyor!',
+            description: 'Kolleksiya tekshiriladi — muvaffaqiyatli bo\'lsa sayt saqlanadi.',
           },
         ]}
       />
 
-      <Callout variant="info" title="Muhim maydonlar">
-        JetBlog maqolani nashr qilganda <InlineCode>name</InlineCode> (sarlavha), <InlineCode>slug</InlineCode>, va <InlineCode>post-body</InlineCode> (kontent) maydonlarini to&apos;ldiradi.
-        Kolleksiyangizda shu maydonlar bo&apos;lishi kerak.
+      {/* ── adapter_config sxemasi ───────────────────────────────────────── */}
+      <DocsH2>Texnik: adapter_config sxemasi</DocsH2>
+      <DocsPara>
+        Quyidagi ma&apos;lumotlar <InlineCode>sites.adapter_config</InlineCode> JSONB maydonida shifrlangan holda saqlanadi.
+        <InlineCode>apiToken</InlineCode> AES-256-GCM bilan shifrlangan.
+      </DocsPara>
+      <CodeBlock
+        language="typescript"
+        filename="WebflowAdapterConfig"
+        code={`type WebflowAdapterConfig = {
+  apiToken:       string;   // AES-256-GCM encrypted Webflow Site API Token
+  siteId:         string;   // Webflow site ID  (e.g. "64a1b2c3d4e5f6a7b8c9d0e1")
+  collectionId:   string;   // CMS Collection ID
+  collectionSlug: string;   // collection URL slug (e.g. "blog-posts") — for URL construction
+  siteDomain:     string;   // primary domain   (e.g. "example.webflow.io")
+  fieldMap: {
+    body:     string;         // REQUIRED — RichText field slug for article HTML
+    title?:   string;         // optional custom PlainText field for title
+                              // ('name' system field is always set from article.title)
+    summary?: string;         // optional PlainText field for SEO description
+    image?:   string;         // optional Image field for featured image
+  };
+};`}
+        className="mb-8"
+      />
+
+      {/* ── Nashr jarayoni ───────────────────────────────────────────────── */}
+      <DocsH2>Nashr jarayoni</DocsH2>
+      <DocsPara>
+        JetBlog Webflow Data API v2 orqali maqolani nashr qilganda:
+      </DocsPara>
+      <StepList
+        className="mb-8"
+        steps={[
+          {
+            description: (
+              <>
+                <InlineCode>POST /v2/collections/{'{collectionId}'}/items</InlineCode> chaqiriladi —
+                <InlineCode>isDraft: false</InlineCode> bilan (darhol LIVE nashr)
+              </>
+            ),
+          },
+          {
+            description: (
+              <>
+                <InlineCode>fieldData</InlineCode> da doim:
+                <InlineCode>name</InlineCode> (sarlavha) va
+                <InlineCode>slug</InlineCode> (noyob URL slug) o&apos;rnatiladi
+              </>
+            ),
+          },
+          {
+            description: 'Xaritalangan maydonlar (body, summary, image) fieldData ga qo\'shiladi',
+          },
+          {
+            description: (
+              <>
+                Live URL quyidagicha quriladi:
+                <InlineCode>https://&#123;domain&#125;/&#123;collectionSlug&#125;/&#123;itemSlug&#125;</InlineCode>
+              </>
+            ),
+          },
+          {
+            description: 'Rasm: Image maydoniga { url, alt } shaklida uzatiladi — xato bo\'lsa ham nashr davom etadi (non-fatal)',
+          },
+        ]}
+      />
+
+      {/* ── API tekshiruv ────────────────────────────────────────────────── */}
+      <DocsH2>API dan foydalanishni tekshirish</DocsH2>
+      <CodeBlock
+        language="bash"
+        filename="terminal"
+        code={`# Saytlar ro'yxati
+curl -H "Authorization: Bearer YOUR_TOKEN" \\
+  https://api.webflow.com/v2/sites
+
+# Kolleksiya maydonlarini ko'rish
+curl -H "Authorization: Bearer YOUR_TOKEN" \\
+  https://api.webflow.com/v2/collections/YOUR_COLLECTION_ID
+
+# Test: CMS item yaratish
+curl -X POST \\
+  -H "Authorization: Bearer YOUR_TOKEN" \\
+  -H "Content-Type: application/json" \\
+  -d '{"isDraft":false,"isArchived":false,"fieldData":{"name":"Test Maqola","slug":"test-maqola","YOUR_BODY_FIELD":"<p>Salom dunyo!</p>"}}' \\
+  https://api.webflow.com/v2/collections/YOUR_COLLECTION_ID/items`}
+        className="mb-8"
+      />
+
+      {/* ── Keng tarqalgan xatolar ───────────────────────────────────────── */}
+      <DocsH2>Keng tarqalgan xatolar</DocsH2>
+
+      <Callout variant="warning" title="402 — CMS API mavjud emas" className="mb-4">
+        Webflow bepul rejada CMS API ishlaydi. <strong>Basic ($14/oy)</strong> rejaga o&apos;ting.
+      </Callout>
+
+      <Callout variant="info" title="401/403 — Token noto'g'ri" className="mb-4">
+        Token <InlineCode>cms:read</InlineCode> va <InlineCode>cms:write</InlineCode> ruxsatlariga ega ekanligini tekshiring.
+        Site Settings → Integrations da yangi token yarating.
+      </Callout>
+
+      <Callout variant="info" title="Rasm ko'rinmaydi" className="mb-4">
+        Webflow Image maydoni URL dan rasm olib ko&apos;rsatadi. Agar rasm ko&apos;rinmasa,
+        Webflow Designer da item ni ochib rasimni qayta yuklang. Nashr jarayoni rasm xatosida ham to&apos;xtamaydi.
       </Callout>
     </div>
   );

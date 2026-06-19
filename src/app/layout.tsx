@@ -4,11 +4,11 @@ import { ThemeProvider } from '@/styles/ThemeProvider';
 import { ToastContainer, Bounce } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.min.css';
 import NextTopLoader from 'nextjs-toploader';
-import config from '@/lib/config/site';
+import config, { SITE_URL } from '@/lib/config/site';
 import type { Metadata } from 'next';
 
-const BASE_URL = 'https://jetblog.app';
-const OG_IMAGE = `${BASE_URL}/og-image.png`;
+const BASE_URL = SITE_URL;
+const OG_IMAGE = config.ogImage;
 
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),

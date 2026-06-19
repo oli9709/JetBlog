@@ -4,11 +4,11 @@ import { cookies } from 'next/headers';
 import { GetArticleById } from '@/lib/API/Database/articles/queries';
 import { GetSiteById } from '@/lib/API/Database/sites/queries';
 import { SupabaseUpdateArticle } from '@/lib/API/Database/articles/mutations';
-import { getAdapter } from '@/lib/adapters';
-import type { ArticlePayload } from '@/lib/adapters';
+import { publishArticle } from '@/lib/API/Services/publish/publishArticle';
 import { withRateLimit } from '@/lib/withRateLimit';
 import { rateLimiters } from '@/lib/ratelimit';
 import { capturePublishError } from '@/lib/monitoring';
+import { getBaseUrl } from '@/lib/config/site';
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
@@ -68,25 +68,10 @@ export async function POST(req: NextRequest) {
       siteId = site.id;
       platform = site.platform_type;
 
-      // 3. Adapter olish
-      let adapter;
-      try {
-        adapter = getAdapter(site);
-      } catch (err: unknown) {
-        const msg = err instanceof Error ? err.message : 'Adapter yaratishda xato';
-        return NextResponse.json({ error: msg }, { status: 400 });
-      }
-
-      // 4. Publish
-      const payload: ArticlePayload = {
-        title: article.title,
-        content: article.content,
-        featuredImageUrl: article.featured_image_url ?? undefined,
-      };
-
+      // 3-4. Yagona publish yo'li — to'liq SEO (seoTitle/seoDescription/tags) bilan
       let result;
       try {
-        result = await adapter.publish(payload);
+        result = await publishArticle(site, article);
       } catch (err: unknown) {
         const msg = err instanceof Error ? err.message : 'Publish xatosi';
         await SupabaseUpdateArticle(articleId, { status: 'error', error_message: msg });
@@ -98,16 +83,17 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: msg }, { status: 500 });
       }
 
-      // 5. DB yangilash
+      // 5. DB yangilash — published_url ni saqlash (ichki havolalar + SEO pings uchun)
       const updatedRes = await SupabaseUpdateArticle(articleId, {
         status: 'published',
         published_at: new Date().toISOString(),
         wp_post_id: isNaN(Number(result.postId)) ? undefined : Number(result.postId),
+        published_url: result.url || null,
         error_message: null,
       });
 
       // 6. Telegram notify — fire-and-forget
-      const origin = process.env.NEXT_PUBLIC_DOMAIN || 'http://localhost:3000';
+      const origin = getBaseUrl();
       fetch(`${origin}/api/telegram/notify`, {
         method: 'POST',
         headers: {

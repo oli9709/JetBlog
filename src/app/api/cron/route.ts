@@ -1,220 +1,151 @@
+/**
+ * /api/cron — Avtopilot DISPATCHER (yengil, tezkor)
+ *
+ * Vazifasi: Bugun nashr qilish vaqti kelgan faol saytlarni topish va
+ * har biri uchun alohida ishchi (/api/cron/site) ni navbatga qo'yish.
+ * Hech qachon maqola generate yoki publish qilmaydi — bu ishchining ishi.
+ *
+ * Avtorizatsiya: Authorization: Bearer <CRON_SECRET>  yoki  ?secret=<CRON_SECRET>
+ *
+ * Navbat:
+ *   - QSTASH_TOKEN mavjud → Upstash QStash orqali (retry, DLQ bilan)
+ *   - QSTASH_TOKEN yo'q  → to'g'ridan-to'g'ri HTTP (mahalliy dev uchun)
+ *
+ * Muhit o'zgaruvchilari:
+ *   CRON_SECRET                   — majburiy; yo'q bo'lsa hech qachon ruxsat berilmaydi
+ *   QSTASH_TOKEN                  — QStash nashr kaliti
+ *   QSTASH_CURRENT_SIGNING_KEY    — ishchi autentifikatsiyasi uchun
+ *   QSTASH_NEXT_SIGNING_KEY       — ishchi autentifikatsiyasi uchun (kalit aylanishi)
+ *   NEXT_PUBLIC_APP_URL           — ishchi URL ni qurish uchun (masalan https://app.jetblog.app)
+ */
+
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { GenerateArticleWithClaude } from '@/lib/API/Services/claude/generate';
-import { GenerateCoverImage } from '@/lib/API/Services/image/generate';
-import { PublishToWordPress } from '@/lib/API/Services/wordpress/publish';
-import { sendTelegramPost } from '@/lib/API/Services/telegram/notify';
-import { SupabaseInsertArticle, SupabaseUpdateArticle } from '@/lib/API/Database/articles/mutations';
-import { SupabaseUpdateKeyword } from '@/lib/API/Database/keywords/mutations';
-import { decryptText } from '@/lib/utils/encryption';
+import { Client as QStashClient } from '@upstash/qstash';
+import { SiteT } from '@/lib/types/supabase';
 
 export const dynamic = 'force-dynamic';
 
-async function runCron() {
-  // Service role client — RLS bypass qiladi, cron uchun kerak
+// ── Yordamchi: autorizatsiya ─────────────────────────────────────────────────
+
+function isAuthorized(req: Request): boolean {
+  const cronSecret = process.env.CRON_SECRET;
+  if (!cronSecret) return false;
+
+  const authHeader = req.headers.get('authorization');
+  if (authHeader === `Bearer ${cronSecret}`) return true;
+
+  try {
+    const { searchParams } = new URL(req.url);
+    if (searchParams.get('secret') === cronSecret) return true;
+  } catch { /* ignore */ }
+
+  return false;
+}
+
+// ── Yordamchi: sayt bugun nashr vaqtiga yetganmi? ───────────────────────────
+
+function isDueSite(site: SiteT): boolean {
+  // publish_days: ['Monday', 'Wednesday', ...] — UTC kun nomi bilan taqqoslanadi
+  const todayName = new Date().toLocaleDateString('en-US', { weekday: 'long', timeZone: 'UTC' }).toLowerCase();
+  const publishDays = (site.publish_days || []).map((d) => d.toLowerCase());
+  if (!publishDays.includes(todayName)) return false;
+
+  // publish_time: 'HH:MM:SS' UTC — joriy UTC soati >= publish_time bo'lishi kerak
+  if (!site.publish_time) return true; // belgilanmagan → istalgan vaqtda nashr qilish mumkin
+  const nowUtc = new Date();
+  const [h, m] = site.publish_time.split(':').map(Number);
+  const publishMinutes = h * 60 + m;
+  const nowMinutes = nowUtc.getUTCHours() * 60 + nowUtc.getUTCMinutes();
+  return nowMinutes >= publishMinutes;
+}
+
+// ── Asosiy dispatcher mantiq ─────────────────────────────────────────────────
+
+async function runDispatcher(): Promise<{ enqueued: number; skipped: number; sites: string[] }> {
   const client = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   );
 
-  const { data: sites, error: sitesError } = await client
+  const { data: sites, error } = await client
     .from('sites')
     .select('*')
     .eq('is_active', true);
 
-  if (sitesError) throw new Error('Faol saytlarni olishda xatolik yuz berdi.');
-  if (!sites || sites.length === 0) {
-    return { message: 'Hech qanday faol sayt topilmadi.', results: [] };
+  if (error) throw new Error(`Faol saytlarni olishda xatolik: ${error.message}`);
+  if (!sites || sites.length === 0) return { enqueued: 0, skipped: 0, sites: [] };
+
+  const dueSites = (sites as SiteT[]).filter(isDueSite);
+
+  const appUrl = (process.env.NEXT_PUBLIC_APP_URL ?? '').replace(/\/$/, '');
+  const workerUrl = `${appUrl}/api/cron/site`;
+  const qstashToken = process.env.QSTASH_TOKEN;
+  const cronSecret = process.env.CRON_SECRET!;
+
+  const enqueuedUrls: string[] = [];
+  let skipped = 0;
+
+  for (const site of dueSites) {
+    const body = JSON.stringify({ site_id: site.id });
+
+    if (qstashToken) {
+      // ── QStash: retry x3 avtomatik, xato bo'lsa DLQ ga o'tadi ─────────────
+      const qstash = new QStashClient({ token: qstashToken });
+      await qstash.publishJSON({
+        url: workerUrl,
+        body: { site_id: site.id },
+        retries: 3,
+        // Ishchi idempotency kalit: bir xil site+sana juftligi bir marta qayta tiklanadi
+        // QStash deduplication: 24 soat davomida bir xil content-based key
+        headers: {
+          'X-JetBlog-Site-Id': site.id,
+        },
+      });
+    } else {
+      // ── Fallback: to'g'ridan-to'g'ri HTTP (mahalliy dev / QSTASH_TOKEN yo'q) ─
+      // Fire-and-forget — dispatcher javobini kutmaydi
+      fetch(workerUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${cronSecret}`,
+        },
+        body,
+      }).catch((err) => {
+        console.error(`[Dispatcher] Fallback HTTP xatoligi site=${site.id}:`, err);
+      });
+    }
+
+    enqueuedUrls.push(site.url);
   }
 
-  const todayName = new Date().toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
-  const results: any[] = [];
+  skipped = (sites as SiteT[]).length - dueSites.length;
 
-  for (const site of sites) {
-    const publishDays = site.publish_days || [];
-    const isPublishDay = publishDays.map((d: string) => d.toLowerCase()).includes(todayName);
-
-    if (!isPublishDay) {
-      results.push({ site: site.url, status: 'skipped', reason: 'Bugun nashr qilish kuni emas.' });
-      continue;
-    }
-
-    const { data: profile } = await client
-      .from('profiles')
-      .select('credits_remaining')
-      .eq('id', site.user_id)
-      .single();
-
-    const currentCredits = profile?.credits_remaining || 0;
-    if (currentCredits < 1) {
-      results.push({ site: site.url, status: 'error', reason: 'Kreditlar tugagan.' });
-      continue;
-    }
-
-    const { data: keywords } = await client
-      .from('keywords')
-      .select('*')
-      .eq('site_id', site.id)
-      .in('status', ['approved', 'pending'])
-      .order('created_at', { ascending: true })
-      .limit(1);
-
-    if (!keywords || keywords.length === 0) {
-      results.push({ site: site.url, status: 'skipped', reason: 'Tasdiqlangan kalit so\'zlar topilmadi.' });
-      continue;
-    }
-
-    const activeKeyword = keywords[0];
-
-    try {
-      await client
-        .from('profiles')
-        .update({ credits_remaining: currentCredits - 1 })
-        .eq('id', site.user_id);
-
-      const draft = await GenerateArticleWithClaude({
-        keyword: activeKeyword.keyword,
-        brandVoice: site.brand_voice,
-        language: activeKeyword.language
-      });
-
-      let coverUrl: string | null = null;
-      try {
-        coverUrl = await GenerateCoverImage({
-          keyword: activeKeyword.keyword,
-          title: draft.title,
-          language: activeKeyword.language
-        });
-      } catch (imgErr) {
-        console.error('Cron rasm yaratishda xatolik:', imgErr);
-      }
-
-      const articleRes = await SupabaseInsertArticle({
-        site_id: site.id,
-        keyword_id: activeKeyword.id,
-        title: draft.title,
-        content: draft.content,
-        featured_image_url: coverUrl || null,
-        status: 'draft',
-        ai_tokens_used: draft.tokensUsed
-      });
-
-      if (!articleRes.data) throw new Error('Maqolani bazaga saqlab bo\'lmadi.');
-
-      const articleId = articleRes.data.id;
-
-      const decryptedPassword = decryptText(site.wp_password || '');
-      const wpPublishRes = await PublishToWordPress({
-        url: site.url,
-        username: site.wp_username,
-        applicationPassword: decryptedPassword,
-        title: draft.title,
-        content: draft.content,
-        featuredImageUrl: coverUrl,
-        status: 'published'
-      });
-
-      if (!wpPublishRes.success) {
-        await SupabaseUpdateArticle(articleId, {
-          status: 'error',
-          error_message: wpPublishRes.error || 'WordPress REST API ulanish xatoligi'
-        });
-        results.push({ site: site.url, status: 'error', reason: wpPublishRes.error });
-        continue;
-      }
-
-      await SupabaseUpdateArticle(articleId, {
-        status: 'published',
-        published_at: new Date().toISOString(),
-        wp_post_id: wpPublishRes.wpPostId
-      });
-
-      await SupabaseUpdateKeyword(activeKeyword.id, {
-        status: 'completed',
-        article_id: articleId
-      });
-
-      if (site.telegram_chat_id) {
-        try {
-          const cleanUrl = site.url.replace(/\/+$/, '');
-          const articleUrl = wpPublishRes.wpPostId
-            ? `${cleanUrl}/?p=${wpPublishRes.wpPostId}`
-            : cleanUrl;
-          const excerpt = draft.content
-            .replace(/<[^>]*>/g, '')
-            .replace(/\s+/g, ' ')
-            .trim()
-            .slice(0, 220) + '...';
-
-          await sendTelegramPost({
-            chatId: site.telegram_chat_id,
-            title: draft.title,
-            excerpt,
-            url: articleUrl,
-            imageUrl: coverUrl
-          });
-        } catch (teleErr) {
-          console.error('Cron Telegram anons xatoligi:', teleErr);
-        }
-      }
-
-      results.push({
-        site: site.url,
-        status: 'success',
-        keyword: activeKeyword.keyword,
-        wpPostId: wpPublishRes.wpPostId
-      });
-
-    } catch (siteErr: any) {
-      console.error(`Site ${site.url} uchun autopilot xatolik:`, siteErr);
-      results.push({ site: site.url, status: 'error', reason: siteErr.message || 'Kutilmagan xatolik' });
-    }
-  }
-
-  return { results };
+  return { enqueued: enqueuedUrls.length, skipped, sites: enqueuedUrls };
 }
 
-function isAuthorized(req: Request): boolean {
-  const cronSecret = process.env.CRON_SECRET;
-  if (!cronSecret) return true;
+// ── Route handler ────────────────────────────────────────────────────────────
 
-  // POST: Authorization: Bearer <secret>
-  const authHeader = req.headers.get('authorization');
-  if (authHeader === `Bearer ${cronSecret}`) return true;
-
-  // GET: ?secret=<secret>
-  try {
-    const { searchParams } = new URL(req.url);
-    if (searchParams.get('secret') === cronSecret) return true;
-  } catch {}
-
-  return false;
-}
-
-// POST /api/cron — pg_cron / pg_net dan chaqiriladi
-export async function POST(req: Request) {
+async function handleRequest(req: Request) {
   if (!isAuthorized(req)) {
     return NextResponse.json({ error: 'Ruxsat berilmagan (Unauthorized)' }, { status: 401 });
   }
   try {
-    const data = await runCron();
-    return NextResponse.json({ success: true, processedDate: new Date().toISOString(), ...data });
-  } catch (error: any) {
-    console.error('Cron POST error:', error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    const result = await runDispatcher();
+    return NextResponse.json({
+      success: true,
+      processedAt: new Date().toISOString(),
+      ...result,
+    });
+  } catch (err: unknown) {
+    console.error('[Dispatcher] Xatolik:', err);
+    return NextResponse.json(
+      { error: err instanceof Error ? err.message : 'Dispatcher xatoligi' },
+      { status: 500 }
+    );
   }
 }
 
-// GET /api/cron — vercel cron / manual test uchun
-export async function GET(req: Request) {
-  if (!isAuthorized(req)) {
-    return NextResponse.json({ error: 'Ruxsat berilmagan (Unauthorized)' }, { status: 401 });
-  }
-  try {
-    const data = await runCron();
-    return NextResponse.json({ success: true, processedDate: new Date().toISOString(), ...data });
-  } catch (error: any) {
-    console.error('Cron GET error:', error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
-  }
-}
+export const GET  = handleRequest;
+export const POST = handleRequest;

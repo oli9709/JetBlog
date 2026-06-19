@@ -15,7 +15,7 @@ interface InsertSitePropsI {
   publish_time?: string;
   telegram_chat_id?: string | null;
   is_active?: boolean;
-  platform_type?: 'wordpress' | 'ghost' | 'webhook';
+  platform_type?: 'wordpress' | 'ghost' | 'webhook' | 'webflow';
   adapter_config?: Record<string, unknown>;
 }
 

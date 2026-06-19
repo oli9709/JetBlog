@@ -10,6 +10,9 @@ interface InsertArticlePropsI {
   keyword_id: string;
   title: string;
   content: string;
+  seo_title?: string | null;
+  seo_description?: string | null;
+  tags?: string[];
   featured_image_url?: string | null;
   wp_post_id?: number | null;
   status?: ArticleT['status'];
@@ -37,6 +40,9 @@ export const SupabaseInsertArticle = async (
         keyword_id: props.keyword_id,
         title: props.title,
         content: props.content,
+        seo_title: props.seo_title || null,
+        seo_description: props.seo_description || null,
+        tags: props.tags || [],
         featured_image_url: props.featured_image_url || null,
         wp_post_id: props.wp_post_id || null,
         status: props.status || 'draft',

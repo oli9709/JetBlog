@@ -114,10 +114,32 @@ export async function POST(req: NextRequest) {
         .update({ status: 'generating' })
         .eq('id', articleId);
 
+      // Ichki havolalar uchun avval nashr etilgan maqolalarni olish
+      let priorArticles: Array<{ title: string; url: string }> = [];
+      try {
+        const { data: published } = await supabase
+          .from('articles')
+          .select('title, published_url')
+          .eq('site_id', keywordData.site_id)
+          .eq('status', 'published')
+          .not('published_url', 'is', null)
+          .order('published_at', { ascending: false })
+          .limit(20);
+
+        if (published && published.length >= 2) {
+          priorArticles = (published as Array<{ title: string; published_url: string }>).map(
+            (a) => ({ title: a.title, url: a.published_url })
+          );
+        }
+      } catch (err) {
+        console.warn('[Generate] Prior articles fetch error (non-fatal):', err);
+      }
+
       const articleDraft = await GenerateArticleWithClaude({
         keyword: keywordData.keyword,
         brandVoice: siteData.brand_voice,
         language: keywordData.language,
+        priorArticles,
       });
 
       // 7. Status: imaging

@@ -40,7 +40,14 @@ export function AddConnectionWizard({ onComplete }: AddConnectionWizardProps) {
       if (!formData.siteUrl) return false;
       if (formData.platform === 'wordpress') return !!(formData.wpUsername && formData.wpPassword);
       if (formData.platform === 'ghost') return !!formData.ghostApiKey;
-      if (formData.platform === 'webflow') return !!(formData.webflowToken && formData.webflowCollectionId);
+      if (formData.platform === 'webflow') {
+        return !!(
+          formData.webflowToken &&
+          formData.webflowSiteId &&
+          formData.webflowCollectionId &&
+          formData.webflowFieldMap?.body
+        );
+      }
       if (formData.platform === 'webhook') return !!(formData.webhookEndpoint && formData.webhookSecret);
     }
     return true;

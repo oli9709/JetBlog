@@ -4,6 +4,25 @@ import { StepList } from '../StepList';
 import { CodeBlock, InlineCode } from '../CodeBlock';
 import { Callout } from '../Callout';
 
+const SEO_NOTES = [
+  {
+    title: 'Excerpt (meta description)',
+    body: 'JetBlog har doim excerpt maydonini to\'ldiradi — bu hech qanday plugin talab qilmaydi va qidiruv snippet uchun ishonchli ishlaydi.',
+  },
+  {
+    title: 'JSON-LD tuzilgan ma\'lumot',
+    body: 'Har bir maqola <script type="application/ld+json"> Article blokini o\'z ichiga oladi. Bu Google uchun plugin-dan mustaqil ishlaydi.',
+  },
+  {
+    title: 'Yoast SEO / RankMath meta',
+    body: 'JetBlog _yoast_wpseo_title, _yoast_wpseo_metadesc, rank_math_title va rank_math_description meta maydonlarini yuboradi. Lekin bu maydonlar faqat plugin «Show in REST API» opsiyasini yoqsa saqlanadi. Agar plugin bo\'lmasa — excerpt va JSON-LD yetarli.',
+  },
+  {
+    title: 'Teglar',
+    body: 'Teglar WP term ID sifatida yuboriladi (ism emas). JetBlog mavjud tegni avtomatik topadi yoki yangi tag yaratadi — qo\'lda term yaratish shart emas.',
+  },
+];
+
 const TROUBLESHOOT = [
   {
     problem: 'Connection failed / 401 Unauthorized',
@@ -94,6 +113,20 @@ export function WordPressPage() {
   -X GET`}
         className="mb-8"
       />
+
+      <DocsH2>SEO meta qanday ishlaydi?</DocsH2>
+      <Callout variant="info" className="mb-4">
+        Excerpt va JSON-LD har doim ishlaydi — SEO plugin o&apos;rnatish <strong>majburiy emas</strong>.
+        Yoast / RankMath uchun qo&apos;shimcha sozlama kerak bo&apos;lishi mumkin.
+      </Callout>
+      <div className="flex flex-col gap-3 mb-8">
+        {SEO_NOTES.map((n) => (
+          <div key={n.title} className="p-4 rounded-xl bg-zinc-900/50 border border-zinc-800">
+            <DocsH3>{n.title}</DocsH3>
+            <p className="text-sm text-zinc-400">{n.body}</p>
+          </div>
+        ))}
+      </div>
 
       <DocsH2>Muammolar va yechimlari</DocsH2>
       <div className="flex flex-col gap-3 mb-8">

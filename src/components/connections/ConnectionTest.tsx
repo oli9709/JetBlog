@@ -166,8 +166,12 @@ function buildApiBody(formData: ConnectionFormData) {
       platform_type: 'webflow',
       url,
       adapter_config: {
-        token: formData.webflowToken ?? '',
-        collectionId: formData.webflowCollectionId ?? '',
+        apiToken:       formData.webflowToken ?? '',
+        siteId:         formData.webflowSiteId ?? '',
+        collectionId:   formData.webflowCollectionId ?? '',
+        collectionSlug: formData.webflowCollectionSlug ?? 'posts',
+        siteDomain:     formData.webflowSiteDomain ?? '',
+        fieldMap:       formData.webflowFieldMap ?? { body: '' },
       },
     };
   }

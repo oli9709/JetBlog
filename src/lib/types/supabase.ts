@@ -20,12 +20,52 @@ export type SubscriptionT = {
   status: string;
 };
 
-export type PlatformType = 'wordpress' | 'ghost' | 'webhook';
+export type PlatformType = 'wordpress' | 'ghost' | 'webhook' | 'webflow';
 
 export type WordPressAdapterConfig = Record<string, never>;
 export type GhostAdapterConfig = { apiUrl: string; adminApiKey: string };
 export type WebhookAdapterConfig = { endpointUrl: string; secretKey: string };
-export type AdapterConfig = WordPressAdapterConfig | GhostAdapterConfig | WebhookAdapterConfig;
+
+/**
+ * Webflow CMS adapter config
+ *
+ * adapter_config shape (stored encrypted where noted):
+ * {
+ *   apiToken:       string   — Webflow Site API Token (AES-256-GCM encrypted)
+ *   siteId:         string   — Webflow site ID (from /v2/sites)
+ *   collectionId:   string   — CMS Collection ID
+ *   collectionSlug: string   — collection URL slug (e.g. 'blog-posts'), for URL construction
+ *   siteDomain:     string   — primary domain (e.g. 'example.webflow.io'), for URL construction
+ *   fieldMap: {
+ *     body:     string   — slug of the RichText field that holds article HTML (REQUIRED)
+ *     title?:   string   — slug of a custom PlainText/RichText field for the article title (optional;
+ *                          `name` system field is always set from article.title regardless)
+ *     summary?: string   — slug of a PlainText field for the SEO meta description
+ *     image?:   string   — slug of an Image field for the featured image
+ *   }
+ * }
+ */
+export type WebflowFieldMap = {
+  body: string;
+  title?: string;
+  summary?: string;
+  image?: string;
+};
+
+export type WebflowAdapterConfig = {
+  apiToken: string;        // encrypted AES-256-GCM
+  siteId: string;
+  collectionId: string;
+  collectionSlug: string;
+  siteDomain: string;
+  fieldMap: WebflowFieldMap;
+};
+
+export type AdapterConfig =
+  | WordPressAdapterConfig
+  | GhostAdapterConfig
+  | WebhookAdapterConfig
+  | WebflowAdapterConfig;
 
 export type SiteT = {
   id: string;
@@ -45,6 +85,7 @@ export type SiteT = {
   publish_time: string;
   is_active: boolean;
   telegram_chat_id?: string | null;
+  indexnow_key?: string | null;
   created_at: string;
 };
 
@@ -67,6 +108,9 @@ export type ArticleT = {
   keyword_id: string;
   title: string;
   content: string;
+  seo_title?: string | null;
+  seo_description?: string | null;
+  tags?: string[];
   featured_image_url?: string | null;
   wp_post_id?: number | null;
   status: 'draft' | 'scheduled' | 'published' | 'error' | 'queued' | 'generating' | 'imaging' | 'publishing' | 'failed';
@@ -77,6 +121,7 @@ export type ArticleT = {
   generation_error?: string | null;
   generation_started_at?: string | null;
   generation_completed_at?: string | null;
+  published_url?: string | null;
   created_at: string;
 };
 

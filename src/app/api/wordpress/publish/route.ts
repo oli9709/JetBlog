@@ -6,6 +6,7 @@ import { GetSiteById } from '@/lib/API/Database/sites/queries';
 import { SupabaseUpdateArticle } from '@/lib/API/Database/articles/mutations';
 import { PublishToWordPress } from '@/lib/API/Services/wordpress/publish';
 import { decryptText } from '@/lib/utils/encryption';
+import { getBaseUrl } from '@/lib/config/site';
 
 /**
  * POST /api/wordpress/publish
@@ -76,7 +77,7 @@ export async function POST(req: Request) {
     });
 
     // 5. Telegram notify — async fire-and-forget (WP nashrini kutmaydi)
-    const origin = process.env.NEXT_PUBLIC_DOMAIN || 'http://localhost:3000';
+    const origin = getBaseUrl();
     fetch(`${origin}/api/telegram/notify`, {
       method: 'POST',
       headers: {
