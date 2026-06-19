@@ -24,7 +24,7 @@
 
 import { NextResponse } from 'next/server';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
-import { verifySignatureAppRouter } from '@upstash/qstash/nextjs';
+import { Receiver } from '@upstash/qstash';
 import { GenerateArticleWithClaude, PriorArticleRef } from '@/lib/API/Services/claude/generate';
 import { GenerateCoverImage } from '@/lib/API/Services/image/generate';
 import { publishArticle } from '@/lib/API/Services/publish/publishArticle';
@@ -284,19 +284,47 @@ async function processOneSite(siteId: string): Promise<{ status: string; reason?
   }
 }
 
-// ── Route handler ─────────────────────────────────────────────────────────────
+// ── QStash imzo tekshirish (Receiver orqali) ──────────────────────────────────
+// verifySignatureAppRouter (@upstash/qstash/nextjs) o'rniga Receiver ishlatiladi —
+// Turbopack subpath eksport muammosini oldini olish uchun.
 
-/**
- * QStash imzosi bilan autentifikatsiya qilingan POST handler.
- * QSTASH_TOKEN yo'q bo'lsa fallback: CRON_SECRET bilan ishlaydi.
- */
-async function workerHandler(req: Request): Promise<Response> {
-  // Body ni olish
-  let body: { site_id?: string };
+async function verifyQStash(req: Request): Promise<{ ok: boolean; rawBody: string }> {
+  const currentKey = process.env.QSTASH_CURRENT_SIGNING_KEY ?? '';
+  const nextKey = process.env.QSTASH_NEXT_SIGNING_KEY ?? '';
+  const signature = req.headers.get('upstash-signature') ?? '';
+  const rawBody = await req.text();
+  if (!currentKey || !nextKey || !signature) return { ok: false, rawBody };
   try {
-    body = await req.json() as { site_id?: string };
+    const receiver = new Receiver({ currentSigningKey: currentKey, nextSigningKey: nextKey });
+    await receiver.verify({ signature, body: rawBody });
+    return { ok: true, rawBody };
   } catch {
-    return NextResponse.json({ error: "So'rov tanasi noto'g'ri" }, { status: 400 });
+    return { ok: false, rawBody };
+  }
+}
+
+export async function POST(req: Request): Promise<Response> {
+  const useQStash = !!(process.env.QSTASH_CURRENT_SIGNING_KEY && process.env.QSTASH_NEXT_SIGNING_KEY);
+
+  let body: { site_id?: string };
+
+  if (useQStash) {
+    // QStash imzosi bilan autentifikatsiya
+    const { ok, rawBody } = await verifyQStash(req);
+    if (!ok) {
+      return NextResponse.json({ error: 'QStash imzo tekshiruvi muvaffaqiyatsiz' }, { status: 401 });
+    }
+    try { body = JSON.parse(rawBody); } catch {
+      return NextResponse.json({ error: "So'rov tanasi noto'g'ri" }, { status: 400 });
+    }
+  } else {
+    // Fallback: CRON_SECRET orqali autentifikatsiya
+    if (!isFallbackAuthorized(req)) {
+      return NextResponse.json({ error: 'Ruxsat berilmagan (Unauthorized)' }, { status: 401 });
+    }
+    try { body = await req.json() as { site_id?: string }; } catch {
+      return NextResponse.json({ error: "So'rov tanasi noto'g'ri" }, { status: 400 });
+    }
   }
 
   const siteId = body?.site_id;
@@ -308,7 +336,6 @@ async function workerHandler(req: Request): Promise<Response> {
     const result = await processOneSite(siteId);
     return NextResponse.json({ success: true, site_id: siteId, ...result });
   } catch (err: unknown) {
-    // 5xx — QStash bu ishni qayta urinadi
     console.error(`[Worker] site=${siteId} 5xx xatosi:`, err);
     return NextResponse.json(
       { error: err instanceof Error ? err.message : 'Ishchi xatoligi' },
@@ -316,16 +343,3 @@ async function workerHandler(req: Request): Promise<Response> {
     );
   }
 }
-
-// QSTASH_TOKEN mavjudligiga qarab autentifikatsiya usulini tanlash
-const qstashToken = process.env.QSTASH_TOKEN;
-
-export const POST = qstashToken
-  ? verifySignatureAppRouter(workerHandler)
-  : async (req: Request) => {
-      // Fallback: CRON_SECRET orqali autentifikatsiya
-      if (!isFallbackAuthorized(req)) {
-        return NextResponse.json({ error: 'Ruxsat berilmagan (Unauthorized)' }, { status: 401 });
-      }
-      return workerHandler(req);
-    };
