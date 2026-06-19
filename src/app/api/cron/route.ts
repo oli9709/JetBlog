@@ -21,7 +21,7 @@
 
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { Client as QStashClient } from '@upstash/qstash';
+// @upstash/qstash — dynamic import (Turbopack build-time resolution muammosini oldini olish)
 import { SiteT } from '@/lib/types/supabase';
 
 export const dynamic = 'force-dynamic';
@@ -91,6 +91,7 @@ async function runDispatcher(): Promise<{ enqueued: number; skipped: number; sit
 
     if (qstashToken) {
       // ── QStash: retry x3 avtomatik, xato bo'lsa DLQ ga o'tadi ─────────────
+      const { Client: QStashClient } = await import('@upstash/qstash');
       const qstash = new QStashClient({ token: qstashToken });
       await qstash.publishJSON({
         url: workerUrl,

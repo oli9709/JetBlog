@@ -24,7 +24,7 @@
 
 import { NextResponse } from 'next/server';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
-import { Receiver } from '@upstash/qstash';
+// @upstash/qstash — dynamic import (Turbopack build-time resolution muammosini oldini olish)
 import { GenerateArticleWithClaude, PriorArticleRef } from '@/lib/API/Services/claude/generate';
 import { GenerateCoverImage } from '@/lib/API/Services/image/generate';
 import { publishArticle } from '@/lib/API/Services/publish/publishArticle';
@@ -295,6 +295,7 @@ async function verifyQStash(req: Request): Promise<{ ok: boolean; rawBody: strin
   const rawBody = await req.text();
   if (!currentKey || !nextKey || !signature) return { ok: false, rawBody };
   try {
+    const { Receiver } = await import('@upstash/qstash');
     const receiver = new Receiver({ currentSigningKey: currentKey, nextSigningKey: nextKey });
     await receiver.verify({ signature, body: rawBody });
     return { ok: true, rawBody };
