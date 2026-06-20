@@ -23,8 +23,8 @@ interface SiteCardProps {
     platform_type?: string;
     adapter_config?: Record<string, unknown>;
     is_active: boolean;
-    publish_days: string[];
-    publish_time: string;
+    publish_days: string[] | null;
+    publish_time: string | null;
     brand_voice: { tone?: string };
     telegram_chat_id?: string;
   };
@@ -125,17 +125,20 @@ export const SiteCard: React.FC<SiteCardProps> = ({ site, onDelete, onToggle, on
         <div className="flex items-center justify-between text-sm">
           <span className="text-zinc-500">Nashr kunlari</span>
           <div className="flex gap-1">
-            {site.publish_days.map(day => (
-              <span key={day} className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-[#FB3640]/10 text-[#FF6B6B] border border-[#FB3640]/20 rounded-md shadow-sm">
-                {DAYS_MAP[day] || day}
-              </span>
-            ))}
+            {(site.publish_days ?? []).length > 0
+              ? (site.publish_days ?? []).map(day => (
+                  <span key={day} className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-[#FB3640]/10 text-[#FF6B6B] border border-[#FB3640]/20 rounded-md shadow-sm">
+                    {DAYS_MAP[day] || day}
+                  </span>
+                ))
+              : <span className="text-xs text-zinc-600">—</span>
+            }
           </div>
         </div>
         <div className="flex items-center justify-between text-sm">
           <span className="text-zinc-500">Nashr vaqti</span>
           <span className="text-zinc-300 font-mono bg-zinc-800/50 px-2 py-0.5 rounded border border-white/5 shadow-inner">
-            {site.publish_time}
+            {site.publish_time ?? '—'}
           </span>
         </div>
         <div className="flex items-center justify-between text-sm">

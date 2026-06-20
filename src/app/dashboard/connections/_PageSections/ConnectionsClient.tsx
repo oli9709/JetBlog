@@ -32,7 +32,17 @@ export default function ConnectionsClient({ initialSites, userId }: ConnectionsC
 
   const handleWizardComplete = (site: any) => {
     if (site) {
-      setSites((prev) => [site, ...prev]);
+      // DB insert.data may omit default columns if the DB default wasn't echoed back.
+      // Merge safe fallbacks so SiteCard never receives null for fields it iterates.
+      const safeSite: SiteT = {
+        ...site,
+        publish_days: site.publish_days ?? [],
+        publish_time: site.publish_time ?? '09:00',
+        brand_voice: site.brand_voice ?? {},
+        is_active: site.is_active ?? true,
+        adapter_config: site.adapter_config ?? {},
+      };
+      setSites((prev) => [safeSite, ...prev]);
     }
     setShowWizard(false);
     toast.success('Sayt muvaffaqiyatli ulandi! ✅');
