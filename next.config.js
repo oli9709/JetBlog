@@ -23,6 +23,6 @@ module.exports = withSentryConfig(nextConfig, {
   silent: true,
   widenClientFileUpload: true,
   hideSourceMaps: true,
-  disableLogger: true,
+  webpack: { treeshake: { removeDebugLogging: true } },
   tunnelRoute: '/monitoring-tunnel',
 });
