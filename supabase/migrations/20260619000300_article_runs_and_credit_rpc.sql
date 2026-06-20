@@ -136,7 +136,7 @@ BEGIN
       PERFORM cron.schedule(
         'autopilot-dispatcher-hourly',
         '0 * * * *',   -- har soat boshida
-        $$SELECT 1$$   -- placeholder: haqiqiy chaqiruv Vercel Cron orqali amalga oshiriladi
+        $cron$SELECT 1$cron$   -- placeholder: haqiqiy chaqiruv Vercel Cron orqali amalga oshiriladi
       );
     EXCEPTION WHEN OTHERS THEN
       RAISE WARNING 'pg_cron dispatcher jadval o''rnatilmadi: %', SQLERRM;
