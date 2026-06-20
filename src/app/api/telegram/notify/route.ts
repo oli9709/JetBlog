@@ -49,7 +49,7 @@ export async function POST(req: Request) {
     // Maqola ma'lumotlarini olish
     const { data: article, error: articleErr } = await supabase
       .from('articles')
-      .select('id, title, content, featured_image_url, wp_post_id')
+      .select('id, title, content, featured_image_url, wp_post_id, published_url')
       .eq('id', articleId)
       .single();
 
@@ -58,10 +58,16 @@ export async function POST(req: Request) {
     }
 
     const excerpt = extractExcerpt(article.content);
-    const cleanUrl = site.url.replace(/\/+$/, '');
-    const articleUrl = article.wp_post_id
-      ? `${cleanUrl}/?p=${article.wp_post_id}`
-      : cleanUrl;
+    // published_url is the canonical post URL set by the adapter on publish.
+    // Fall back to site.url (WordPress-style /?p= link) when it's absent.
+    // Guard site.url — webhook/ghost sites may have null url.
+    const cleanSiteUrl = (site.url ?? '').replace(/\/+$/, '');
+    const articleUrl =
+      article.published_url ||
+      (article.wp_post_id && cleanSiteUrl
+        ? `${cleanSiteUrl}/?p=${article.wp_post_id}`
+        : cleanSiteUrl) ||
+      '';
 
     const sent = await sendTelegramPost({
       chatId: site.telegram_chat_id,

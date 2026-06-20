@@ -36,6 +36,7 @@ import { TipTapEditor } from '@/components/ui/TipTapEditor';
 import { ContentQueue } from './ContentQueue';
 import { ArticleEditor } from './ArticleEditor';
 import { GenerationProgressModal } from '@/components/content/GenerationProgressModal';
+import { getDisplayHost } from '@/lib/utils/siteUrl';
 
 interface ContentClientPropsI {
   initialSites: SiteT[];
@@ -261,7 +262,7 @@ export default function ContentClient({ initialSites, userId }: ContentClientPro
             >
               {sites.map((s) => (
                 <option key={s.id} value={s.id}>
-                  {s.url.replace('https://', '').replace('http://', '')}
+                  {getDisplayHost(s)}
                 </option>
               ))}
             </select>

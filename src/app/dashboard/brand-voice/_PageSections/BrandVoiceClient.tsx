@@ -17,6 +17,7 @@ import { BrandForm, BrandVoiceData } from './BrandForm';
 import { SiteScanner } from './SiteScanner';
 import { Analytics } from './Analytics';
 import type { GSCStats } from '@/lib/API/Services/gsc/fetch';
+import { getDisplayHost } from '@/lib/utils/siteUrl';
 
 interface BrandVoiceClientPropsI {
   initialSites: SiteT[];
@@ -169,7 +170,7 @@ export default function BrandVoiceClient({ initialSites, userId }: BrandVoiceCli
             >
               {sites.map((s) => (
                 <option key={s.id} value={s.id}>
-                  {s.url.replace('https://', '').replace('http://', '')}
+                  {getDisplayHost(s)}
                 </option>
               ))}
             </select>

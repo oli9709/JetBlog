@@ -5,6 +5,7 @@ import { createPortal } from 'react-dom';
 import { Trash2, Send, Globe, X, MessageCircle, Info } from 'lucide-react';
 import { Switch } from '@/components/ui/Switch';
 import { cn } from '@/lib/utils/helpers';
+import { getDisplayUrl, getDisplayHost } from '@/lib/utils/siteUrl';
 import { ShimmerButton } from '@/components/magicui/shimmer-button';
 
 const PLATFORM_BADGE: Record<string, { label: string; className: string }> = {
@@ -17,9 +18,10 @@ const PLATFORM_BADGE: Record<string, { label: string; className: string }> = {
 interface SiteCardProps {
   site: {
     id: string;
-    url: string;
+    url: string | null;
     wp_username: string;
     platform_type?: string;
+    adapter_config?: Record<string, unknown>;
     is_active: boolean;
     publish_days: string[];
     publish_time: string;
@@ -81,7 +83,7 @@ export const SiteCard: React.FC<SiteCardProps> = ({ site, onDelete, onToggle, on
           </div>
           <div>
             <h3 className="text-base font-bold bg-clip-text text-transparent bg-gradient-to-r from-zinc-100 to-zinc-500 truncate max-w-[200px]">
-              {site.url.replace(/^https?:\/\//, '')}
+              {getDisplayHost(site)}
             </h3>
             <div className="flex items-center gap-2 mt-0.5">
               <p className="text-xs text-zinc-500">@{site.wp_username}</p>
@@ -168,7 +170,7 @@ export const SiteCard: React.FC<SiteCardProps> = ({ site, onDelete, onToggle, on
         )}
 
         <button 
-          onClick={() => onDelete(site.id, site.url)}
+          onClick={() => onDelete(site.id, getDisplayUrl(site))}
           className="p-2 text-zinc-500 hover:text-rose-400 hover:bg-rose-500/10 rounded-xl transition-all duration-300"
           title="Saytni o'chirish"
         >

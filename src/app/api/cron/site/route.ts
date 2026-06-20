@@ -251,7 +251,7 @@ async function processOneSite(siteId: string): Promise<{ status: string; reason?
     // ── 12. Telegram anons (kritik emas) ─────────────────────────────────
     if (site.telegram_chat_id) {
       try {
-        const articleUrl = publishResult.url || site.url.replace(/\/+$/, '');
+        const articleUrl = publishResult.url || (site.url ?? '').replace(/\/+$/, '');
         const excerpt = draft.content
           .replace(/<[^>]*>/g, '')
           .replace(/\s+/g, ' ')

@@ -66,6 +66,12 @@ export async function submitIndexNow(
     return;
   }
 
+  // WordPress sayt url si bo'sh bo'lsa (ma'lumotlar bazasida null) — xavfsiz o'tkazib yuborish
+  if (!site.url) {
+    console.log('[IndexNow] skipped: no site url');
+    return;
+  }
+
   try {
     const serviceClient = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,

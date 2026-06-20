@@ -64,9 +64,13 @@ export async function runPostPublishSEO(params: {
     if (err instanceof Error) Sentry.captureException(err, { tags: { feature: 'gsc-indexing' } });
   }
 
-  // 3. Sitemap warm
+  // 3. Sitemap warm — faqat url mavjud bo'lsa (webhook/ghost uchun url bo'sh bo'lishi mumkin)
   try {
-    await warmSitemap(site.url);
+    if (site.url) {
+      await warmSitemap(site.url);
+    } else {
+      console.log('[PostPublishSEO] Sitemap warm skipped: no site url');
+    }
   } catch (err: unknown) {
     console.error('[PostPublishSEO] Sitemap warm error:', err);
     if (err instanceof Error) Sentry.captureException(err, { tags: { feature: 'sitemap-warm' } });

@@ -28,6 +28,7 @@ import { toast } from 'react-toastify';
 import { KeywordTable } from './KeywordTable';
 import { KeywordFilters } from './KeywordFilters';
 import { KeywordForm } from './KeywordForm';
+import { getDisplayHost } from '@/lib/utils/siteUrl';
 
 interface KeywordsClientPropsI {
   initialSites: SiteT[];
@@ -259,7 +260,7 @@ export default function KeywordsClient({ initialSites, userId }: KeywordsClientP
             >
               {sites.map((s) => (
                 <option key={s.id} value={s.id}>
-                  {s.url.replace('https://', '').replace('http://', '')}
+                  {getDisplayHost(s)}
                 </option>
               ))}
             </select>

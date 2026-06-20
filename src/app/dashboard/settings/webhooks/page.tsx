@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
+import { getDisplayHost } from '@/lib/utils/siteUrl';
 
 interface Webhook {
   id: string;
@@ -151,7 +152,7 @@ export default function WebhooksPage() {
             >
               <option value="">Sayt tanlang...</option>
               {sites.map(s => (
-                <option key={s.id} value={s.id}>{s.url}</option>
+                <option key={s.id} value={s.id}>{getDisplayHost(s)}</option>
               ))}
             </select>
           </div>
