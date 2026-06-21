@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
+import type { SupabaseClient } from '@supabase/supabase-js';
 import { cookies } from 'next/headers';
 import { encryptText } from '@/lib/utils/encryption';
-import { SupabaseInsertSite } from '@/lib/API/Database/sites/mutations';
 import { withRateLimit } from '@/lib/withRateLimit';
 import { rateLimiters } from '@/lib/ratelimit';
 import jwt from 'jsonwebtoken';
@@ -57,6 +57,43 @@ const DEFAULT_BRAND_VOICE: BrandVoice = {
   rules: [],
 };
 
+// ─── Inline insert helper ─────────────────────────────────────────────────────
+// Uses the SAME authenticated supabase client from the route handler so
+// auth.uid() is guaranteed to match the verified session — RLS passes.
+
+async function insertSite(
+  supabase: SupabaseClient,
+  payload: Record<string, unknown>
+): Promise<NextResponse | null> {
+  const { data, error } = await supabase
+    .from('sites')
+    .insert([payload])
+    .select()
+    .single();
+
+  if (error) {
+    // Log the full Postgres error so Vercel logs show the real cause
+    console.error('[sites/verify] INSERT failed:', JSON.stringify({
+      code:    error.code,
+      message: error.message,
+      details: error.details,
+      hint:    error.hint,
+    }));
+    return NextResponse.json({
+      ok: false,
+      errorCode: 'db_error',
+      error: `Bazaga saqlashda xatolik: ${error.message}`,
+    });
+  }
+
+  return NextResponse.json({
+    ok: true,
+    success: true,
+    steps: { dns: true, auth: true, write: true },
+    site: data,
+  });
+}
+
 // ─── Route ────────────────────────────────────────────────────────────────────
 
 /**
@@ -87,14 +124,14 @@ export async function POST(request: NextRequest) {
         }
       );
 
-      const { data: { session }, error: authError } = await supabase.auth.getSession();
-      if (authError || !session?.user) {
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      if (authError || !user) {
         return NextResponse.json(
           { ok: false, errorCode: 'unknown', error: 'Tizimga kirish talab etiladi!' },
           { status: 401 }
         );
       }
-      const userId = session.user.id;
+      const userId = user.id;
 
       // ── Body ──────────────────────────────────────────────────────────────
       let body: Record<string, unknown>;
@@ -138,8 +175,8 @@ export async function POST(request: NextRequest) {
             try { data = await res.json() as Record<string, unknown>; } catch { /* non-JSON ok */ }
 
             if (data.status === 'JetBlog webhook active') {
-              // Muvaffaqiyatli — DB ga saqlash
-              const insert = await SupabaseInsertSite({
+              // Muvaffaqiyatli — DB ga saqlash (route ning o'z supabase clienti orqali)
+              return await insertSite(supabase, {
                 user_id: userId,
                 url: endpointUrl,
                 wp_username: '',
@@ -149,13 +186,8 @@ export async function POST(request: NextRequest) {
                 publish_time: '09:00:00',
                 is_active: true,
                 platform_type: 'webhook',
-                // secretKey DB da shifrlangan saqlanadi
                 adapter_config: { endpointUrl, secretKey: secretKey ? encryptText(secretKey) : '' },
               });
-              if (insert.error) {
-                return NextResponse.json({ ok: false, errorCode: 'unknown', error: 'Bazaga saqlashda xatolik' });
-              }
-              return NextResponse.json({ ok: true, success: true, steps: { dns: true, auth: true, write: true }, site: insert.data });
             }
           }
 
@@ -188,7 +220,7 @@ export async function POST(request: NextRequest) {
 
         // Local sayt — tekshiruvni o'tkazib yuborish
         if (isLocalhost(rawUrl)) {
-          const insert = await SupabaseInsertSite({
+          return await insertSite(supabase, {
             user_id: userId,
             url: rawUrl,
             wp_username,
@@ -200,10 +232,6 @@ export async function POST(request: NextRequest) {
             platform_type: 'wordpress',
             adapter_config: {},
           });
-          if (insert.error) {
-            return NextResponse.json({ ok: false, errorCode: 'unknown', error: 'Bazaga saqlashda xatolik' });
-          }
-          return NextResponse.json({ ok: true, success: true, steps: { dns: true, auth: true, write: true }, site: insert.data });
         }
 
         try {
@@ -222,12 +250,11 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ ok: false, errorCode: 'wp_not_found', step: 'dns', error: 'WordPress REST API topilmadi' });
           }
 
-          const encryptedPassword = encryptText(wp_password);
-          const insert = await SupabaseInsertSite({
+          return await insertSite(supabase, {
             user_id: userId,
             url: rawUrl,
             wp_username,
-            wp_password: encryptedPassword,
+            wp_password: encryptText(wp_password),
             brand_voice: DEFAULT_BRAND_VOICE,
             publish_days: ['Monday', 'Wednesday', 'Friday'],
             publish_time: '09:00:00',
@@ -235,10 +262,6 @@ export async function POST(request: NextRequest) {
             platform_type: 'wordpress',
             adapter_config: {},
           });
-          if (insert.error) {
-            return NextResponse.json({ ok: false, errorCode: 'unknown', error: 'Bazaga saqlashda xatolik' });
-          }
-          return NextResponse.json({ ok: true, success: true, steps: { dns: true, auth: true, write: true }, site: insert.data });
         } catch {
           return NextResponse.json({ ok: false, errorCode: 'wp_not_found', step: 'dns', error: "WordPress ga ulanib bo'lmadi" });
         }
@@ -274,7 +297,7 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ ok: false, errorCode: 'ghost_auth_failed', step: 'auth', error: `Ghost API xatosi: ${res.status}` });
           }
 
-          const insert = await SupabaseInsertSite({
+          return await insertSite(supabase, {
             user_id: userId,
             url: rawUrl,
             wp_username: '',
@@ -284,13 +307,8 @@ export async function POST(request: NextRequest) {
             publish_time: '09:00:00',
             is_active: true,
             platform_type: 'ghost',
-            // adminApiKey DB da shifrlangan saqlanadi
             adapter_config: { apiUrl, adminApiKey: encryptText(adminApiKey) },
           });
-          if (insert.error) {
-            return NextResponse.json({ ok: false, errorCode: 'unknown', error: 'Bazaga saqlashda xatolik' });
-          }
-          return NextResponse.json({ ok: true, success: true, steps: { dns: true, auth: true, write: true }, site: insert.data });
         } catch {
           return NextResponse.json({ ok: false, errorCode: 'ghost_auth_failed', step: 'auth', error: "Ghost ga ulanib bo'lmadi" });
         }
@@ -337,7 +355,7 @@ export async function POST(request: NextRequest) {
           }
 
           // DB ga saqlash — apiToken shifrlangan holda
-          const insert = await SupabaseInsertSite({
+          return await insertSite(supabase, {
             user_id: userId,
             url: rawUrl,
             wp_username: '',
@@ -356,10 +374,6 @@ export async function POST(request: NextRequest) {
               fieldMap,
             },
           });
-          if (insert.error) {
-            return NextResponse.json({ ok: false, errorCode: 'unknown', error: 'Bazaga saqlashda xatolik' });
-          }
-          return NextResponse.json({ ok: true, success: true, steps: { dns: true, auth: true, write: true }, site: insert.data });
         } catch (err: unknown) {
           const msg = err instanceof Error ? err.message : "Webflow ga ulanib bo'lmadi";
           return NextResponse.json({ ok: false, errorCode: 'webflow_auth_failed', step: 'auth', error: msg });

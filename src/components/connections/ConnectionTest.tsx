@@ -262,13 +262,14 @@ export function ConnectionTest({ formData, onSuccess, onBack }: ConnectionTestPr
       });
 
       const resData = await res.json() as {
+        ok?: boolean;
         success?: boolean;
         errorCode?: string;
         error?: string;
         site?: unknown;
       };
 
-      if (!res.ok || resData.success === false) {
+      if (!res.ok || !resData.ok) {
         const code = resData.errorCode ?? 'unknown';
         setStep('dns',  { status: 'error' });
         setStep('auth', { status: 'error' });

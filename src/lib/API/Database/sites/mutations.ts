@@ -46,7 +46,9 @@ export const SupabaseInsertSite = async (
     .select()
     .single();
 
-  if (res.error) SupabaseDBError(res.error);
+  // NOTE: do NOT call SupabaseDBError here — it throws and makes the error
+  // undetectable by callers that check `if (insert.error)`. Return res as-is
+  // so callers can handle the error themselves.
 
   return res as PostgrestSingleResponse<SiteT>;
 };
