@@ -398,15 +398,11 @@ export function ConnectionForm({ platform, data, onChange }: ConnectionFormProps
 
   const update = (patch: Partial<ConnectionFormData>) => onChange({ ...data, ...patch });
 
-  // Webhook platformi tanlanganida form maydonlarini avtomatik to'ldirish
-  // (wizard canNext() validatsiyasi uchun)
+  // Webhook platformi tanlanganida faqat secretKey ni avtomatik to'ldirish.
+  // webhookEndpoint foydalanuvchi o'zi kiritadi (quyidagi input orqali).
   useEffect(() => {
     if (platform === 'webhook') {
-      update({
-        siteUrl:         WEBHOOK_RECEIVE_URL,
-        webhookEndpoint: WEBHOOK_RECEIVE_URL,
-        webhookSecret:   secretKey,
-      });
+      update({ webhookSecret: secretKey });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [platform]);
@@ -496,11 +492,27 @@ export function ConnectionForm({ platform, data, onChange }: ConnectionFormProps
     );
   }
 
-  // webhook → AI Builder Prompt
+  // webhook → endpoint URL input + AI Builder Prompt
   return (
-    <AIBuilderPrompt
-      webhookUrl={WEBHOOK_RECEIVE_URL}
-      secretKey={secretKey}
-    />
+    <div className="flex flex-col gap-4">
+      <FloatingInput
+        id="webhook-endpoint"
+        label="Receiver endpoint URL (https://...)"
+        type="url"
+        value={data.webhookEndpoint ?? ''}
+        onChange={(v) => update({ webhookEndpoint: v, siteUrl: v })}
+        icon={<Globe className="w-5 h-5" />}
+        required
+        placeholder="https://your-site.com"
+      />
+      <HintBox>
+        Deploy qilingan saytingiz URL manzilini kiriting. Masalan: https://audit-dashboard.onrender.com
+        &nbsp;—&nbsp;saytda <code>/api/jetblog</code> endpoint bo&apos;lishi kerak.
+      </HintBox>
+      <AIBuilderPrompt
+        webhookUrl={WEBHOOK_RECEIVE_URL}
+        secretKey={secretKey}
+      />
+    </div>
   );
 }

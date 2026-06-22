@@ -149,6 +149,12 @@ export async function POST(request: NextRequest) {
 
       // ── Webhook ───────────────────────────────────────────────────────────
       if (platform === 'webhook') {
+        // Diagnostic: log the raw incoming fields so we can confirm what the client sent
+        console.log('[webhook/verify] incoming body fields:', JSON.stringify({
+          url:            body.url,
+          platform_type:  body.platform_type,
+          adapter_config: body.adapter_config,
+        }));
         const endpointUrl = normalizeUrl(adapterCfg.endpointUrl ?? (body.url as string) ?? '');
         const secretKey   = adapterCfg.secretKey ?? '';
 
