@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
-import { cookies } from 'next/headers';
+import { SupabaseServerClient } from '@/lib/API/Services/init/supabase';
 import { GetInvoiceById } from '@/lib/API/Database/invoices/queries';
 import { SupabaseUpdateInvoice } from '@/lib/API/Database/invoices/mutations';
 import { GenerateInvoicePDFBuffer, UploadInvoicePDFToStorage } from '@/lib/API/Services/invoice/pdf';
@@ -11,12 +10,9 @@ import { GenerateInvoicePDFBuffer, UploadInvoicePDFToStorage } from '@/lib/API/S
  */
 export async function POST(req: Request) {
   try {
-    const cookieStore = await cookies();
-    const supabase = createRouteHandlerClient<any>({ cookies: () => cookieStore as any });
-    
-    // Foydalanuvchi seansini tekshirish
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) {
+    const supabase = await SupabaseServerClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
       return NextResponse.json({ error: 'Ruxsat berilmagan (Unauthorized)' }, { status: 401 });
     }
 
@@ -35,7 +31,7 @@ export async function POST(req: Request) {
     const invoice = invoiceRes.data;
 
     // 2. Foydalanuvchi profili va email manzilini olish
-    const userEmail = session.user.email || 'billing@jetblog.app';
+    const userEmail = user.email || 'billing@jetblog.app';
 
     // 3. PDF Kit orqali PDF fayl bufferini generatsiya qilish
     const pdfBuffer = await GenerateInvoicePDFBuffer({

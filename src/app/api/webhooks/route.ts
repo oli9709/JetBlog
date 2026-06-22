@@ -1,13 +1,11 @@
 import { NextResponse } from 'next/server';
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
-import { cookies } from 'next/headers';
+import { SupabaseServerClient } from '@/lib/API/Services/init/supabase';
 import crypto from 'crypto';
 
 export async function GET() {
-  const cookieStore = await cookies();
-  const supabase = createRouteHandlerClient<any>({ cookies: () => cookieStore as any });
-  const { data: { session } } = await supabase.auth.getSession();
-  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const supabase = await SupabaseServerClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const { data, error } = await supabase
     .from('webhooks')
@@ -19,10 +17,9 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
-  const cookieStore = await cookies();
-  const supabase = createRouteHandlerClient<any>({ cookies: () => cookieStore as any });
-  const { data: { session } } = await supabase.auth.getSession();
-  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const supabase = await SupabaseServerClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const { site_id, endpoint_url, events } = await req.json();
   if (!site_id || !endpoint_url) {
@@ -34,7 +31,7 @@ export async function POST(req: Request) {
     .from('sites')
     .select('id')
     .eq('id', site_id)
-    .eq('user_id', session.user.id)
+    .eq('user_id', user.id)
     .single();
 
   if (!site) return NextResponse.json({ error: 'Sayt topilmadi' }, { status: 404 });
@@ -57,23 +54,22 @@ export async function POST(req: Request) {
 }
 
 export async function PATCH(req: Request) {
-  const cookieStore = await cookies();
-  const supabase = createRouteHandlerClient<any>({ cookies: () => cookieStore as any });
-  const { data: { session } } = await supabase.auth.getSession();
-  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const supabase = await SupabaseServerClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const { id, ...fields } = await req.json();
   if (!id) return NextResponse.json({ error: 'id talab qilinadi' }, { status: 400 });
 
   // Faqat ruxsat etilgan maydonlarni yangilash
   const allowed = ['source_platform', 'prompt_generated_at', 'connection_tested', 'is_active'];
-  const update: Record<string, any> = {};
+  const update: Record<string, unknown> = {};
   for (const key of allowed) {
     if (key in fields) update[key] = fields[key];
   }
 
   if (Object.keys(update).length === 0) {
-    return NextResponse.json({ error: 'Yangilanadigan maydon yo\'q' }, { status: 400 });
+    return NextResponse.json({ error: "Yangilanadigan maydon yo'q" }, { status: 400 });
   }
 
   const { data, error } = await supabase
@@ -88,10 +84,9 @@ export async function PATCH(req: Request) {
 }
 
 export async function DELETE(req: Request) {
-  const cookieStore = await cookies();
-  const supabase = createRouteHandlerClient<any>({ cookies: () => cookieStore as any });
-  const { data: { session } } = await supabase.auth.getSession();
-  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const supabase = await SupabaseServerClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const { id } = await req.json();
   if (!id) return NextResponse.json({ error: 'id talab qilinadi' }, { status: 400 });

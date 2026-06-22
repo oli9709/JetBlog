@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
+import { SupabaseServerClient } from '@/lib/API/Services/init/supabase';
 import { createClient } from '@supabase/supabase-js';
-import { cookies } from 'next/headers';
 import { GetInvoiceById } from '@/lib/API/Database/invoices/queries';
 import { SupabaseUpdateInvoice } from '@/lib/API/Database/invoices/mutations';
 import { GenerateInvoicePDFBuffer, UploadInvoicePDFToStorage } from '@/lib/API/Services/invoice/pdf';
@@ -12,22 +11,19 @@ import { GenerateInvoicePDFBuffer, UploadInvoicePDFToStorage } from '@/lib/API/S
  */
 export async function POST(req: Request) {
   try {
-    const cookieStore = await cookies();
-    const supabase = createRouteHandlerClient<any>({ cookies: () => cookieStore as any });
-    
-    // Foydalanuvchi seansini tekshirish
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) {
+    const supabase = await SupabaseServerClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
       return NextResponse.json({ error: 'Ruxsat berilmagan (Unauthorized)' }, { status: 401 });
     }
 
-    // Admin tekshiruvi
+    // Admin tekshiruvi (service role client bypasses RLS for admin check)
     const adminClient = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     );
     const { data: adminProfile } = await adminClient
-      .from('profiles').select('is_admin').eq('id', session.user.id).single();
+      .from('profiles').select('is_admin').eq('id', user.id).single();
     if (!adminProfile?.is_admin) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
@@ -56,29 +52,37 @@ export async function POST(req: Request) {
       paid_at: new Date().toISOString()
     });
 
-    // 3. Foydalanuvchi profile-dagi credits_remaining miqdorini oshirish
-    const { data: profile } = await supabase
+    // 3. Foydalanuvchi profile-dagi credits_remaining miqdorini oshirish.
+    // adminClient (service-role) ishlatiladi — invoice.user_id logged-in admindan
+    // FARQLI foydalanuvchi bo'lishi mumkin, shuning uchun user-scoped RLS o'tmaydi.
+    const { data: profile, error: profileReadError } = await adminClient
       .from('profiles')
       .select('credits_remaining')
       .eq('id', invoice.user_id)
       .single();
 
+    if (profileReadError) {
+      console.error('[pay-invoice] profile read failed:', profileReadError);
+      return NextResponse.json({ error: 'Foydalanuvchi profilini o\'qib bo\'lmadi!' }, { status: 500 });
+    }
+
     const currentCredits = profile?.credits_remaining || 0;
     const newCreditsTotal = currentCredits + invoice.credits_to_add;
 
-    const { error: profileError } = await supabase
+    const { error: profileError } = await adminClient
       .from('profiles')
       .update({ credits_remaining: newCreditsTotal })
       .eq('id', invoice.user_id);
 
     if (profileError) {
+      console.error('[pay-invoice] credit update failed:', profileError);
       return NextResponse.json({ error: 'Foydalanuvchi balansini oshirishda xatolik!' }, { status: 500 });
     }
 
     // 4. To'langan kvitansiya PDF-ni qayta yaratib Storage-ga joylash
     let publicPdfUrl = invoice.invoice_pdf_url;
     try {
-      const userEmail = session.user.email || 'billing@jetblog.app';
+      const userEmail = user.email || 'billing@jetblog.app';
       const pdfBuffer = await GenerateInvoicePDFBuffer({
         invoiceId: invoice.id,
         userEmail: userEmail,

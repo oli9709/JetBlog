@@ -39,12 +39,12 @@ export async function POST(req: NextRequest) {
         },
       });
 
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
         return NextResponse.json({ error: 'Ruxsat berilmagan (Unauthorized)' }, { status: 401 });
       }
 
-      userId = session.user.id;
+      userId = user.id;
       const body = await req.json() as { articleId?: string };
       articleId = body.articleId ?? '';
 

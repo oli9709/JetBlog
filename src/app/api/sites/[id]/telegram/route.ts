@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
-import { cookies } from 'next/headers';
+import { SupabaseServerClient } from '@/lib/API/Services/init/supabase';
 import { sendTelegramTestMessage } from '@/lib/API/Services/telegram/notify';
 
 /**
@@ -15,11 +14,9 @@ export async function PUT(
 ) {
   try {
     const { id: siteId } = await params;
-    const cookieStore = await cookies();
-    const supabase = createRouteHandlerClient<any>({ cookies: () => cookieStore as any });
-
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) {
+    const supabase = await SupabaseServerClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -35,7 +32,7 @@ export async function PUT(
       .from('sites')
       .select('id')
       .eq('id', siteId)
-      .eq('user_id', session.user.id)
+      .eq('user_id', user.id)
       .single();
 
     if (siteErr || !site) {
@@ -46,7 +43,7 @@ export async function PUT(
     const testOk = await sendTelegramTestMessage(telegram_chat_id);
     if (!testOk) {
       return NextResponse.json(
-        { error: 'Telegram xabar yuborib bo\'lmadi. Chat ID ni tekshiring va bot admin ekanligini tasdiqlang.' },
+        { error: "Telegram xabar yuborib bo'lmadi. Chat ID ni tekshiring va bot admin ekanligini tasdiqlang." },
         { status: 400 }
       );
     }
@@ -56,7 +53,7 @@ export async function PUT(
       .from('sites')
       .update({ telegram_chat_id })
       .eq('id', siteId)
-      .eq('user_id', session.user.id);
+      .eq('user_id', user.id);
 
     if (updateErr) {
       console.error('Sites telegram_chat_id yangilashda xato:', updateErr);
@@ -65,9 +62,9 @@ export async function PUT(
 
     return NextResponse.json({ success: true, telegram_chat_id });
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Sites Telegram Route error:', error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: error instanceof Error ? error.message : 'Xatolik' }, { status: 500 });
   }
 }
 
@@ -81,11 +78,9 @@ export async function DELETE(
 ) {
   try {
     const { id: siteId } = await params;
-    const cookieStore = await cookies();
-    const supabase = createRouteHandlerClient<any>({ cookies: () => cookieStore as any });
-
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) {
+    const supabase = await SupabaseServerClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -93,15 +88,15 @@ export async function DELETE(
       .from('sites')
       .update({ telegram_chat_id: null })
       .eq('id', siteId)
-      .eq('user_id', session.user.id);
+      .eq('user_id', user.id);
 
     if (error) {
-      return NextResponse.json({ error: 'O\'chirishda xatolik.' }, { status: 500 });
+      return NextResponse.json({ error: "O'chirishda xatolik." }, { status: 500 });
     }
 
     return NextResponse.json({ success: true });
 
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error: unknown) {
+    return NextResponse.json({ error: error instanceof Error ? error.message : 'Xatolik' }, { status: 500 });
   }
 }

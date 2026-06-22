@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
-import { cookies } from 'next/headers';
+import { SupabaseServerClient } from '@/lib/API/Services/init/supabase';
 import { GetArticleById } from '@/lib/API/Database/articles/queries';
 import { GetSiteById } from '@/lib/API/Database/sites/queries';
 import { SupabaseUpdateArticle } from '@/lib/API/Database/articles/mutations';
@@ -15,15 +14,13 @@ import { getBaseUrl } from '@/lib/config/site';
  */
 export async function POST(req: Request) {
   try {
-    const cookieStore = await cookies();
-    const supabase = createRouteHandlerClient<any>({ cookies: () => cookieStore as any });
-
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) {
+    const supabase = await SupabaseServerClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
       return NextResponse.json({ error: 'Ruxsat berilmagan (Unauthorized)' }, { status: 401 });
     }
 
-    const userId = session.user.id;
+    const userId = user.id;
     const body = await req.json();
     const { articleId } = body;
 
