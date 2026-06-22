@@ -171,14 +171,14 @@ export default function ContentClient({ initialSites, userId }: ContentClientPro
     setGenerationError(error);
   };
 
-  // Maqolani WordPress saytiga REST API orqali yuborish
+  // Maqolani nashr qilish — platform-aware (WordPress, Ghost, Webhook, Webflow)
   const handlePublishNow = async (idToPublish?: string) => {
     const targetId = idToPublish || selectedArticle?.id;
     if (!targetId) return;
     setIsPublishing(true);
 
     try {
-      const res = await fetch('/api/wordpress/publish', {
+      const res = await fetch('/api/publish', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ articleId: targetId })
