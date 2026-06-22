@@ -163,8 +163,12 @@ export async function POST(request: NextRequest) {
         }
 
         // /api/jetblog GET tekshiruv — with one retry for cold-start hosts (e.g. Render free tier)
-        const testUrl = endpointUrl.replace(/\/?$/, '') + '/api/jetblog';
-        console.log('[webhook/verify] probing', testUrl);
+        // Strip /api/jetblog suffix if the user pasted the full probe URL as the endpoint,
+        // then re-append it — so both "https://example.com" and "https://example.com/api/jetblog"
+        // resolve to the same correct probe target.
+        const baseUrl = endpointUrl.replace(/\/api\/jetblog\/?$/, '').replace(/\/?$/, '');
+        const testUrl = baseUrl + '/api/jetblog';
+        console.log('[webhook/verify] endpointUrl:', endpointUrl, '→ probing:', testUrl);
 
         const probeJetblog = async (): Promise<{ ok: boolean; errorCode?: string; detail?: string }> => {
           for (let attempt = 1; attempt <= 2; attempt++) {
@@ -252,9 +256,11 @@ export async function POST(request: NextRequest) {
           });
         }
 
+        // Store the clean base URL (not the /api/jetblog probe path) so cron jobs
+        // can append /api/jetblog themselves without doubling the path.
         return await insertSite(supabase, {
           user_id: userId,
-          url: endpointUrl,
+          url: baseUrl,
           wp_username: '',
           wp_password: '',
           brand_voice: DEFAULT_BRAND_VOICE,
@@ -262,7 +268,7 @@ export async function POST(request: NextRequest) {
           publish_time: '09:00:00',
           is_active: true,
           platform_type: 'webhook',
-          adapter_config: { endpointUrl, secretKey: secretKey ? encryptText(secretKey) : '' },
+          adapter_config: { endpointUrl: baseUrl, secretKey: secretKey ? encryptText(secretKey) : '' },
         });
       }
 
