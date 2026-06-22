@@ -162,39 +162,108 @@ export async function POST(request: NextRequest) {
           return NextResponse.json({ ok: false, errorCode: 'webhook_localhost', step: 'dns', error: "Localhost tekshirib bo'lmaydi" });
         }
 
-        // /api/jetblog GET tekshiruv
-        try {
-          const testUrl = endpointUrl.replace(/\/?$/, '') + '/api/jetblog';
-          const res = await fetch(testUrl, {
-            method: 'GET',
-            signal: AbortSignal.timeout(10_000),
-          });
+        // /api/jetblog GET tekshiruv — with one retry for cold-start hosts (e.g. Render free tier)
+        const testUrl = endpointUrl.replace(/\/?$/, '') + '/api/jetblog';
+        console.log('[webhook/verify] probing', testUrl);
 
-          if (res.ok) {
-            let data: Record<string, unknown> = {};
-            try { data = await res.json() as Record<string, unknown>; } catch { /* non-JSON ok */ }
-
-            if (data.status === 'JetBlog webhook active') {
-              // Muvaffaqiyatli — DB ga saqlash (route ning o'z supabase clienti orqali)
-              return await insertSite(supabase, {
-                user_id: userId,
-                url: endpointUrl,
-                wp_username: '',
-                wp_password: '',
-                brand_voice: DEFAULT_BRAND_VOICE,
-                publish_days: ['Monday', 'Wednesday', 'Friday'],
-                publish_time: '09:00:00',
-                is_active: true,
-                platform_type: 'webhook',
-                adapter_config: { endpointUrl, secretKey: secretKey ? encryptText(secretKey) : '' },
+        const probeJetblog = async (): Promise<{ ok: boolean; errorCode?: string; detail?: string }> => {
+          for (let attempt = 1; attempt <= 2; attempt++) {
+            let httpStatus: number | null = null;
+            let rawBody = '';
+            try {
+              const res = await fetch(testUrl, {
+                method: 'GET',
+                // 15s per attempt; cold-start hosts return fast 503, not a long hang
+                signal: AbortSignal.timeout(15_000),
               });
+              httpStatus = res.status;
+
+              // Always read body so we can log it and check the status string
+              // even if the HTTP status is non-2xx (e.g. mis-configured 503 that
+              // still returns the correct JSON payload).
+              try { rawBody = await res.text(); } catch { rawBody = '(unreadable)'; }
+
+              // Try to parse as JSON regardless of res.ok
+              let data: Record<string, unknown> = {};
+              try { data = JSON.parse(rawBody) as Record<string, unknown>; } catch { /* not JSON */ }
+
+              const statusVal = (data.status as string | undefined ?? '').trim();
+              const matched = statusVal === 'JetBlog webhook active';
+
+              console.log(
+                `[webhook/verify] attempt=${attempt} status=${httpStatus} matched=${matched}` +
+                ` body=${rawBody.slice(0, 200)}`
+              );
+
+              if (matched) return { ok: true };
+
+              // 5xx on attempt 1 → retry (cold start); any other failure is final
+              if (attempt === 1 && httpStatus !== null && httpStatus >= 500) {
+                console.log('[webhook/verify] 5xx on attempt 1, waiting 4s before retry…');
+                await new Promise(r => setTimeout(r, 4_000));
+                continue;
+              }
+
+              // Final failure — build a descriptive detail string
+              const detail = httpStatus !== null
+                ? `HTTP ${httpStatus} — body: ${rawBody.slice(0, 300)}`
+                : `no response`;
+              return { ok: false, errorCode: 'webhook_not_found', detail };
+
+            } catch (err: unknown) {
+              const errName = err instanceof Error ? err.name : 'UnknownError';
+              const errMsg  = err instanceof Error ? err.message : String(err);
+              console.error(
+                `[webhook/verify] attempt=${attempt} fetch threw ${errName}: ${errMsg}`
+              );
+
+              // AbortError = timeout; retry once
+              if (attempt === 1 && errName === 'AbortError') {
+                console.log('[webhook/verify] timeout on attempt 1, retrying…');
+                await new Promise(r => setTimeout(r, 2_000));
+                continue;
+              }
+
+              // Network error or second timeout
+              const isColdStart = errName === 'AbortError';
+              return {
+                ok: false,
+                errorCode: isColdStart ? 'webhook_cold_start' : 'webhook_not_found',
+                detail: `${errName}: ${errMsg}`,
+              };
             }
           }
-
-          return NextResponse.json({ ok: false, errorCode: 'webhook_not_found', step: 'dns', error: 'Endpoint topilmadi' });
-        } catch {
-          return NextResponse.json({ ok: false, errorCode: 'webhook_not_found', step: 'dns', error: "Saytga ulanib bo'lmadi" });
+          // Should never reach here
+          return { ok: false, errorCode: 'webhook_not_found', detail: 'max attempts exceeded' };
         }
+
+        const probe = await probeJetblog();
+
+        if (!probe.ok) {
+          console.error('[webhook/verify] FAILED', probe);
+          const isColdStart = probe.errorCode === 'webhook_cold_start';
+          return NextResponse.json({
+            ok: false,
+            errorCode: probe.errorCode,
+            step: 'dns',
+            error: isColdStart
+              ? "Server uyg'onmoqda (Render free tier). 60 soniyadan keyin qayta urinib ko'ring."
+              : `Endpoint topilmadi: ${probe.detail}`,
+          });
+        }
+
+        return await insertSite(supabase, {
+          user_id: userId,
+          url: endpointUrl,
+          wp_username: '',
+          wp_password: '',
+          brand_voice: DEFAULT_BRAND_VOICE,
+          publish_days: ['Monday', 'Wednesday', 'Friday'],
+          publish_time: '09:00:00',
+          is_active: true,
+          platform_type: 'webhook',
+          adapter_config: { endpointUrl, secretKey: secretKey ? encryptText(secretKey) : '' },
+        });
       }
 
       // ── Umumiy URL tekshiruv ───────────────────────────────────────────────
