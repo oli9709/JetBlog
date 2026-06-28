@@ -62,23 +62,19 @@ async function processOneSite(siteId: string): Promise<{ status: string; reason?
 
   // ── 1. Idempotency: (site_id, run_date) ni atomik qayd qilish ────────────
   // ON CONFLICT DO NOTHING: agar allaqachon yozuv mavjud bo'lsa — hech narsa qilmaydi
-  const { data: inserted, error: insertRunErr } = await db
-    .from('article_runs')
-    .insert({ site_id: siteId, run_date: today, status: 'processing', started_at: new Date().toISOString() })
-    .select('id')
-    .single();
+  const { data: claimedId, error: claimErr } = await db
+    .rpc('claim_article_run', { p_site_id: siteId, p_run_date: today });
 
-  if (insertRunErr) {
-    // 23505 = unique_violation — bu sayt bugun allaqachon qayta ishlangan
-    if (insertRunErr.code === '23505') {
-      console.log(`[Worker] Idempotency: site=${siteId} bugun allaqachon qayta ishlangan.`);
-      return { status: 'duplicate', reason: 'Bugun allaqachon nashr qilingan (idempotent).' };
-    }
-    // Boshqa DB xatolari — 5xx qaytarish (QStash qayta urinadi)
-    throw new Error(`article_runs yozishda xatolik: ${insertRunErr.message}`);
+  if (claimErr) {
+    throw new Error(`claim_article_run RPC xatoligi: ${claimErr.message}`);
   }
 
-  const runId = inserted.id as string;
+  if (!claimedId) {
+    console.log(`[Worker] Idempotency: site=${siteId} bugun yakunlangan yoki ishlanmoqda.`);
+    return { status: 'duplicate', reason: 'Bugun allaqachon nashr qilingan yoki ishlanmoqda (idempotent).' };
+  }
+
+  const runId = claimedId as string;
 
   // ── Yordamchi: run ni yangilash ──────────────────────────────────────────
   const updateRun = (fields: Record<string, unknown>) =>
