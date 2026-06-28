@@ -103,13 +103,16 @@ export default function ContentClient({ initialSites, userId }: ContentClientPro
   };
 
   // Maqoladagi o'zgarishlarni saqlash
-  const handleSaveChanges = async () => {
+  // newTitle/newContent uzatilsa — o'sha qiymatlar bilan saqlaydi (stale state oldini oladi).
+  const handleSaveChanges = async (newTitle?: string, newContent?: string) => {
     if (!selectedArticle) return;
+    const titleToSave = newTitle ?? editTitle;
+    const contentToSave = newContent ?? editContent;
     setIsSaving(true);
     try {
       const res = await SupabaseUpdateArticle(selectedArticle.id, {
-        title: editTitle,
-        content: editContent
+        title: titleToSave,
+        content: contentToSave
       });
       if (res.data) {
         setArticles((prev) =>
@@ -314,7 +317,7 @@ export default function ContentClient({ initialSites, userId }: ContentClientPro
               onSave={(id, title, content) => {
                 setEditTitle(title);
                 setEditContent(content);
-                handleSaveChanges();
+                handleSaveChanges(title, content);
               }}
               onPublishNow={(id) => handlePublishNow(id)}
               isSaving={isSaving}
