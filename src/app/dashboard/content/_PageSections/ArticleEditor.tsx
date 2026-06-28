@@ -29,9 +29,8 @@ export function ArticleEditor({
   useEffect(() => {
     if (article) {
       setTitle(article.title || '');
-      // Agar backend dan HTML content kelsa shu yerda set qilinadi
-      // Hozircha bo'sh string turadi (demo)
-      setContent('');
+      // Backend dan kelgan HTML content ni editorga yuklash
+      setContent(article.content || '');
       setLastSaved(new Date());
     }
   }, [article?.id]);

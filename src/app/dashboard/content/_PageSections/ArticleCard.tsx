@@ -8,6 +8,7 @@ import { formatDate } from '@/lib/utils/helpers';
 export interface ArticleT {
   id: string;
   title: string;
+  content?: string;
   status: 'draft' | 'scheduled' | 'published' | 'error';
   scheduled_for: string;
   published_at?: string;
