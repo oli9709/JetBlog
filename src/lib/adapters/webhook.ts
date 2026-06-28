@@ -56,34 +56,61 @@ export class WebhookAdapter implements SiteAdapter {
 
     const signature = this.sign(body);
 
-    const res = await fetch(this.endpointUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-JetBlog-Signature': signature,
-        'X-JetBlog-Event': 'article.published',
-      },
-      body,
-      signal: AbortSignal.timeout(15000),
-    });
+    // Render kabi bepul hostinglar harakatsizlikdan keyin "uxlaydi" (cold-start ~40-50s).
+    // Har urinishda 60s timeout (uyg'onishni qoplaydi) + 5xx/timeout da qayta urinish.
+    // 4xx — doimiy xato (imzo/format), qayta urinilmaydi.
+    const maxAttempts = 3;
+    const perAttemptTimeoutMs = 60000;
+    let lastError = "noma'lum xato";
 
-    if (!res.ok) {
-      const text = await res.text();
-      throw new Error(`Webhook publish failed ${res.status}: ${text.slice(0, 200)}`);
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+      try {
+        const res = await fetch(this.endpointUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-JetBlog-Signature': signature,
+            'X-JetBlog-Event': 'article.published',
+          },
+          body,
+          signal: AbortSignal.timeout(perAttemptTimeoutMs),
+        });
+
+        // 5xx (masalan Render "Service Starting" 503) — receiver uyg'onmoqda, qayta urinamiz
+        if (res.status >= 500) {
+          throw new Error(`Webhook ${res.status} (receiver uyg'onmoqda)`);
+        }
+
+        // 4xx — doimiy xato, qayta urinish foydasiz
+        if (!res.ok) {
+          const text = await res.text();
+          throw Object.assign(
+            new Error(`Webhook publish failed ${res.status}: ${text.slice(0, 200)}`),
+            { permanent: true }
+          );
+        }
+
+        // 2xx — muvaffaqiyat
+        let postId = `webhook-${Date.now()}`;
+        let url = this.endpointUrl;
+        try {
+          const json = (await res.json()) as { postId?: string; url?: string };
+          if (json.postId) postId = json.postId;
+          if (json.url) url = json.url;
+        } catch {
+          // non-JSON 2xx javob ham OK
+        }
+        return { postId, url };
+      } catch (err: unknown) {
+        // 4xx (permanent) — darhol tashlaymiz, retry yo'q
+        if (err && typeof err === 'object' && 'permanent' in err) throw err;
+        lastError = err instanceof Error ? err.message : 'Webhook ulanish xatosi';
+        if (attempt < maxAttempts) {
+          await new Promise((r) => setTimeout(r, 3000 * attempt));
+        }
+      }
     }
 
-    // Webhook receiver may return { postId, url } — use it if provided
-    let postId = `webhook-${Date.now()}`;
-    let url = this.endpointUrl;
-
-    try {
-      const json = await res.json() as { postId?: string; url?: string };
-      if (json.postId) postId = json.postId;
-      if (json.url) url = json.url;
-    } catch {
-      // non-JSON response is fine — we already got 2xx
-    }
-
-    return { postId, url };
+    throw new Error(`Webhook publish ${maxAttempts} urinishdan keyin muvaffaqiyatsiz: ${lastError}`);
   }
 }
