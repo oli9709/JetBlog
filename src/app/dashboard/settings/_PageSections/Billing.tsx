@@ -130,20 +130,20 @@ const Billing = ({ initialInvoices, userId, initialCredits }: BillingPropsI) => 
           <CardHeader>
             <div className="flex items-center gap-2">
               <Receipt className="w-5 h-5 text-[#FF6B6B]" />
-              <CardTitle className="text-lg font-bold text-white">Manual Invoice Billing</CardTitle>
+              <CardTitle className="text-lg font-bold text-white">Qo'lda hisob-faktura to'lovi</CardTitle>
             </div>
             <CardDescription className="text-zinc-400">
-              Billing is fully automated via manual invoices and balance top-ups.
+              To'lov qo'lda hisob-fakturalar va balans to'ldirish orqali amalga oshiriladi.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4 pt-2">
             <div className="p-3.5 rounded-xl bg-zinc-950/60 border border-zinc-800/60 space-y-1">
               <div className="text-xs font-semibold text-zinc-300 flex items-center gap-2">
                 <Sparkles className="w-3.5 h-3.5 text-[#FB3640]" />
-                Active Plan: PRO Autopilot
+                Faol tarif: PRO Autopilot
               </div>
               <p className="text-[10px] text-zinc-500">
-                PRO priority Claude content generation and infinite connected WP blogs.
+                PRO ustuvor AI kontent generatsiyasi va cheksiz ulangan bloglar.
               </p>
             </div>
             <a
@@ -151,7 +151,7 @@ const Billing = ({ initialInvoices, userId, initialCredits }: BillingPropsI) => 
               className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-zinc-800 hover:bg-zinc-700 text-white text-xs font-semibold rounded-xl transition-all"
             >
               <MessageSquare className="w-3.5 h-3.5" />
-              Contact Billing Support
+              To'lov bo'yicha yordamga murojaat
             </a>
           </CardContent>
         </Card>

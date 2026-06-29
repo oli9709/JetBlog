@@ -243,7 +243,7 @@ export default function KeywordsClient({ initialSites, userId }: KeywordsClientP
         <div>
           <h1 className="text-3xl font-extrabold tracking-tight flex items-center gap-2 bg-gradient-to-r from-[#FB3640] to-[#FB3640] bg-clip-text text-transparent">
             <Key className="h-8 w-8 text-[#FB3640]" />
-            Keywords Autopilot
+            Kalit so'zlar avtopiloti
           </h1>
           <p className="text-muted-foreground mt-1">
             SEO kalit so'zlarni tahlil qiling va WordPress autopilotingizni boshqaring.

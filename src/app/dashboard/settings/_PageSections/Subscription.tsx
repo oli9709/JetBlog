@@ -33,7 +33,7 @@ const SubscriptionExists = ({ price_id, status, period_ends }: SubscriptionExist
       .find((item) => !!item);
 
     if (!match) {
-      setErrorMessage('Subscription Type Not Valid, Please Contact Support');
+      setErrorMessage('Obuna turi noto\'g\'ri, iltimos qo\'llab-quvvatlash xizmatiga murojaat qiling');
       return;
     }
 
@@ -54,33 +54,33 @@ const SubscriptionExists = ({ price_id, status, period_ends }: SubscriptionExist
     <div className="mt-6">
       <Card className="bg-background-light dark:bg-background-dark">
         <CardHeader>
-          <CardTitle>Subscription</CardTitle>
+          <CardTitle>Obuna</CardTitle>
           <CardDescription>
-            Click button below to go to the billing page to manage your Subscription and Billing
+            Obuna va to'lovni boshqarish uchun quyidagi tugmani bosing
           </CardDescription>
           <ErrorText errorMessage={errorMessage} />
         </CardHeader>
         <CardContent className="space-y-4">
           <h2 className="text-xl">
-            Current Plan: <span className="font-bold">{currentPlan?.name}</span>
+            Joriy tarif: <span className="font-bold">{currentPlan?.name}</span>
           </h2>
           <div>
-            Status: <span className="font-bold">{status}</span>
+            Holat: <span className="font-bold">{status}</span>
           </div>
           <div>
-            Billing:{' '}
+            To'lov:{' '}
             <span className="font-bold">
               ${currentPlan?.price}/{currentPlan?.interval}
             </span>
           </div>
           <div>
-            Billing Period Ends:{' '}
+            To'lov davri tugaydi:{' '}
             <span className="font-bold">{new Date(period_ends).toLocaleDateString()}</span>
           </div>
         </CardContent>
         <CardFooter>
           <Button onClick={goToPortal} className="mt-4">
-            Go to Billing
+            To'lov sahifasiga o'tish
           </Button>
         </CardFooter>
       </Card>

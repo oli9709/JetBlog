@@ -65,7 +65,7 @@ export const UpdateDisplayName = ({ display_name, user }: UpdateDisplayNameProps
       return;
     }
 
-    toast.success('Update Completed');
+    toast.success('Yangilash yakunlandi');
   };
 
   return (
@@ -78,17 +78,17 @@ export const UpdateDisplayName = ({ display_name, user }: UpdateDisplayNameProps
             render={({ field }) => (
               <FormItem>
                 <FormMessage className="py-2" />
-                <FormLabel>Display Name</FormLabel>
+                <FormLabel>Ko'rinadigan ism</FormLabel>
                 <FormControl>
                   <Input {...register('display_name')} className="bg-background-light dark:bg-background-dark" type="text" {...field} />
                 </FormControl>
-                <FormDescription>This is your public display name.</FormDescription>
+                <FormDescription>Bu sizning commonga ko'rinadigan ismingiz.</FormDescription>
               </FormItem>
             )}
           />
           <Button disabled={isSubmitting} className="mt-4">
             {isSubmitting && <Icons.Spinner className="mr-2 h-4 w-4 animate-spin" />}
-            Update Profile
+            Profilni yangilash
           </Button>
         </form>
       </Form>
@@ -127,7 +127,7 @@ export const UpdateEmail = ({ email, customer }: UpdateEmailPropsI) => {
       return;
     }
 
-    toast.success('Update Email Sent, confirm email to complete Update');
+    toast.success('Email yangilash yuborildi, tasdiqlash uchun emailni tekshiring');
   };
 
   return (
@@ -143,14 +143,14 @@ export const UpdateEmail = ({ email, customer }: UpdateEmailPropsI) => {
                 <FormControl>
                   <Input {...register('email')} className="bg-background-light dark:bg-background-dark" type="text" {...field} />
                 </FormControl>
-                <FormDescription>This is the email associated with your account</FormDescription>
+                <FormDescription>Bu hisobingizga bog'langan email</FormDescription>
                 <FormMessage />
               </FormItem>
             )}
           />
           <Button disabled={isSubmitting} className="mt-4">
             {isSubmitting && <Icons.Spinner className="mr-2 h-4 w-4 animate-spin" />}
-            Update Email
+            Emailni yangilash
           </Button>
         </form>
       </Form>
@@ -183,7 +183,7 @@ export const UpdatePassword = () => {
       return;
     }
 
-    toast.success('Update Completed');
+    toast.success('Yangilash yakunlandi');
   };
 
   return (
@@ -195,18 +195,18 @@ export const UpdatePassword = () => {
             name="password"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Password</FormLabel>
+                <FormLabel>Parol</FormLabel>
                 <FormControl>
                   <Input {...register('password')} className="bg-background-light dark:bg-background-dark" type="text" {...field} />
                 </FormControl>
-                <FormDescription>Update Account Password</FormDescription>
+                <FormDescription>Hisob parolini yangilash</FormDescription>
                 <FormMessage />
               </FormItem>
             )}
           />
           <Button disabled={isSubmitting} className="mt-4">
             {isSubmitting && <Icons.Spinner className="mr-2 h-4 w-4 animate-spin" />}
-            Update Password
+            Parolni yangilash
           </Button>
         </form>
       </Form>

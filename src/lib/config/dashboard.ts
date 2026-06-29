@@ -2,18 +2,18 @@ import { IntervalE } from '../types/enums';
 
 const configuration = {
   routes: [
-    { title: 'Overview', link: '/dashboard/main', icon: 'Home' },
-    { title: 'Connections', link: '/dashboard/connections', icon: 'Link' },
-    { title: 'Keywords', link: '/dashboard/keywords', icon: 'Key' },
-    { title: 'Content Queue', link: '/dashboard/content', icon: 'FileText' },
-    { title: 'Brand Voice', link: '/dashboard/brand-voice', icon: 'Sparkles' },
-    { title: 'Settings', link: '/dashboard/settings/profile', icon: 'Settings' }
+    { title: 'Bosh sahifa', link: '/dashboard/main', icon: 'Home' },
+    { title: 'Ulanishlar', link: '/dashboard/connections', icon: 'Link' },
+    { title: 'Kalit so\'zlar', link: '/dashboard/keywords', icon: 'Key' },
+    { title: 'Kontent navbati', link: '/dashboard/content', icon: 'FileText' },
+    { title: 'Brend ovozi', link: '/dashboard/brand-voice', icon: 'Sparkles' },
+    { title: 'Sozlamalar', link: '/dashboard/settings/profile', icon: 'Settings' }
   ],
   subroutes: {
     settings: [
-      { title: 'Profile', link: '/dashboard/settings/profile' },
-      { title: 'Billing', link: '/dashboard/settings/billing' },
-      { title: 'Webhooks', link: '/dashboard/settings/webhooks' }
+      { title: 'Profil', link: '/dashboard/settings/profile' },
+      { title: 'To\'lov', link: '/dashboard/settings/billing' },
+      { title: 'Webhook\'lar', link: '/dashboard/settings/webhooks' }
     ]
   },
   products: [

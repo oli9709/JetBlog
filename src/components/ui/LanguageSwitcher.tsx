@@ -17,7 +17,7 @@ const LANGUAGES = [
 ] as const;
 
 export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({ value, onChange, className, includeAll }) => {
-  const options = includeAll ? [{ id: 'all', label: 'ALL' }, ...LANGUAGES] : LANGUAGES;
+  const options = includeAll ? [{ id: 'all', label: 'BARCHASI' }, ...LANGUAGES] : LANGUAGES;
   const activeIndex = options.findIndex(lang => lang.id === value);
 
   return (

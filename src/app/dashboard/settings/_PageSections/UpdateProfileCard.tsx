@@ -18,8 +18,8 @@ const UpdateProfileCard = ({ user, display_name, email, customer }: UpdateProfil
     <div>
       <Card className='bg-background-light dark:bg-background-dark'>
         <CardHeader>
-          <CardTitle>Update Account</CardTitle>
-          <CardDescription>Update Account display name, email and password</CardDescription>
+          <CardTitle>Hisobni yangilash</CardTitle>
+          <CardDescription>Hisob ko'rinadigan ismi, email va parolini yangilang</CardDescription>
         </CardHeader>
         <CardContent>
           <UpdateDisplayName display_name={display_name} user={user} />
