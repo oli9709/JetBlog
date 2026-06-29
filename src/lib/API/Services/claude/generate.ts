@@ -307,6 +307,7 @@ Havolalar matn oqimida natural ko'rinishi kerak.` : ''}`;
 
   // Agar dummy API key bo'lsa yoki bo'sh bo'lsa, SDK chaqiruvini simulyatsiya qilib chiroyli o'zbekcha maqola qaytaramiz
   if (!process.env.ANTHROPIC_API_KEY || process.env.ANTHROPIC_API_KEY.includes('dummy')) {
+    console.error('[generate] FALLBACK ISHLATILDI — ANTHROPIC_API_KEY yo\'q yoki dummy. key mavjud:', !!process.env.ANTHROPIC_API_KEY, ' uzunligi:', (process.env.ANTHROPIC_API_KEY ?? '').length);
     await new Promise((resolve) => setTimeout(resolve, 2000)); // Simulyatsiya kutish
 
     const premiumArticle = GetPremiumFallbackArticle(keyword, language);
@@ -322,6 +323,7 @@ Havolalar matn oqimida natural ko'rinishi kerak.` : ''}`;
   }
 
   try {
+    console.log('[generate] Claude chaqirilyapti, model: claude-3-5-sonnet-20241022, keyword:', keyword, ' til:', language);
     const response = await anthropic.messages.create({
       model: 'claude-3-5-sonnet-20241022',
       max_tokens: 4000,
@@ -353,7 +355,8 @@ Havolalar matn oqimida natural ko'rinishi kerak.` : ''}`;
       tokensUsed: response.usage ? response.usage.input_tokens + response.usage.output_tokens : 15000
     };
   } catch (error) {
-    console.warn('Claude API chaqiruvida xatolik yuz berdi. Offline rejimda premium zaxira maqolasi generatsiya qilinmoqda:', error);
+    const e = error as { message?: string; status?: number; error?: unknown };
+    console.error('[generate] CLAUDE API XATOSI — fallback ishlatilmoqda. status:', e?.status, ' message:', e?.message, ' full:', JSON.stringify(e?.error ?? error));
     
     const premiumArticle = GetPremiumFallbackArticle(keyword, language);
     const seo = deriveSeoMeta(premiumArticle.title, premiumArticle.content, keyword);
