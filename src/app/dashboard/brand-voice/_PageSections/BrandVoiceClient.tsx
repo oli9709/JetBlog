@@ -32,29 +32,11 @@ interface GSCState {
   noSite?: boolean;
 }
 
-const MOCK_STATS = {
-  totalArticles: 145,
-  publishedThisMonth: 32,
-  publishedThisWeek: 8,
-  avgWordsPerArticle: 1250,
-  topKeywords: [
-    { keyword: 'AI SEO', count: 45 },
-    { keyword: 'Next.js', count: 32 },
-    { keyword: 'React', count: 28 },
-    { keyword: 'Supabase', count: 24 },
-    { keyword: 'TailwindCSS', count: 19 },
-    { keyword: 'Frontend', count: 15 },
-    { keyword: 'Backend', count: 12 },
-  ],
-  publishHistory: [
-    { date: '01 May', count: 2 },
-    { date: '05 May', count: 5 },
-    { date: '10 May', count: 3 },
-    { date: '15 May', count: 8 },
-    { date: '20 May', count: 4 },
-    { date: '25 May', count: 7 },
-    { date: '30 May', count: 3 },
-  ]
+const EMPTY_STATS = {
+  totalArticles: 0, publishedThisMonth: 0, publishedThisWeek: 0,
+  avgWordsPerArticle: 0,
+  topKeywords: [] as { keyword: string; count: number }[],
+  publishHistory: [] as { date: string; count: number }[],
 };
 
 export default function BrandVoiceClient({ initialSites, userId }: BrandVoiceClientPropsI) {
@@ -65,6 +47,24 @@ export default function BrandVoiceClient({ initialSites, userId }: BrandVoiceCli
   const [isSaving, setIsSaving] = useState(false);
   const [isScanning, setIsScanning] = useState(false);
   const [gsc, setGsc] = useState<GSCState>({ connected: false, loading: false });
+  const [stats, setStats] = useState(EMPTY_STATS);
+
+  const fetchStats = useCallback(async (siteId: string) => {
+    if (!siteId || siteId === 'default') { setStats(EMPTY_STATS); return; }
+    try {
+      const res = await fetch(`/api/analytics/stats?siteId=${siteId}`).then(r => r.json());
+      setStats({
+        totalArticles: res.totalArticles ?? 0,
+        publishedThisMonth: res.publishedThisMonth ?? 0,
+        publishedThisWeek: res.publishedThisWeek ?? 0,
+        avgWordsPerArticle: res.avgWordsPerArticle ?? 0,
+        topKeywords: res.topKeywords ?? [],
+        publishHistory: res.publishHistory ?? [],
+      });
+    } catch { setStats(EMPTY_STATS); }
+  }, []);
+
+  useEffect(() => { fetchStats(selectedSiteId); }, [selectedSiteId, fetchStats]);
 
   const searchParams = useSearchParams();
 
@@ -210,7 +210,7 @@ export default function BrandVoiceClient({ initialSites, userId }: BrandVoiceCli
           <section>
             <Analytics
               siteId={selectedSiteId}
-              stats={MOCK_STATS}
+              stats={stats}
               gsc={gsc}
               onConnectGSC={handleConnectGSC}
               onDisconnectGSC={handleDisconnectGSC}

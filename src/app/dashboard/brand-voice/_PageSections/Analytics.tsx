@@ -110,9 +110,6 @@ export function Analytics({ siteId, stats, gsc, onConnectGSC, onDisconnectGSC }:
             <div className="text-4xl font-extrabold text-white">
               <NumberTicker value={stats.totalArticles} />
             </div>
-            <div className="flex items-center gap-1 text-xs font-bold text-emerald-400 bg-emerald-400/10 px-2 py-1 rounded-full">
-              <TrendingUp className="h-3 w-3" /> +12%
-            </div>
           </div>
         </div>
 
