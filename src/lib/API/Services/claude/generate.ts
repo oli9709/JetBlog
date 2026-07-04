@@ -1,4 +1,4 @@
-import { getAnthropicClient } from '../init/anthropic';
+import { getGeminiClient, isGeminiConfigured } from '../init/gemini';
 
 export interface PriorArticleRef {
   title: string;
@@ -217,7 +217,6 @@ export const GenerateArticleWithClaude = async ({
   language,
   priorArticles = [],
 }: GenerateArticlePropsI): Promise<GeneratedArticleResultI> => {
-  const anthropic = getAnthropicClient();
   const tone = brandVoice.tone || 'professional';
   const rules = brandVoice.rules?.map((r, i) => `${i + 1}. ${r}`).join('\n') || 'Hech qanday maxsus qoidalar yo\'q.';
   const audience = brandVoice.target_audience || 'keng auditoriya';
@@ -306,8 +305,8 @@ FAQAT yuqoridagi ro'yxatdagi haqiqiy URL lardan foydalaning — URL o'ylab topma
 Havolalar matn oqimida natural ko'rinishi kerak.` : ''}`;
 
   // Agar dummy API key bo'lsa yoki bo'sh bo'lsa, SDK chaqiruvini simulyatsiya qilib chiroyli o'zbekcha maqola qaytaramiz
-  if (!process.env.ANTHROPIC_API_KEY || process.env.ANTHROPIC_API_KEY.includes('dummy')) {
-    console.error('[generate] FALLBACK ISHLATILDI — ANTHROPIC_API_KEY yo\'q yoki dummy. key mavjud:', !!process.env.ANTHROPIC_API_KEY, ' uzunligi:', (process.env.ANTHROPIC_API_KEY ?? '').length);
+  if (!isGeminiConfigured()) {
+    console.error('[generate] FALLBACK ISHLATILDI — GEMINI_API_KEY yo\'q.');
     await new Promise((resolve) => setTimeout(resolve, 2000)); // Simulyatsiya kutish
 
     const premiumArticle = GetPremiumFallbackArticle(keyword, language);
@@ -323,16 +322,16 @@ Havolalar matn oqimida natural ko'rinishi kerak.` : ''}`;
   }
 
   try {
-    console.log('[generate] Claude chaqirilyapti, model: claude-3-5-sonnet-20241022, keyword:', keyword, ' til:', language);
-    const response = await anthropic.messages.create({
-      model: 'claude-3-5-sonnet-20241022',
-      max_tokens: 4000,
-      system: systemPrompt,
-      messages: [{ role: 'user', content: userPrompt }]
+    const genai = getGeminiClient();
+    const model = process.env.VERTEX_GEMINI_MODEL || 'gemini-2.5-flash';
+    console.log('[generate] Gemini chaqirilyapti, model:', model, ' keyword:', keyword, ' til:', language);
+    const response = await genai.models.generateContent({
+      model,
+      contents: userPrompt,
+      config: { systemInstruction: systemPrompt, maxOutputTokens: 8192, temperature: 0.7 },
     });
-
-    const block = response.content[0];
-    const text = block.type === 'text' ? block.text : '';
+    let text = (response.text ?? '').trim();
+    text = text.replace(/^```(?:html)?\s*/i, '').replace(/\s*```$/i, '').trim();
 
     // Sarlavhani ajratib olamiz (H1 yoki H2 tegi ichidan)
     const titleMatch = text.match(/<h1>(.*?)<\/h1>/i) || text.match(/<h2>(.*?)<\/h2>/i);
@@ -352,11 +351,11 @@ Havolalar matn oqimida natural ko'rinishi kerak.` : ''}`;
       seoTitle: seo.seoTitle,
       seoDescription: seo.seoDescription,
       tags: seo.tags,
-      tokensUsed: response.usage ? response.usage.input_tokens + response.usage.output_tokens : 15000
+      tokensUsed: response.usageMetadata ? (response.usageMetadata.promptTokenCount ?? 0) + (response.usageMetadata.candidatesTokenCount ?? 0) : 15000
     };
   } catch (error) {
     const e = error as { message?: string; status?: number; error?: unknown };
-    console.error('[generate] CLAUDE API XATOSI — fallback ishlatilmoqda. status:', e?.status, ' message:', e?.message, ' full:', JSON.stringify(e?.error ?? error));
+    console.error('[generate] GEMINI XATOSI — fallback ishlatilmoqda. message:', e?.message, ' full:', JSON.stringify(e?.error ?? error));
     
     const premiumArticle = GetPremiumFallbackArticle(keyword, language);
     const seo = deriveSeoMeta(premiumArticle.title, premiumArticle.content, keyword);
