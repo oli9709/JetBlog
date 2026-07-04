@@ -231,61 +231,38 @@ export const GenerateArticleWithClaude = async ({
 ${rules}
   `.trim();
 
-  const systemPrompt = `You are Uzbekistan's best SEO content writer. 
-You write long-form, Google-optimized articles in Uzbek, Russian, or English depending on the language specified.
-Your articles are detailed, helpful, locally relevant, and always between 1200-1800 words.
-Never use filler phrases like "albatta", "shubhasiz", "qisqacha aytganda". Write like a human expert.`;
+  const systemPrompt = `You are Uzbekistan's most experienced SEO content writer and genuine subject-matter expert.
+Write long-form, genuinely helpful, Google-optimized articles in the specified language (Uzbek, Russian, or English), 1200-1800 words.
+Write like a real human expert: specific, concrete, trustworthy — never generic or templated.
+
+CRITICAL ACCURACY (this is often a YMYL topic — finance, health, legal):
+- NEVER invent statistics, percentages, dates, or study results and attribute them to real institutions (e.g. "Markaziy bank", "tadqiqotlar ko'rsatadi"). If you lack a verified fact, OMIT the number or use cautious general language ("ko'plab hollarda", "mutaxassislar fikricha") WITHOUT a fabricated source.
+- Do NOT state specific prices as hard facts. Use ranges and clearly frame them as approximate/illustrative ("taxminan", "loyihaga qarab farq qiladi").
+- Avoid absolute claims; be factual and measured.
+
+Never use filler like "albatta", "shubhasiz", "qisqacha aytganda".`;
 
   const userPrompt = `Kalit so'z: ${keyword}
 Til: ${langText}
 Brend uslubi: ${brandVoiceText}
 
-Quyidagi MAJBURIY tuzilmada HTML formatda yoz:
+Quyidagi tuzilishda HTML yoz (sarlavhalarni MAVZUGA moslashtir — bu yorliqlarni ko'chirma):
 
-<h1>Kalit so'zni o'z ichiga olgan jozibali sarlavha</h1>
+<p>Kirish — 120-150 so'z. Birinchi jumlada kalit so'z. O'quvchi muammosini tushunganingni ko'rsat.</p>
 
-<p>Kirish paragrafi — 120-150 so'z. Birinchi jumlada kalit so'zni ishlatish majburiy. O'quvchini qiziqtir, muammosini tushunganingni ko'rsat.</p>
+Keyin 4-6 ta <h2> bo'lim — sarlavhalari AYNAN SHU MAVZUGA mos bo'lsin (qat'iy shablon emas).
+Har biri 150-250 so'z, kerak joyda <ul> ro'yxat. Bo'limlar mazmunli va konkret bo'lsin.
 
-<h2>Bu nima va nima uchun muhim?</h2>
-<p>200 so'z. Batafsil tushuntirish, faktlar, raqamlar.</p>
+MAHALLIY/NARX bo'limi SHARTLI:
+- Agar mavzu mahalliy mahsulot/xizmat bo'lib, real narx mantiqiy bo'lsa → O'zbekiston/Toshkent
+  konteksti va TAXMINIY narx oralig'i bo'limini qo'sh (aniq raqamni fakt qilib berma).
+- Agar mavzu abstrakt/global/enterprise bo'lsa → o'rniga mos bo'lim yoz (masalan: keng tarqalgan
+  xatolar, real misollar, bosqichma-bosqich joriy etish).
 
-<h2>Asosiy afzalliklari va xususiyatlari</h2>
-<p>200 so'z. Konkret ma'lumot.</p>
-<ul>
-  <li>Muhim nuqta 1</li>
-  <li>Muhim nuqta 2</li>
-  <li>Muhim nuqta 3</li>
-  <li>Muhim nuqta 4</li>
-  <li>Muhim nuqta 5</li>
-</ul>
+<h2>Ko'p so'raladigan savollar (FAQ)</h2> — 4-5 ta savol-javob, mavzuga aniq.
 
-<h2>O'zbekistonda/Toshkentda holat va narxlar</h2>
-<p>200 so'z. Mahalliy kontekst, narxlar, imkoniyatlar. Bu bo'lim o'quvchi uchun eng qimmatli qism.</p>
-
-<h2>Qanday tanlash kerak? — Amaliy maslahatlar</h2>
-<p>200 so'z. 5-7 ta amaliy maslahat ro'yxati.</p>
-<ul>
-  <li>Maslahat 1</li>
-  <li>Maslahat 2</li>
-  <li>Maslahat 3</li>
-  <li>Maslahat 4</li>
-  <li>Maslahat 5</li>
-</ul>
-
-<h2>Ko'p so'raladigan savollar (FAQ)</h2>
-<p><strong>Savol 1?</strong></p>
-<p>Javob — 3-4 jumla bilan to'liq javob.</p>
-<p><strong>Savol 2?</strong></p>
-<p>Javob — 3-4 jumla bilan to'liq javob.</p>
-<p><strong>Savol 3?</strong></p>
-<p>Javob — 3-4 jumla bilan to'liq javob.</p>
-<p><strong>Savol 4?</strong></p>
-<p>Javob — 3-4 jumla bilan to'liq javob.</p>
-<p><strong>Savol 5?</strong></p>
-<p>Javob — 3-4 jumla bilan to'liq javob.</p>
-
-<h2>Xulosa</h2>
-<p>120-150 so'z. Asosiy fikrlarni jamlash. Oxirgi jumlada call-to-action bo'lsin.</p>
+<h2>Xulosa</h2> — 120-150 so'z, tabiiy yakun. Agressiv "biz bilan bog'laning" MAJBURIY EMAS —
+faqat maqola tabiatiga mos kelsa qo'sh.
 
 QATTIQ QOIDALAR:
 - Umumiy hajm: 1200-1800 so'z (bu MAJBURIY, kam bo'lsa qayta yoz)
@@ -293,7 +270,9 @@ QATTIQ QOIDALAR:
 - H1 sarlavhani content ichiga YOZMA — WordPress o'zi qo'yadi
 - "albatta", "shubhasiz", "qisqacha" kabi so'zlarni ISHLATMA
 - Faqat HTML teglari: h2, p, ul, li, strong, em, a
-- Hech qanday markdown (**, ##) ishlatma — faqat HTML${priorArticles.length >= 2 ? `
+- Hech qanday markdown (**, ##) ishlatma — faqat HTML
+- Statistika/foiz/sanani o'ylab topib real muassasaga bog'lama.
+- Narxni taxminiy va ehtiyotkor ber; aniq raqamni fakt qilib da'vo qilma.${priorArticles.length >= 2 ? `
 
 ICHKI HAVOLALAR (MAJBURIY):
 Quyidagi maqolalar bu saytda allaqachon nashr etilgan:
