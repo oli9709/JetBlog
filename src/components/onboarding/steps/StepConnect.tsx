@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-import Link from 'next/link';
+import { Link } from '@/i18n/navigation';
 import { AlertCircle } from 'lucide-react';
 import { cn } from '@/lib/utils/helpers';
 import { ConnectionForm, type ConnectionFormData } from '@/components/connections/ConnectionForm';

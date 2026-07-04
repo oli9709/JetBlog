@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import config from '@/lib/config/marketing';
-import Link from 'next/link';
+import { Link } from '@/i18n/navigation';
 import { MainLogoText } from '@/components/MainLogo';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 

@@ -1,5 +1,5 @@
 import siteConfig from '@/lib/config/site';
-import Link from 'next/link';
+import { Link } from '@/i18n/navigation';
 import Image from 'next/image';
 
 const JET_FILTER =

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
+import { Link } from '@/i18n/navigation';
 import { NavItem } from '@/lib/types/types';
 import { Icons } from '@/components/Icons';
 

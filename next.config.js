@@ -1,4 +1,6 @@
 // @ts-check
+const createNextIntlPlugin = require('next-intl/plugin');
+const withNextIntl = createNextIntlPlugin();
 const { withSentryConfig } = require('@sentry/nextjs');
 
 /** @type {import('next').NextConfig} */
@@ -17,7 +19,7 @@ const nextConfig = {
   },
 };
 
-module.exports = withSentryConfig(nextConfig, {
+module.exports = withNextIntl(withSentryConfig(nextConfig, {
   org: process.env.SENTRY_ORG,
   project: process.env.SENTRY_PROJECT,
   silent: true,
@@ -25,4 +27,4 @@ module.exports = withSentryConfig(nextConfig, {
   hideSourceMaps: true,
   webpack: { treeshake: { removeDebugLogging: true } },
   tunnelRoute: '/monitoring-tunnel',
-});
+}));

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useCallback, useState } from 'react';
-import Link from 'next/link';
+import { Link } from '@/i18n/navigation';
 import { BookOpen, MessageCircle, ChevronDown } from 'lucide-react';
 import { FAQ_CATEGORIES, getAllFAQItems, type FAQItem } from '@/lib/constants/faq';
 import { FAQSearch } from './FAQSearch';

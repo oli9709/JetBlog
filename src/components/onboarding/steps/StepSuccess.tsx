@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect } from 'react';
-import Link from 'next/link';
+import { Link } from '@/i18n/navigation';
 import { Globe, Ghost, Layers, Webhook, BookOpen, LayoutDashboard, CheckCircle2 } from 'lucide-react';
 import { cn } from '@/lib/utils/helpers';
 import type { PlatformType } from '@/components/connections/PlatformSelector';
