@@ -1,5 +1,3 @@
-'use client';
-
 import Hero from './_PageSections/Hero';
 import LogoMarquee from './_PageSections/LogoMarquee';
 import Feature from './_PageSections/Feature';
