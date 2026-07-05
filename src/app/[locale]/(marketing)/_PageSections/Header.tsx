@@ -8,10 +8,12 @@ import { MainLogoText } from '@/components/MainLogo';
 import { ThemeDropDownMenu } from '@/components/ThemeDropdown';
 import { SupabaseSession } from '@/lib/API/Services/supabase/user';
 import { ClientHeader } from './ClientHeader';
+import { getTranslations } from 'next-intl/server';
 
 export const Header = async () => {
   const { routes } = config;
   const { data } = await SupabaseSession();
+  const t = await getTranslations('Nav');
 
   return (
     <ClientHeader>
@@ -34,7 +36,7 @@ export const Header = async () => {
                   'px-6 bg-zinc-800 hover:bg-zinc-700 text-white rounded-full transition-all'
                 )}
               >
-                Dashboard
+                {t('dashboard')}
               </Link>
             ) : (
               <Link
@@ -44,7 +46,7 @@ export const Header = async () => {
                   'px-6 bg-[#FB3640] hover:bg-[#FF6B6B] text-white font-semibold rounded-full transition-all shadow-md shadow-[#FB3640]/20'
                 )}
               >
-                Kirish
+                {t('login')}
               </Link>
             )}
           </nav>

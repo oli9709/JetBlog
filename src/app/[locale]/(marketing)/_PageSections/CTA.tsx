@@ -3,8 +3,11 @@ import { Sparkles, ArrowRight } from 'lucide-react';
 import { ShimmerButton } from '@/components/magicui/shimmer-button';
 import { TypingAnimation } from '@/components/magicui/typing-animation';
 import { ScrollReveal } from '@/components/ScrollReveal';
+import { getTranslations } from 'next-intl/server';
 
-export default function CTA() {
+export default async function CTA() {
+  const t = await getTranslations('Landing');
+
   return (
     <div className="relative overflow-hidden py-24 sm:py-32">
 
@@ -20,11 +23,11 @@ export default function CTA() {
 
             <div className="relative z-10 flex flex-col items-center space-y-6">
               <div className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-full border border-[#FB3640]/30 bg-[#FB3640]/10 text-[#FF8A8F] text-xs font-bold uppercase shadow-[0_0_15px_rgba(251,54,64,0.2)]">
-                <Sparkles className="w-4 h-4 animate-pulse text-[#FB3640]" /> Autopilot Rejimi
+                <Sparkles className="w-4 h-4 animate-pulse text-[#FB3640]" /> {t('ctaMode')}
               </div>
 
               <h2 className="text-3xl md:text-5xl font-extrabold tracking-tight text-white leading-tight">
-                SEO-ni avtomatlashtirishga tayyormisiz?
+                {t('ctaHeading')}
               </h2>
 
               <div className="h-10">
@@ -32,12 +35,12 @@ export default function CTA() {
                   className="text-lg md:text-xl font-medium text-emerald-400"
                   duration={50}
                 >
-                  "Toshkentda eng yaxshi stomatolog..." - avtomatik yozilmoqda.
+                  {t('ctaTyping')}
                 </TypingAnimation>
               </div>
 
               <p className="mx-auto max-w-xl text-sm md:text-base text-zinc-400 leading-relaxed">
-                Bugun boshlang — ertaga saytingizda yangi maqola bo'lsin.
+                {t('ctaBody')}
               </p>
 
               <div className="pt-8 flex flex-col sm:flex-row gap-4 justify-center w-full sm:w-auto">
@@ -47,7 +50,7 @@ export default function CTA() {
                     className="shadow-2xl shadow-[#FB3640]/30 h-14 px-8 w-full sm:w-auto"
                   >
                     <span className="whitespace-pre-wrap text-center text-sm font-bold leading-none tracking-tight text-white lg:text-base flex items-center gap-2">
-                      Bepul Autopilotni Boshlash <ArrowRight className="w-4 h-4" />
+                      {t('ctaStartAutopilot')} <ArrowRight className="w-4 h-4" />
                     </span>
                   </ShimmerButton>
                 </Link>
@@ -55,7 +58,7 @@ export default function CTA() {
                   href="/pricing"
                   className="group relative inline-flex h-14 items-center justify-center overflow-hidden rounded-full border border-zinc-700/50 bg-zinc-900/50 px-8 text-sm font-bold text-zinc-300 backdrop-blur-md transition-all hover:bg-zinc-800 hover:text-white hover:border-zinc-700 w-full sm:w-auto"
                 >
-                  <span className="relative z-10">Tarif Rejalar</span>
+                  <span className="relative z-10">{t('ctaPlans')}</span>
                 </Link>
               </div>
             </div>

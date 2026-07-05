@@ -5,8 +5,10 @@ import { Globe, Bot, Image as ImageIcon, Key, Cpu, Zap, Share2 } from 'lucide-re
 import { AnimatedBeam } from '@/components/magicui/animated-beam';
 import { NumberTicker } from '@/components/magicui/number-ticker';
 import { ScrollReveal } from '@/components/ScrollReveal';
+import { useTranslations } from 'next-intl';
 
 export default function Feature() {
+  const t = useTranslations('Landing');
   const containerRef = useRef<HTMLDivElement>(null);
   const div1Ref = useRef<HTMLDivElement>(null);
   const div2Ref = useRef<HTMLDivElement>(null);
@@ -21,13 +23,13 @@ export default function Feature() {
       {/* Title */}
       <ScrollReveal>
         <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
-          <span className="text-xs font-bold tracking-widest text-[#FB3640] uppercase">Qanday Ishlaydi?</span>
+          <span className="text-xs font-bold tracking-widest text-[#FB3640] uppercase">{t('howItWorks')}</span>
           <h2 className="text-3xl md:text-5xl font-extrabold tracking-tight text-white leading-tight">
-            Maqola yozishning <br className="hidden sm:block" />
-            <span className="bg-gradient-to-r from-[#FB3640] to-[#FF8A8F] bg-clip-text text-transparent">Yangi Davri</span>
+            {t('newEra')} <br className="hidden sm:block" />
+            <span className="bg-gradient-to-r from-[#FB3640] to-[#FF8A8F] bg-clip-text text-transparent">{t('newEraHighlight')}</span>
           </h2>
           <p className="text-zinc-400 text-base md:text-lg">
-            Siz shunchaki kalit so'zni berasiz. Qolgan barcha bosqichlarni tizim o'zi mustaqil bajaradi va maqolani to'g'ridan-to'g'ri saytingizga yuklaydi.
+            {t('howItWorksDesc')}
           </p>
         </div>
       </ScrollReveal>
@@ -135,19 +137,19 @@ export default function Feature() {
             <div className="text-4xl md:text-5xl font-extrabold text-white mb-2 flex">
               <NumberTicker value={500} />+
             </div>
-            <span className="text-zinc-500 text-sm font-semibold uppercase tracking-wider">Nashr Qilingan Maqolalar</span>
+            <span className="text-zinc-500 text-sm font-semibold uppercase tracking-wider">{t('publishedArticles')}</span>
           </div>
           <div className="flex flex-col items-center justify-center p-8 rounded-3xl border border-zinc-800/50 bg-zinc-900/30">
             <div className="text-4xl md:text-5xl font-extrabold text-white mb-2 flex">
               <NumberTicker value={2} />
             </div>
-            <span className="text-zinc-500 text-sm font-semibold uppercase tracking-wider">Daqiqada tayyor bo'ladi</span>
+            <span className="text-zinc-500 text-sm font-semibold uppercase tracking-wider">{t('minutesStat')}</span>
           </div>
           <div className="flex flex-col items-center justify-center p-8 rounded-3xl border border-zinc-800/50 bg-zinc-900/30">
             <div className="text-4xl md:text-5xl font-extrabold text-white mb-2 flex">
               <NumberTicker value={98} />%
             </div>
-            <span className="text-zinc-500 text-sm font-semibold uppercase tracking-wider">Mijozlar Mamnuniyati</span>
+            <span className="text-zinc-500 text-sm font-semibold uppercase tracking-wider">{t('satisfactionStat')}</span>
           </div>
         </div>
       </ScrollReveal>

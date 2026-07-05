@@ -9,6 +9,7 @@ import { Link } from '@/i18n/navigation';
 import { Check, Sparkles } from 'lucide-react';
 import { NumberTicker } from '@/components/magicui/number-ticker';
 import { ScrollReveal } from '@/components/ScrollReveal';
+import { useTranslations } from 'next-intl';
 
 interface PriceCardProps {
   product: ProductI;
@@ -16,6 +17,7 @@ interface PriceCardProps {
 }
 
 const PriceCard = ({ product, timeInterval }: PriceCardProps) => {
+  const t = useTranslations('Pricing');
   const { name, description, features, plans } = product;
 
   const activePlan = plans.find((p) => p.interval === timeInterval) || plans[0];
@@ -38,7 +40,7 @@ const PriceCard = ({ product, timeInterval }: PriceCardProps) => {
     >
       {isPopular && (
         <div className="inline-flex items-center gap-1.5 px-4 py-1 text-xs font-bold text-white bg-[#FB3640] rounded-full absolute -top-3 left-1/2 transform -translate-x-1/2 shadow-lg">
-          <Sparkles className="w-3.5 h-3.5" /> Tavsiya Etiladi
+          <Sparkles className="w-3.5 h-3.5" /> {t('recommended')}
         </div>
       )}
 
@@ -58,7 +60,7 @@ const PriceCard = ({ product, timeInterval }: PriceCardProps) => {
             <span className="text-xs text-zinc-500 font-medium">
               {isFree
                 ? ''
-                : `/ ${timeInterval === IntervalE.MONTHLY ? 'oy' : 'oy (yillik)'}`}
+                : `/ ${timeInterval === IntervalE.MONTHLY ? t('perMonth') : t('perMonthYearly')}`}
             </span>
           </div>
 
@@ -93,7 +95,7 @@ const PriceCard = ({ product, timeInterval }: PriceCardProps) => {
               : undefined
           }
         >
-          {isFree ? 'Bepul Boshlash' : 'Tarifni tanlash'}
+          {isFree ? t('ctaFree') : t('ctaPaid')}
         </Link>
       </div>
     </div>
@@ -101,6 +103,7 @@ const PriceCard = ({ product, timeInterval }: PriceCardProps) => {
 };
 
 const Pricing = () => {
+  const t = useTranslations('Pricing');
   const [timeInterval, setTimeInterval] = useState(IntervalE.MONTHLY);
   const { products } = configuration;
 
@@ -123,13 +126,13 @@ const Pricing = () => {
         <ScrollReveal>
           <div className="mx-auto flex w-full flex-col gap-4 max-w-3xl text-center">
             <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight text-white leading-tight">
-              Tarif rejalarimiz va{' '}
+              {t('title')}{' '}
               <span className="text-[#FB3640]">
-                Narxlar
+                {t('titleHighlight')}
               </span>
             </h1>
             <p className="max-w-2xl mx-auto text-zinc-400 text-sm md:text-base leading-relaxed">
-              Biznesingiz yoki shaxsiy blogingiz uchun eng mos bo'lgan tarifni tanlang. Istalgan vaqtda boshqa tarifga o'tishingiz mumkin.
+              {t('subtitle')}
             </p>
           </div>
         </ScrollReveal>
@@ -143,7 +146,7 @@ const Pricing = () => {
                 !isYearly ? 'text-white' : 'text-zinc-500'
               )}
             >
-              Oylik To'lov
+              {t('monthly')}
             </span>
             <button
               onClick={toggleBilling}
@@ -165,7 +168,7 @@ const Pricing = () => {
                 isYearly ? 'text-white' : 'text-zinc-500'
               )}
             >
-              Yillik To'lov{' '}
+              {t('yearly')}{' '}
               <span
                 className="text-[10px] px-2 py-0.5 rounded-full font-extrabold border"
                 style={{
@@ -174,7 +177,7 @@ const Pricing = () => {
                   borderColor: 'rgba(251,54,64,0.3)',
                 }}
               >
-                Save 20%
+                {t('save20')}
               </span>
             </span>
           </div>
@@ -195,7 +198,7 @@ const Pricing = () => {
         <ScrollReveal delay="300">
           <div className="max-w-3xl mx-auto text-center bg-white/[0.03] border border-white/10 rounded-2xl p-6 backdrop-blur-md">
             <p className="text-xs text-zinc-500 leading-relaxed">
-              * Barcha to'lovlar manual invoice tizimi orqali amalga oshiriladi. Hisobingiz yaratilgach, siz xohlagan paketni tanlab invoice olishingiz mumkin. Yillik tariflarda qo'shimcha 2 oylik bepul muddat taqdim etiladi.
+              {t('footerNote')}
             </p>
           </div>
         </ScrollReveal>

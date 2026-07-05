@@ -1,5 +1,7 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
+
 const items = [
   { emoji: '🤖', name: 'Claude AI' },
   { emoji: '📊', name: 'DataForSEO' },
@@ -14,11 +16,12 @@ const items = [
 ];
 
 export default function LogoMarquee() {
+  const t = useTranslations('Landing');
   return (
     <section className="py-12 md:py-16">
       <div className="flex flex-col items-center space-y-6">
         <p className="text-sm font-semibold text-zinc-500 uppercase tracking-widest text-center">
-          Zamonaviy texnologiyalar bilan integratsiya qilingan
+          {t('techBadge')}
         </p>
 
         <div className="relative overflow-hidden w-full py-6">

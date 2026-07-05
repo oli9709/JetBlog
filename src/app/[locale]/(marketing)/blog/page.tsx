@@ -4,8 +4,10 @@ export const dynamic = 'force-dynamic';
 
 import { useState } from 'react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { useTranslations } from 'next-intl';
 
 export default function BlogPage() {
+  const t = useTranslations('Blog');
   const [email, setEmail] = useState('');
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [errorMsg, setErrorMsg] = useState('');
@@ -23,12 +25,18 @@ export default function BlogPage() {
       setEmail('');
     } else if (error.code === '23505') {
       setStatus('error');
-      setErrorMsg('Bu email allaqachon obunada');
+      setErrorMsg(t('errorDuplicate'));
     } else {
       setStatus('error');
-      setErrorMsg('Xatolik yuz berdi, qayta urinib ko\'ring');
+      setErrorMsg(t('errorGeneral'));
     }
   };
+
+  const topics = [
+    { icon: '🔍', titleKey: 'topic1Title' as const, descKey: 'topic1Desc' as const },
+    { icon: '🤖', titleKey: 'topic2Title' as const, descKey: 'topic2Desc' as const },
+    { icon: '🌐', titleKey: 'topic3Title' as const, descKey: 'topic3Desc' as const },
+  ];
 
   return (
     <div className="min-h-screen bg-[#000F08]">
@@ -36,10 +44,10 @@ export default function BlogPage() {
 
         {/* Header */}
         <div className="mb-16 text-center">
-          <span className="inline-block text-xs font-semibold tracking-widest text-[#FB3640] uppercase mb-4">Blog</span>
-          <h1 className="text-4xl font-extrabold text-white mb-4">Tez kunda...</h1>
+          <span className="inline-block text-xs font-semibold tracking-widest text-[#FB3640] uppercase mb-4">{t('badge')}</span>
+          <h1 className="text-4xl font-extrabold text-white mb-4">{t('heading')}</h1>
           <p className="text-zinc-400 text-lg leading-relaxed max-w-xl mx-auto">
-            JetBlog blogi hozircha tayyorlanmoqda. Bu yerda SEO, AI va WordPress haqida amaliy maqolalar chiqadi.
+            {t('subtitle')}
           </p>
         </div>
 
@@ -49,18 +57,14 @@ export default function BlogPage() {
             <div className="absolute inset-0 bg-gradient-to-br from-[#FB3640]/5 via-transparent to-transparent pointer-events-none" />
 
             <div className="text-6xl mb-4">✍️</div>
-            <h2 className="text-xl font-bold text-white mb-3">Nima haqida yozamiz?</h2>
+            <h2 className="text-xl font-bold text-white mb-3">{t('comingSoonTitle')}</h2>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6 text-left">
-              {[
-                { icon: '🔍', title: 'SEO strategiyalar', desc: 'O\'zbek va rus tilidagi saytlar uchun ishlagan SEO usullari' },
-                { icon: '🤖', title: 'AI & Kontent', desc: 'Claude AI bilan sifatli maqola yaratish sirlar' },
-                { icon: '🌐', title: 'WordPress', desc: 'WordPressni avtomatlashtirish va optimallashtirish bo\'yicha qo\'llanmalar' },
-              ].map(item => (
-                <div key={item.title} className="p-4 rounded-xl bg-white/3 border border-white/8">
+              {topics.map(item => (
+                <div key={item.titleKey} className="p-4 rounded-xl bg-white/3 border border-white/8">
                   <div className="text-2xl mb-2">{item.icon}</div>
-                  <h3 className="text-white font-semibold text-sm mb-1">{item.title}</h3>
-                  <p className="text-zinc-500 text-xs leading-relaxed">{item.desc}</p>
+                  <h3 className="text-white font-semibold text-sm mb-1">{t(item.titleKey)}</h3>
+                  <p className="text-zinc-500 text-xs leading-relaxed">{t(item.descKey)}</p>
                 </div>
               ))}
             </div>
@@ -70,16 +74,16 @@ export default function BlogPage() {
         {/* Newsletter subscription */}
         <div className="rounded-2xl border border-[#FB3640]/20 bg-[#FB3640]/5 p-8">
           <div className="text-center mb-6">
-            <h2 className="text-xl font-bold text-white mb-2">Birinchi bo'lib xabar oling</h2>
+            <h2 className="text-xl font-bold text-white mb-2">{t('newsletterTitle')}</h2>
             <p className="text-zinc-400 text-sm">
-              Yangi maqolalar chiqqanda email orqali xabar beramiz. Spam yo'q — faqat foydali kontent.
+              {t('newsletterSubtitle')}
             </p>
           </div>
 
           {status === 'success' ? (
             <div className="flex items-center justify-center gap-2 text-emerald-400 font-semibold">
               <span className="w-6 h-6 rounded-full bg-emerald-400/20 border border-emerald-400/40 flex items-center justify-center text-xs">✓</span>
-              Obuna bo'ldingiz! Yangi maqolalar haqida xabar beramiz.
+              {t('subscribeSuccess')}
             </div>
           ) : (
             <form onSubmit={handleSubscribe} className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
@@ -88,7 +92,7 @@ export default function BlogPage() {
                 required
                 value={email}
                 onChange={e => { setEmail(e.target.value); setStatus('idle'); }}
-                placeholder="email@example.com"
+                placeholder={t('subscribePlaceholder')}
                 className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-[#FB3640]/50 transition-colors"
               />
               <button
@@ -96,7 +100,7 @@ export default function BlogPage() {
                 disabled={status === 'loading'}
                 className="shrink-0 bg-[#FB3640] hover:bg-[#FF6B6B] text-white text-sm font-semibold px-6 py-3 rounded-xl transition-colors disabled:opacity-60"
               >
-                {status === 'loading' ? '...' : 'Obuna bo\'lish'}
+                {status === 'loading' ? t('subscribing') : t('subscribeButton')}
               </button>
             </form>
           )}

@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Search, X } from 'lucide-react';
 import { cn } from '@/lib/utils/helpers';
 import type { FAQItem } from '@/lib/constants/faq';
+import { useTranslations } from 'next-intl';
 
 interface FAQSearchProps {
   onResults: (results: FAQItem[] | null) => void;
@@ -11,6 +12,7 @@ interface FAQSearchProps {
 }
 
 export function FAQSearch({ onResults, allItems }: FAQSearchProps) {
+  const t = useTranslations('Faq');
   const [query, setQuery] = useState('');
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -62,7 +64,7 @@ export function FAQSearch({ onResults, allItems }: FAQSearchProps) {
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Savol qidiring..."
+          placeholder={t('searchPlaceholder')}
           className="flex-1 bg-transparent text-white text-sm placeholder:text-zinc-600 focus:outline-none"
         />
         {query && (
@@ -70,7 +72,7 @@ export function FAQSearch({ onResults, allItems }: FAQSearchProps) {
             type="button"
             onClick={clear}
             className="text-zinc-500 hover:text-white transition-colors"
-            aria-label="Tozalash"
+            aria-label={t('searchClear')}
           >
             <X className="w-4 h-4" />
           </button>

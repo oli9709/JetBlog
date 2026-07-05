@@ -5,6 +5,7 @@ import { Bot } from 'lucide-react';
 import { NumberTicker } from '@/components/magicui/number-ticker';
 import { TypingAnimation } from '@/components/magicui/typing-animation';
 import { ScrollReveal } from '@/components/ScrollReveal';
+import { useTranslations } from 'next-intl';
 
 // ── Terminal animation (LARGE CARD — unchanged) ──────────────────────────────
 const LINES = [
@@ -16,7 +17,7 @@ const LINES = [
   { text: '🚀 Maqola nashr qilindi! wp_post_id: 1247',            color: '#00FF88' },
 ];
 
-function TerminalMockup() {
+function TerminalMockup({ runningLabel, publishedLabel }: { runningLabel: string; publishedLabel: string }) {
   const [visibleLines, setVisibleLines] = useState(0);
   const [showCursor, setShowCursor] = useState(true);
 
@@ -57,25 +58,25 @@ function TerminalMockup() {
       <div className="flex items-center justify-between px-5 py-3 border-t border-white/8 bg-zinc-900/40">
         <div className="flex items-center gap-2 text-xs text-zinc-400">
           <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-          Avtomatik ishlamoqda
+          {runningLabel}
         </div>
         <div className="flex items-center gap-1 text-xs font-bold text-white/60">
           <NumberTicker value={127} className="text-white font-mono" />
-          <span className="text-zinc-500 ml-1">maqola nashr qilindi</span>
+          <span className="text-zinc-500 ml-1">{publishedLabel}</span>
         </div>
       </div>
     </div>
   );
 }
 
-// ── KARTA 1: Kalit So'zlar ────────────────────────────────────────────────────
-const KEYWORDS = [
-  { kw: "toshkentda stomatolog", vol: 2400,  diff: "Oson",    dot: "#22c55e", delay: 0 },
-  { kw: "ingliz tili kurslari",  vol: 8100,  diff: "O'rta",   dot: "#eab308", delay: 800 },
-  { kw: "uy-joy narxlari",       vol: 5600,  diff: "Qiyin",   dot: "#ef4444", delay: 1600 },
-];
+// ── KARTA 1: Keywords ────────────────────────────────────────────────────────────
+function KeywordCard({ diffEasy, diffMedium, diffHard }: { diffEasy: string; diffMedium: string; diffHard: string }) {
+  const KEYWORDS = [
+    { kw: "toshkentda stomatolog", vol: 2400,  diff: diffEasy,   dot: "#22c55e", delay: 0 },
+    { kw: "ingliz tili kurslari",  vol: 8100,  diff: diffMedium, dot: "#eab308", delay: 800 },
+    { kw: "uy-joy narxlari",       vol: 5600,  diff: diffHard,   dot: "#ef4444", delay: 1600 },
+  ];
 
-function KeywordCard() {
   const [visible, setVisible] = useState<boolean[]>([false, false, false]);
 
   useEffect(() => {
@@ -84,6 +85,7 @@ function KeywordCard() {
         setVisible(prev => { const n = [...prev]; n[i] = true; return n; });
       }, k.delay + 300);
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -116,7 +118,7 @@ function KeywordCard() {
 const DAYS = ['Du', 'Se', 'Ch', 'Pa', 'Ju', 'Sh', 'Ya'];
 const ACTIVE = [0, 2, 4]; // Du, Ch, Ju
 
-function SchedulerCard() {
+function SchedulerCard({ nextPublishLabel, nextPublishDay }: { nextPublishLabel: string; nextPublishDay: string }) {
   const [now, setNow] = useState('');
 
   useEffect(() => {
@@ -167,7 +169,7 @@ function SchedulerCard() {
       </div>
       <div className="flex items-center gap-2 rounded-lg bg-white/5 px-3 py-2 text-[10px] text-white/60">
         <span className="w-1.5 h-1.5 rounded-full bg-[#FB3640] animate-pulse" />
-        Keyingi nashr: <span className="text-white font-semibold">Dushanba 09:00</span>
+        {nextPublishLabel} <span className="text-white font-semibold">{nextPublishDay}</span>
         {now && <span className="ml-auto text-white/30">{now}</span>}
       </div>
     </div>
@@ -181,7 +183,7 @@ const GRADIENTS = [
   'linear-gradient(135deg, #FB3640 0%, #f97316 100%)',
 ];
 
-function DalleCard() {
+function DalleCard({ imageCreatedLabel }: { imageCreatedLabel: string }) {
   const [states, setStates] = useState<('loading' | 'done')[]>(['loading', 'loading', 'loading']);
   const [showTick, setShowTick] = useState(false);
 
@@ -216,7 +218,6 @@ function DalleCard() {
             )}
             {states[i] === 'done' && (
               <div className="absolute inset-0 opacity-30">
-                {/* Decorative abstract shape */}
                 <div className="absolute top-1 left-1 w-4 h-4 rounded-full bg-white/20" />
                 <div className="absolute bottom-1 right-1 w-6 h-2 rounded-full bg-white/10" />
               </div>
@@ -233,7 +234,7 @@ function DalleCard() {
         }}
       >
         <span>✓</span>
-        <span>Rasm yaratildi</span>
+        <span>{imageCreatedLabel}</span>
       </div>
       <style>{`
         @keyframes shimmer {
@@ -245,22 +246,19 @@ function DalleCard() {
   );
 }
 
-// ── KARTA 4: Telegram Kanallari ───────────────────────────────────────────────
+// ── KARTA 4: Telegram ─────────────────────────────────────────────────────────
 function TelegramCard() {
   const [views, setViews] = useState(0);
 
   useEffect(() => {
-    // Delay start so NumberTicker animates visibly
     const t = setTimeout(() => setViews(1247), 600);
     return () => clearTimeout(t);
   }, []);
 
   return (
     <div className="w-full mt-1">
-      {/* Telegram-style chat bubble */}
       <div className="rounded-xl bg-[#17212B] border border-white/5 p-3 text-[10px]">
         <div className="flex items-center gap-2 mb-2">
-          {/* Avatar */}
           <div className="w-6 h-6 rounded-full bg-gradient-to-br from-[#FB3640] to-[#7c3aed] flex items-center justify-center text-[8px] font-bold text-white shrink-0">
             JB
           </div>
@@ -298,33 +296,6 @@ interface SmallCardDef {
   Content: React.FC;
 }
 
-const SMALL_CARDS: SmallCardDef[] = [
-  {
-    emoji: '🔍',
-    name: "Kalit So'zlar",
-    description: "DataForSEO orqali qidiruv hajmi va raqobat darajasini tahlil qiling.",
-    Content: KeywordCard,
-  },
-  {
-    emoji: '📅',
-    name: "Smart Scheduler",
-    description: "Haftaning qaysi kunlari va soatlarida nashr jadvali.",
-    Content: SchedulerCard,
-  },
-  {
-    emoji: '🎨',
-    name: "DALL-E 3 Cover Art",
-    description: "Har bir maqola uchun premium muqova rasmlarini avtomatik yaratish.",
-    Content: DalleCard,
-  },
-  {
-    emoji: '✈️',
-    name: "Telegram Kanallari",
-    description: "Yangi maqolani avtomatik rasm va havola bilan Telegramga yuboring.",
-    Content: TelegramCard,
-  },
-];
-
 function SmallCard({ name, description, emoji, Content }: SmallCardDef) {
   const [hovered, setHovered] = useState(false);
 
@@ -338,7 +309,6 @@ function SmallCard({ name, description, emoji, Content }: SmallCardDef) {
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      {/* Header */}
       <div className="flex items-center gap-2.5 mb-3">
         <div
           className="p-2 rounded-xl text-base leading-none"
@@ -354,8 +324,6 @@ function SmallCard({ name, description, emoji, Content }: SmallCardDef) {
           <p className="text-[10px] text-white/60 leading-snug mt-0.5">{description}</p>
         </div>
       </div>
-
-      {/* Animated content */}
       <Content />
     </div>
   );
@@ -363,19 +331,48 @@ function SmallCard({ name, description, emoji, Content }: SmallCardDef) {
 
 // ── Main component ────────────────────────────────────────────────────────────
 export default function FeatureList() {
+  const t = useTranslations('Landing');
+
+  const smallCards: SmallCardDef[] = [
+    {
+      emoji: '🔍',
+      name: t('keywordsCardName'),
+      description: t('keywordsCardDesc'),
+      Content: () => <KeywordCard diffEasy={t('diffEasy')} diffMedium={t('diffMedium')} diffHard={t('diffHard')} />,
+    },
+    {
+      emoji: '📅',
+      name: t('schedulerCardName'),
+      description: t('schedulerCardDesc'),
+      Content: () => <SchedulerCard nextPublishLabel={t('nextPublish')} nextPublishDay={t('nextPublishDay')} />,
+    },
+    {
+      emoji: '🎨',
+      name: t('dalleCardName'),
+      description: t('dalleCardDesc'),
+      Content: () => <DalleCard imageCreatedLabel={t('imageCreated')} />,
+    },
+    {
+      emoji: '✈️',
+      name: t('telegramCardName'),
+      description: t('telegramCardDesc'),
+      Content: TelegramCard,
+    },
+  ];
+
   return (
     <section className="space-y-12 py-16 md:py-24 max-w-7xl mx-auto px-4 sm:px-6">
 
       <ScrollReveal>
         <div className="mx-auto flex max-w-3xl flex-col items-center space-y-4 text-center">
           <h2 className="text-3xl md:text-5xl font-extrabold tracking-tight text-white leading-tight">
-            Saytingiz o'sishi uchun{' '}
+            {t('featureTitle')}{' '}
             <span className="bg-gradient-to-r from-[#FB3640] to-[#FF8A8F] bg-clip-text text-transparent">
-              Cheksiz Imkoniyatlar
+              {t('featureTitleHighlight')}
             </span>
           </h2>
           <p className="max-w-2xl text-zinc-400 text-base md:text-lg leading-relaxed">
-            Sizning WordPress saytingiz uchun to'liq yopiq tsiklli avtomatlashtirilgan SEO va maqola yozish tizimi.
+            {t('featureDesc')}
           </p>
         </div>
       </ScrollReveal>
@@ -383,7 +380,7 @@ export default function FeatureList() {
       <ScrollReveal delay="200">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 auto-rows-[220px]">
 
-          {/* ── LARGE CARD (unchanged) ── */}
+          {/* ── LARGE CARD ── */}
           <div
             className="lg:col-span-2 lg:row-span-2 rounded-2xl overflow-hidden border border-[#FB3640]/20 bg-[#000F08] transition-all duration-300 hover:border-[#FB3640]/60 group"
             style={{ boxShadow: '0 0 0 1px transparent' }}
@@ -400,17 +397,17 @@ export default function FeatureList() {
                 <Bot className="w-5 h-5 text-[#FB3640]" />
               </div>
               <div>
-                <h3 className="text-base font-bold text-white">AI Yozuvchi — Live Demo</h3>
-                <p className="text-xs text-zinc-500">Claude AI + DALL-E 3 + WordPress avtomatik pipeline</p>
+                <h3 className="text-base font-bold text-white">{t('aiWriterName')}</h3>
+                <p className="text-xs text-zinc-500">{t('aiWriterDesc')}</p>
               </div>
             </div>
             <div className="h-[calc(100%-76px)]">
-              <TerminalMockup />
+              <TerminalMockup runningLabel={t('terminalRunning')} publishedLabel={t('terminalPublished')} />
             </div>
           </div>
 
           {/* ── SMALL CARDS ── */}
-          {SMALL_CARDS.map(card => (
+          {smallCards.map(card => (
             <div key={card.name} className="h-full">
               <SmallCard {...card} />
             </div>

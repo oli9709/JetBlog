@@ -5,8 +5,10 @@ import config from '@/lib/config/marketing';
 import { Link } from '@/i18n/navigation';
 import { MainLogoText } from '@/components/MainLogo';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { useTranslations } from 'next-intl';
 
 export default function Footer() {
+  const t = useTranslations('Footer');
   const { footer_nav } = config;
   const [email, setEmail] = useState('');
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
@@ -26,10 +28,10 @@ export default function Footer() {
     } else if (error.code === '23505') {
       // unique violation
       setStatus('error');
-      setErrorMsg('Bu email allaqachon obunada');
+      setErrorMsg(t('errorDuplicate'));
     } else {
       setStatus('error');
-      setErrorMsg('Xatolik yuz berdi, qayta urinib ko\'ring');
+      setErrorMsg(t('errorGeneral'));
     }
   };
 
@@ -87,15 +89,15 @@ export default function Footer() {
 
           {/* Right: Newsletter */}
           <div className="mt-10 xl:mt-0">
-            <h3 className="text-sm font-semibold text-white/80">Yangiliklar obunasi</h3>
+            <h3 className="text-sm font-semibold text-white/80">{t('newsletterTitle')}</h3>
             <p className="mt-2 text-sm text-zinc-500 leading-relaxed">
-              Har hafta eng yangi SEO va AI marketing maslahatlarini oling.
+              {t('newsletterSubtitle')}
             </p>
 
             {status === 'success' ? (
               <div className="mt-6 flex items-center gap-2 text-emerald-400 text-sm font-semibold">
                 <span className="w-5 h-5 rounded-full bg-emerald-400/20 border border-emerald-400/40 flex items-center justify-center text-xs">✓</span>
-                Obuna bo'ldingiz!
+                {t('subscribeSuccess')}
               </div>
             ) : (
               <form onSubmit={handleSubscribe} className="mt-6">
@@ -105,7 +107,7 @@ export default function Footer() {
                     required
                     value={email}
                     onChange={e => { setEmail(e.target.value); setStatus('idle'); }}
-                    placeholder="email@example.com"
+                    placeholder={t('subscribePlaceholder')}
                     className="flex-1 min-w-0 bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-[#FB3640]/50 transition-colors"
                   />
                   <button
@@ -113,7 +115,7 @@ export default function Footer() {
                     disabled={status === 'loading'}
                     className="shrink-0 bg-[#FB3640] hover:bg-[#FF6B6B] text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition-colors disabled:opacity-60"
                   >
-                    {status === 'loading' ? '...' : 'Obuna'}
+                    {status === 'loading' ? t('subscribing') : t('subscribeButton')}
                   </button>
                 </div>
                 {status === 'error' && (
@@ -128,7 +130,7 @@ export default function Footer() {
         <div className="mt-12 pt-6 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-4">
           <MainLogoText />
           <p className="text-xs text-zinc-600">
-            © 2026 JetBlog. Barcha huquqlar himoyalangan.
+            {t('copyright')}
           </p>
         </div>
       </div>

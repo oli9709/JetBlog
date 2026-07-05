@@ -7,19 +7,22 @@ import { FAQ_CATEGORIES, getAllFAQItems, type FAQItem } from '@/lib/constants/fa
 import { FAQSearch } from './FAQSearch';
 import { FAQCategory } from './FAQCategory';
 import { cn } from '@/lib/utils/helpers';
+import { useTranslations } from 'next-intl';
 
 function SearchResults({ results }: { results: FAQItem[] }) {
+  const t = useTranslations('Faq');
+
   if (results.length === 0) {
     return (
       <div className="flex flex-col items-center gap-4 py-16 text-center">
         <div className="text-4xl">🔍</div>
-        <p className="text-zinc-400 text-sm">Hech narsa topilmadi</p>
+        <p className="text-zinc-400 text-sm">{t('noResults')}</p>
         <Link
           href="/docs/quick-start"
           className="flex items-center gap-2 text-sm font-semibold text-[#FB3640] hover:underline"
         >
           <BookOpen className="w-4 h-4" />
-          Javob topa olmadingizmi? Docs ga o&apos;ting →
+          {t('notFound')}
         </Link>
       </div>
     );
@@ -29,7 +32,7 @@ function SearchResults({ results }: { results: FAQItem[] }) {
     <div className="flex flex-col divide-y divide-zinc-800/60 rounded-2xl border border-zinc-800/80 bg-zinc-950/40 backdrop-blur-md overflow-hidden">
       <div className="px-5 py-3 border-b border-zinc-800/60 flex items-center gap-2">
         <span className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">
-          {results.length} ta natija
+          {t('resultsCount', { count: results.length })}
         </span>
       </div>
       {results.map((item) => (
@@ -74,6 +77,7 @@ function SearchResultItem({ item }: { item: FAQItem }) {
 }
 
 export function FAQPage() {
+  const t = useTranslations('Faq');
   const [searchResults, setSearchResults] = useState<FAQItem[] | null>(null);
   const allItems = getAllFAQItems();
 
@@ -86,24 +90,23 @@ export function FAQPage() {
       {/* Header */}
       <div className="text-center space-y-4">
         <span className="inline-block text-xs font-bold uppercase tracking-widest text-[#FB3640]">
-          Ko&apos;p beriladigan savollar
+          {t('badge')}
         </span>
         <h1 className="text-4xl md:text-5xl font-extrabold text-white leading-tight">
-          Savollar &amp;{' '}
+          {t('heading')}{' '}
           <span className="bg-gradient-to-r from-[#FB3640] to-rose-400 bg-clip-text text-transparent">
-            Javoblar
+            {t('headingHighlight')}
           </span>
         </h1>
         <p className="text-zinc-400 max-w-xl mx-auto text-sm leading-relaxed">
-          JetBlog haqida eng ko&apos;p so&apos;raladigan savollarga javob toping.
-          Kerakli savolni quyida qidiring yoki kategoriyadan tanlang.
+          {t('subtitle')}
         </p>
       </div>
 
       {/* Search */}
       <FAQSearch onResults={handleResults} allItems={allItems} />
 
-      {/* Content: search results yoki kategoriyalar */}
+      {/* Content: search results or categories */}
       {searchResults !== null ? (
         <SearchResults results={searchResults} />
       ) : (
@@ -121,9 +124,9 @@ export function FAQPage() {
       {/* Footer CTA */}
       <div className="rounded-2xl border border-zinc-800/80 bg-zinc-900/30 p-6 flex flex-col sm:flex-row items-center gap-4 justify-between">
         <div>
-          <p className="text-white font-semibold">Javob topa olmadingizmi?</p>
+          <p className="text-white font-semibold">{t('ctaTitle')}</p>
           <p className="text-zinc-400 text-sm mt-1">
-            To&apos;liq qo&apos;llanma yoki support orqali yordam oling.
+            {t('ctaBody')}
           </p>
         </div>
         <div className="flex gap-3 shrink-0">
@@ -135,7 +138,7 @@ export function FAQPage() {
             )}
           >
             <BookOpen className="w-4 h-4" />
-            Docs ga o&apos;tish
+            {t('ctaDocs')}
           </Link>
           <a
             href="https://t.me/jetblog_support"
@@ -147,7 +150,7 @@ export function FAQPage() {
             )}
           >
             <MessageCircle className="w-4 h-4" />
-            Telegram support
+            {t('ctaSupport')}
           </a>
         </div>
       </div>

@@ -5,6 +5,7 @@ import * as AccordionPrimitive from '@radix-ui/react-accordion';
 import { ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils/helpers';
 import type { FAQCategory as FAQCategoryType } from '@/lib/constants/faq';
+import { useTranslations } from 'next-intl';
 
 interface FAQCategoryProps {
   category: FAQCategoryType;
@@ -12,6 +13,7 @@ interface FAQCategoryProps {
 }
 
 export function FAQCategory({ category, defaultOpen = false }: FAQCategoryProps) {
+  const t = useTranslations('Faq');
   const Icon = category.icon;
 
   return (
@@ -23,7 +25,7 @@ export function FAQCategory({ category, defaultOpen = false }: FAQCategoryProps)
         </div>
         <span className="font-bold text-white">{category.title}</span>
         <span className="ml-auto text-xs font-medium text-zinc-600 bg-zinc-900 px-2.5 py-1 rounded-full border border-zinc-800">
-          {category.items.length} ta savol
+          {t('questionCount', { count: category.items.length })}
         </span>
       </div>
 
