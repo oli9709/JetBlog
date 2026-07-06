@@ -1,6 +1,6 @@
 import React from 'react';
 import { notFound } from 'next/navigation';
-import { getAllSlugs, getDocsSitemap } from '@/lib/config/docs';
+import { getAllSlugs, getDocTitle } from '@/lib/config/docs';
 import { getLocale } from 'next-intl/server';
 import type { Metadata } from 'next';
 
@@ -27,11 +27,10 @@ export function generateStaticParams() {
 }
 
 export async function generateMetadata(
-  { params }: { params: Promise<{ locale: string; slug: string }> }
+  { params }: { params: Promise<{ slug: string }> }
 ): Promise<Metadata> {
-  const { locale, slug } = await params;
-  const sitemap = getDocsSitemap(locale as 'uz' | 'ru' | 'en');
-  const title = sitemap.flatMap((s) => s.items).find((i) => i.slug === slug)?.title;
+  const { slug } = await params;
+  const title = getDocTitle(slug);
   return {
     title: title ? `${title} — JetBlog Docs` : 'JetBlog Docs',
   };
