@@ -1,4 +1,5 @@
 import React from 'react';
+import { getLocale } from 'next-intl/server';
 import { DocsPageHeader, DocsH2 } from '../DocsPageHeader';
 import { CodeBlock, InlineCode } from '../CodeBlock';
 
@@ -224,7 +225,8 @@ function EndpointCard({ ep, errorsLabel }: { ep: Endpoint; errorsLabel: string }
   );
 }
 
-export function ApiEndpointsPage({ locale = 'uz' }: Props) {
+export async function ApiEndpointsPage({ locale: _locale }: Props) {
+  const locale = (await getLocale()) as 'uz' | 'ru' | 'en';
   const l = LABELS[locale] ?? LABELS.uz;
   const endpoints = buildEndpoints(locale);
   return (

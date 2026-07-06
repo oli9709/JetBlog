@@ -6,6 +6,7 @@ import { StepList } from '../StepList';
 import { CodeBlock, InlineCode } from '../CodeBlock';
 import { Callout } from '../Callout';
 import { PlatformTabs } from '../PlatformTabs';
+import { useLocale } from 'next-intl';
 
 interface Props { locale?: string }
 
@@ -212,7 +213,8 @@ const CONTENT: Record<string, {
   },
 };
 
-export function AIBuilders({ locale = 'uz' }: Props) {
+export function AIBuilders({ locale: _localeProp }: Props) {
+  const locale = useLocale() as 'uz' | 'ru' | 'en';
   const c = CONTENT[locale] ?? CONTENT.uz;
   return (
     <div>

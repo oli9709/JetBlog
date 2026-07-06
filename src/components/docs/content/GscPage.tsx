@@ -1,4 +1,5 @@
 import React from 'react';
+import { getLocale } from 'next-intl/server';
 import { DocsPageHeader, DocsH2, DocsPara } from '../DocsPageHeader';
 import { StepList } from '../StepList';
 import { Callout } from '../Callout';
@@ -81,7 +82,8 @@ const CONTENT: Record<string, {
   },
 };
 
-export function GscPage({ locale = 'uz' }: Props) {
+export async function GscPage({ locale: _locale }: Props) {
+  const locale = (await getLocale()) as 'uz' | 'ru' | 'en';
   const c = CONTENT[locale] ?? CONTENT.uz;
   return (
     <div>

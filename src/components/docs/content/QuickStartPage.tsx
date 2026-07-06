@@ -6,6 +6,7 @@ import { StepList } from '../StepList';
 import { Callout } from '../Callout';
 import { PlatformTabs } from '../PlatformTabs';
 import { InlineCode } from '../CodeBlock';
+import { useLocale } from 'next-intl';
 
 interface Props { locale?: string }
 
@@ -198,7 +199,8 @@ function getContent(locale: string) {
   };
 }
 
-export function QuickStartPage({ locale = 'uz' }: Props) {
+export function QuickStartPage({ locale: _localeProp }: Props) {
+  const locale = useLocale() as 'uz' | 'ru' | 'en';
   const c = getContent(locale);
   const isEn = locale === 'en';
   const isRu = locale === 'ru';

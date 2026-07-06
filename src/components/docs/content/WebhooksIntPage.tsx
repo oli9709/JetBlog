@@ -1,4 +1,5 @@
 import React from 'react';
+import { getLocale } from 'next-intl/server';
 import { DocsPageHeader, DocsH2, DocsPara } from '../DocsPageHeader';
 import { CodeBlock, InlineCode } from '../CodeBlock';
 import { Callout } from '../Callout';
@@ -96,7 +97,8 @@ const CONTENT: Record<string, {
   },
 };
 
-export function WebhooksIntPage({ locale = 'uz' }: Props) {
+export async function WebhooksIntPage({ locale: _locale }: Props) {
+  const locale = (await getLocale()) as 'uz' | 'ru' | 'en';
   const c = CONTENT[locale] ?? CONTENT.uz;
   return (
     <div>
