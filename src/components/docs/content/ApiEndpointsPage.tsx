@@ -152,7 +152,7 @@ function EndpointCard({ ep }: { ep: Endpoint }) {
   );
 }
 
-export function ApiEndpointsPage() {
+export function ApiEndpointsPage({ locale: _locale }: { locale?: string } = {}) {
   return (
     <div>
       <DocsPageHeader

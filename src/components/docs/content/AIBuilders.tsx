@@ -136,7 +136,7 @@ const PAYLOAD_CODE = `{
 const ENV_CODE = `# .env yoki .env.local
 JETBLOG_SECRET=your_secret_key_here`;
 
-export function AIBuilders() {
+export function AIBuilders({ locale: _locale }: { locale?: string } = {}) {
   return (
     <div>
       <DocsPageHeader

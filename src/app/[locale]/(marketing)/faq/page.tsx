@@ -4,9 +4,9 @@ import { FAQPage } from '@/components/faq/FAQPage';
 import { getAllFAQItems } from '@/lib/constants/faq';
 
 export const metadata: Metadata = {
-  title: "Ko'p beriladigan savollar — JetBlog",
+  title: 'FAQ — JetBlog',
   description:
-    "JetBlog haqida eng ko'p so'raladigan savollarga javob toping: platformalar, kreditlar, maqola generatsiya va texnik tafsilotlar.",
+    'Find answers to the most common questions about JetBlog: platforms, credits, article generation and technical details.',
 };
 
 function buildJsonLd() {

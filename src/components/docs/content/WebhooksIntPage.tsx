@@ -25,7 +25,7 @@ const PAYLOAD_CODE = `{
   }
 }`;
 
-export function WebhooksIntPage() {
+export function WebhooksIntPage({ locale: _locale }: { locale?: string } = {}) {
   return (
     <div>
       <DocsPageHeader

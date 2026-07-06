@@ -7,7 +7,7 @@ import { Callout } from '../Callout';
 import { PlatformTabs } from '../PlatformTabs';
 import { InlineCode } from '../CodeBlock';
 
-export function QuickStartPage() {
+export function QuickStartPage({ locale: _locale }: { locale?: string } = {}) {
   return (
     <div>
       <DocsPageHeader

@@ -11,7 +11,7 @@ const TONES = [
   { name: 'Authoritative', desc: 'Mutaxassis, qat\'iy, ishonch uyg\'otuvchi' },
 ];
 
-export function BrandVoicePage() {
+export function BrandVoicePage({ locale: _locale }: { locale?: string } = {}) {
   return (
     <div>
       <DocsPageHeader

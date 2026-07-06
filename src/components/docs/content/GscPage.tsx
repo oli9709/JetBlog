@@ -3,7 +3,7 @@ import { DocsPageHeader, DocsH2, DocsPara } from '../DocsPageHeader';
 import { StepList } from '../StepList';
 import { Callout } from '../Callout';
 
-export function GscPage() {
+export function GscPage({ locale: _locale }: { locale?: string } = {}) {
   return (
     <div>
       <DocsPageHeader

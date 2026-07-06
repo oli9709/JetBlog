@@ -24,7 +24,7 @@ const ERROR_RESPONSE_CODE = `{
   }
 }`;
 
-export function ApiErrorsPage() {
+export function ApiErrorsPage({ locale: _locale }: { locale?: string } = {}) {
   return (
     <div>
       <DocsPageHeader

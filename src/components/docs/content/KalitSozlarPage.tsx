@@ -4,7 +4,7 @@ import { StepList } from '../StepList';
 import { Callout } from '../Callout';
 import { InlineCode } from '../CodeBlock';
 
-export function KalitSozlarPage() {
+export function KalitSozlarPage({ locale: _locale }: { locale?: string } = {}) {
   return (
     <div>
       <DocsPageHeader

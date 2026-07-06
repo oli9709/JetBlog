@@ -5,19 +5,38 @@ import { Bot } from 'lucide-react';
 import { NumberTicker } from '@/components/magicui/number-ticker';
 import { TypingAnimation } from '@/components/magicui/typing-animation';
 import { ScrollReveal } from '@/components/ScrollReveal';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 
-// ── Terminal animation (LARGE CARD — unchanged) ──────────────────────────────
-const LINES = [
-  { text: "$ jetblog generate --keyword 'toshkentda stomatolog'", color: '#00FF88' },
-  { text: "✓ Kalit so'z tahlil qilindi: 3,768 qidiruv/oy",      color: '#00FF88' },
-  { text: '✓ Claude AI maqola yozmoqda...',                       color: '#00FF88' },
-  { text: '✓ DALL-E 3 rasm yaratmoqda...',                        color: '#00FF88' },
-  { text: '✓ WordPress ga yuklanmoqda...',                         color: '#00FF88' },
-  { text: '🚀 Maqola nashr qilindi! wp_post_id: 1247',            color: '#00FF88' },
-];
+// ── Terminal animation (LARGE CARD) ──────────────────────────────────────────
+const LINES_DATA: Record<string, { text: string; color: string }[]> = {
+  uz: [
+    { text: "$ jetblog generate --keyword 'toshkentda stomatolog'", color: '#00FF88' },
+    { text: "✓ Kalit so'z tahlil qilindi: 3,768 qidiruv/oy",       color: '#00FF88' },
+    { text: '✓ Claude AI maqola yozmoqda...',                        color: '#00FF88' },
+    { text: '✓ DALL-E 3 rasm yaratmoqda...',                         color: '#00FF88' },
+    { text: '✓ WordPress ga yuklanmoqda...',                          color: '#00FF88' },
+    { text: '🚀 Maqola nashr qilindi! wp_post_id: 1247',             color: '#00FF88' },
+  ],
+  ru: [
+    { text: "$ jetblog generate --keyword 'stomatolog v tashkente'", color: '#00FF88' },
+    { text: '✓ Ключевое слово проанализировано: 3 768 запросов/мес.', color: '#00FF88' },
+    { text: '✓ Claude AI пишет статью...',                            color: '#00FF88' },
+    { text: '✓ DALL-E 3 создаёт изображение...',                      color: '#00FF88' },
+    { text: '✓ Загрузка в WordPress...',                               color: '#00FF88' },
+    { text: '🚀 Статья опубликована! wp_post_id: 1247',               color: '#00FF88' },
+  ],
+  en: [
+    { text: "$ jetblog generate --keyword 'best dentist tashkent'",  color: '#00FF88' },
+    { text: '✓ Keyword analyzed: 3,768 searches/mo',                  color: '#00FF88' },
+    { text: '✓ Claude AI writing article...',                          color: '#00FF88' },
+    { text: '✓ DALL-E 3 generating image...',                          color: '#00FF88' },
+    { text: '✓ Uploading to WordPress...',                             color: '#00FF88' },
+    { text: '🚀 Article published! wp_post_id: 1247',                 color: '#00FF88' },
+  ],
+};
 
-function TerminalMockup({ runningLabel, publishedLabel }: { runningLabel: string; publishedLabel: string }) {
+function TerminalMockup({ runningLabel, publishedLabel, locale }: { runningLabel: string; publishedLabel: string; locale: string }) {
+  const LINES = LINES_DATA[locale] ?? LINES_DATA.uz;
   const [visibleLines, setVisibleLines] = useState(0);
   const [showCursor, setShowCursor] = useState(true);
 
@@ -29,7 +48,7 @@ function TerminalMockup({ runningLabel, publishedLabel }: { runningLabel: string
       timeout = setTimeout(() => setVisibleLines(0), 2000);
     }
     return () => clearTimeout(timeout);
-  }, [visibleLines]);
+  }, [visibleLines, LINES.length]);
 
   useEffect(() => {
     const id = setInterval(() => setShowCursor(v => !v), 530);
@@ -69,13 +88,29 @@ function TerminalMockup({ runningLabel, publishedLabel }: { runningLabel: string
   );
 }
 
+const KEYWORD_EXAMPLES: Record<string, Array<{ kw: string; vol: number; dot: string; diff: 'easy' | 'medium' | 'hard' }>> = {
+  uz: [
+    { kw: 'toshkentda stomatolog', vol: 2400, dot: '#22c55e', diff: 'easy' },
+    { kw: 'ingliz tili kurslari',  vol: 8100, dot: '#eab308', diff: 'medium' },
+    { kw: "uy-joy narxlari",       vol: 5600, dot: '#ef4444', diff: 'hard' },
+  ],
+  ru: [
+    { kw: 'стоматолог в Ташкенте',    vol: 2400, dot: '#22c55e', diff: 'easy' },
+    { kw: 'курсы английского языка',  vol: 8100, dot: '#eab308', diff: 'medium' },
+    { kw: 'цены на недвижимость',     vol: 5600, dot: '#ef4444', diff: 'hard' },
+  ],
+  en: [
+    { kw: 'best dentist Tashkent',    vol: 2400, dot: '#22c55e', diff: 'easy' },
+    { kw: 'English language courses', vol: 8100, dot: '#eab308', diff: 'medium' },
+    { kw: 'real estate prices',       vol: 5600, dot: '#ef4444', diff: 'hard' },
+  ],
+};
+
 // ── KARTA 1: Keywords ────────────────────────────────────────────────────────────
-function KeywordCard({ diffEasy, diffMedium, diffHard }: { diffEasy: string; diffMedium: string; diffHard: string }) {
-  const KEYWORDS = [
-    { kw: "toshkentda stomatolog", vol: 2400,  diff: diffEasy,   dot: "#22c55e", delay: 0 },
-    { kw: "ingliz tili kurslari",  vol: 8100,  diff: diffMedium, dot: "#eab308", delay: 800 },
-    { kw: "uy-joy narxlari",       vol: 5600,  diff: diffHard,   dot: "#ef4444", delay: 1600 },
-  ];
+function KeywordCard({ diffEasy, diffMedium, diffHard, locale }: { diffEasy: string; diffMedium: string; diffHard: string; locale: string }) {
+  const examples = KEYWORD_EXAMPLES[locale] ?? KEYWORD_EXAMPLES.uz;
+  const diffLabels: Record<'easy' | 'medium' | 'hard', string> = { easy: diffEasy, medium: diffMedium, hard: diffHard };
+  const KEYWORDS = examples.map(e => ({ ...e, diff: diffLabels[e.diff] }));
 
   const [visible, setVisible] = useState<boolean[]>([false, false, false]);
 
@@ -83,7 +118,7 @@ function KeywordCard({ diffEasy, diffMedium, diffHard }: { diffEasy: string; dif
     KEYWORDS.forEach((k, i) => {
       setTimeout(() => {
         setVisible(prev => { const n = [...prev]; n[i] = true; return n; });
-      }, k.delay + 300);
+      }, i * 400 + 300);
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -115,10 +150,15 @@ function KeywordCard({ diffEasy, diffMedium, diffHard }: { diffEasy: string; dif
 }
 
 // ── KARTA 2: Smart Scheduler ──────────────────────────────────────────────────
-const DAYS = ['Du', 'Se', 'Ch', 'Pa', 'Ju', 'Sh', 'Ya'];
-const ACTIVE = [0, 2, 4]; // Du, Ch, Ju
+const DAYS_DATA: Record<string, string[]> = {
+  uz: ['Du', 'Se', 'Ch', 'Pa', 'Ju', 'Sh', 'Ya'],
+  ru: ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'],
+  en: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+};
+const ACTIVE = [0, 2, 4]; // Mon, Wed, Fri
 
-function SchedulerCard({ nextPublishLabel, nextPublishDay }: { nextPublishLabel: string; nextPublishDay: string }) {
+function SchedulerCard({ nextPublishLabel, nextPublishDay, locale }: { nextPublishLabel: string; nextPublishDay: string; locale: string }) {
+  const DAYS = DAYS_DATA[locale] ?? DAYS_DATA.uz;
   const [now, setNow] = useState('');
 
   useEffect(() => {
@@ -246,8 +286,19 @@ function DalleCard({ imageCreatedLabel }: { imageCreatedLabel: string }) {
   );
 }
 
+const TELEGRAM_AGO: Record<string, string> = {
+  uz: '2 daqiqa oldin',
+  ru: '2 минуты назад',
+  en: '2 minutes ago',
+};
+const TELEGRAM_MSG: Record<string, string> = {
+  uz: '🔥 Yangi maqola: Toshkentda...',
+  ru: '🔥 Новая статья: Стоматолог в Ташкенте...',
+  en: '🔥 New article: Best dentist in Tashkent...',
+};
+
 // ── KARTA 4: Telegram ─────────────────────────────────────────────────────────
-function TelegramCard() {
+function TelegramCard({ locale }: { locale: string }) {
   const [views, setViews] = useState(0);
 
   useEffect(() => {
@@ -264,7 +315,7 @@ function TelegramCard() {
           </div>
           <div>
             <div className="text-white font-semibold text-[10px]">JetBlog</div>
-            <div className="text-white/30 text-[9px]">2 daqiqa oldin</div>
+            <div className="text-white/30 text-[9px]">{TELEGRAM_AGO[locale] ?? TELEGRAM_AGO.uz}</div>
           </div>
         </div>
         <div className="text-white/80 leading-relaxed mb-2 min-h-[28px]">
@@ -273,7 +324,7 @@ function TelegramCard() {
             className="text-[10px] leading-relaxed text-white/80"
             startOnView={false}
           >
-            🔥 Yangi maqola: Toshkentda...
+            {TELEGRAM_MSG[locale] ?? TELEGRAM_MSG.uz}
           </TypingAnimation>
         </div>
         <div className="flex items-center justify-end gap-1 text-white/30 text-[9px]">
@@ -332,19 +383,20 @@ function SmallCard({ name, description, emoji, Content }: SmallCardDef) {
 // ── Main component ────────────────────────────────────────────────────────────
 export default function FeatureList() {
   const t = useTranslations('Landing');
+  const locale = useLocale();
 
   const smallCards: SmallCardDef[] = [
     {
       emoji: '🔍',
       name: t('keywordsCardName'),
       description: t('keywordsCardDesc'),
-      Content: () => <KeywordCard diffEasy={t('diffEasy')} diffMedium={t('diffMedium')} diffHard={t('diffHard')} />,
+      Content: () => <KeywordCard diffEasy={t('diffEasy')} diffMedium={t('diffMedium')} diffHard={t('diffHard')} locale={locale} />,
     },
     {
       emoji: '📅',
       name: t('schedulerCardName'),
       description: t('schedulerCardDesc'),
-      Content: () => <SchedulerCard nextPublishLabel={t('nextPublish')} nextPublishDay={t('nextPublishDay')} />,
+      Content: () => <SchedulerCard nextPublishLabel={t('nextPublish')} nextPublishDay={t('nextPublishDay')} locale={locale} />,
     },
     {
       emoji: '🎨',
@@ -356,7 +408,7 @@ export default function FeatureList() {
       emoji: '✈️',
       name: t('telegramCardName'),
       description: t('telegramCardDesc'),
-      Content: TelegramCard,
+      Content: () => <TelegramCard locale={locale} />,
     },
   ];
 
@@ -402,7 +454,7 @@ export default function FeatureList() {
               </div>
             </div>
             <div className="h-[calc(100%-76px)]">
-              <TerminalMockup runningLabel={t('terminalRunning')} publishedLabel={t('terminalPublished')} />
+              <TerminalMockup runningLabel={t('terminalRunning')} publishedLabel={t('terminalPublished')} locale={locale} />
             </div>
           </div>
 

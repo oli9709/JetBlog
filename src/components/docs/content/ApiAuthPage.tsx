@@ -17,7 +17,7 @@ const response = await fetch('/api/generate', {
   body: JSON.stringify({ keywordId: 'uuid' })
 })`;
 
-export function ApiAuthPage() {
+export function ApiAuthPage({ locale: _locale }: { locale?: string } = {}) {
   return (
     <div>
       <DocsPageHeader

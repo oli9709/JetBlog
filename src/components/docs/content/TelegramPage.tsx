@@ -4,7 +4,7 @@ import { StepList } from '../StepList';
 import { Callout } from '../Callout';
 import { InlineCode } from '../CodeBlock';
 
-export function TelegramPage() {
+export function TelegramPage({ locale: _locale }: { locale?: string } = {}) {
   return (
     <div>
       <DocsPageHeader
