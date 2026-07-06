@@ -1,5 +1,7 @@
 import { redirect } from 'next/navigation';
+import { getLocale } from 'next-intl/server';
 
-export default function DocsPage() {
-  redirect('/docs/quick-start');
+export default async function DocsPage() {
+  const locale = await getLocale();
+  redirect(`/${locale}/docs/quick-start`);
 }
