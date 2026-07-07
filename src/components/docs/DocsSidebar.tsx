@@ -2,14 +2,18 @@
 
 import React, { useState } from 'react';
 import { Link } from '@/i18n/navigation';
-import { usePathname } from '@/i18n/navigation';
+import { usePathname as useNextPathname } from 'next/navigation';
 import { ChevronDown } from 'lucide-react';
-import { docsSitemap } from '@/lib/config/docs';
+import { getDocsSitemap } from '@/lib/config/docs';
 import { cn } from '@/lib/utils/helpers';
 
 export function DocsSidebar() {
-  const pathname = usePathname();
-  const currentSlug = pathname.split('/').pop() ?? '';
+  // next/navigation usePathname includes locale prefix: /ru/docs/quick-start
+  const fullPathname = useNextPathname();
+  const segments = fullPathname.split('/');
+  const locale = (['uz', 'ru', 'en'].includes(segments[1]) ? segments[1] : 'uz') as 'uz' | 'ru' | 'en';
+  const currentSlug = segments[segments.length - 1] ?? '';
+  const docsSitemap = getDocsSitemap(locale);
 
   const [openSections, setOpenSections] = useState<Record<string, boolean>>(() => {
     const init: Record<string, boolean> = {};

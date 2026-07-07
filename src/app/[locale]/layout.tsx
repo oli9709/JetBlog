@@ -87,7 +87,7 @@ export default async function LocaleLayout({
   return (
     <html suppressHydrationWarning lang={locale} className={`${InterFont.variable}`}>
       <body>
-        <NextIntlClientProvider messages={messages}>
+        <NextIntlClientProvider locale={locale} messages={messages}>
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
             <NextTopLoader color={config.loading_bar_color} />
             {children}
