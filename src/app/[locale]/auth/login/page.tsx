@@ -16,24 +16,25 @@ import {
   CardHeader,
   CardTitle
 } from '@/components/ui/Card';
-import { Link } from '@/i18n/navigation';
+import { Link, useRouter } from '@/i18n/navigation';
 import { Icons } from '@/components/Icons';
-
-function mapAuthError(message: string): string {
-  if (message.includes('Email not confirmed'))
-    return 'Email tasdiqlanmagan. Pochtangizni tekshiring.';
-  if (message.includes('Invalid login credentials') || message.includes('invalid_credentials'))
-    return "Email yoki parol noto'g'ri. Agar ilgari Google orqali ro'yxatdan o'tgan bo'lsangiz, pastdagi \"Google orqali kirish\" tugmasini bosing.";
-  if (message.includes('Too many requests') || message.includes('rate limit'))
-    return "Juda ko'p urinish. 5 daqiqa kuting.";
-  if (message.includes('User not found'))
-    return 'Bu email bilan hisob topilmadi.';
-  return "Kirish amalga oshmadi. Qayta urinib ko'ring.";
-}
+import { useTranslations } from 'next-intl';
 
 export default function LoginPage() {
+  const t = useTranslations('Auth');
+  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
+
+  const mapAuthError = (message: string): string => {
+    if (message.includes('Email not confirmed')) return t('errEmailNotConfirmed');
+    if (message.includes('Invalid login credentials') || message.includes('invalid_credentials'))
+      return t('errInvalidCredentials');
+    if (message.includes('Too many requests') || message.includes('rate limit'))
+      return t('errTooManyRequests');
+    if (message.includes('User not found')) return t('errUserNotFound');
+    return t('errDefault');
+  };
 
   const form = useForm<authFormValues>({
     resolver: zodResolver(authFormSchema),
@@ -60,7 +61,7 @@ export default function LoginPage() {
       return;
     }
 
-    window.location.href = '/dashboard/main';
+    router.push('/dashboard/main');
   };
 
   const handleGoogleSignIn = async () => {
@@ -83,12 +84,11 @@ export default function LoginPage() {
     <div className="md:w-96">
       <Card className="bg-background-light dark:bg-background-dark">
         <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl">Tizimga kirish</CardTitle>
-          <CardDescription>Email va parolingizni kiriting</CardDescription>
+          <CardTitle className="text-2xl">{t('loginTitle')}</CardTitle>
+          <CardDescription>{t('loginDesc')}</CardDescription>
         </CardHeader>
 
         <CardContent>
-          {/* Global auth xato */}
           {authError && (
             <div className="mb-4 rounded-md bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 px-4 py-3 text-sm text-red-700 dark:text-red-400">
               {authError}
@@ -102,12 +102,12 @@ export default function LoginPage() {
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Email</FormLabel>
+                    <FormLabel>{t('email')}</FormLabel>
                     <FormControl>
                       <Input
                         {...register('email')}
                         type="text"
-                        placeholder="Email"
+                        placeholder={t('email')}
                         className="bg-background-light dark:bg-background-dark"
                         {...field}
                       />
@@ -121,14 +121,14 @@ export default function LoginPage() {
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Parol</FormLabel>
+                    <FormLabel>{t('password')}</FormLabel>
                     <FormControl>
                       <div className="relative">
                         <Input
                           className="bg-background-light dark:bg-background-dark"
                           {...register('password')}
                           type={showPassword ? 'text' : 'password'}
-                          placeholder="Parol"
+                          placeholder={t('password')}
                           {...field}
                         />
                         <div className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-600 cursor-pointer">
@@ -151,13 +151,13 @@ export default function LoginPage() {
                     href="/auth/forgot-password"
                     className="text-[#FB3640] hover:text-[#FB3640]/80 underline"
                   >
-                    Parolni unutdingiz?
+                    {t('forgotPassword')}
                   </Link>
                 </div>
                 <Button disabled={isSubmitting} className="w-full">
                   {isSubmitting && <Icons.Spinner className="mr-2 h-4 w-4 animate-spin" />}
                   <Icons.Mail className="mr-2 h-4 w-4" />
-                  Kirish
+                  {t('loginBtn')}
                 </Button>
               </div>
             </form>
@@ -169,12 +169,12 @@ export default function LoginPage() {
                 <span className="w-full border-t" />
               </div>
               <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-background px-2 text-muted-foreground">yoki</span>
+                <span className="bg-background px-2 text-muted-foreground">{t('or')}</span>
               </div>
             </div>
             <Button onClick={handleGoogleSignIn} variant="outline" className="w-full">
               <Icons.Google />
-              <span className="ml-2 font-semibold">Google orqali kirish</span>
+              <span className="ml-2 font-semibold">{t('googleBtn')}</span>
             </Button>
           </div>
         </CardContent>
@@ -183,13 +183,13 @@ export default function LoginPage() {
           <div className="flex flex-col w-full gap-1">
             <div className="text-left text-sm text-gray-500">
               <Link href="/auth/magic-link" className="text-[#FB3640] hover:text-[#FB3640]/80">
-                Havolali kirish (magic link)
+                {t('magicLink')}
               </Link>
             </div>
             <div className="text-sm text-gray-500">
-              Hisobingiz yo&apos;qmi?{' '}
+              {t('noAccount')}{' '}
               <Link href="/auth/signup" className="text-[#FB3640] hover:text-[#FB3640]/80 font-medium">
-                Ro&apos;yxatdan o&apos;tish
+                {t('signupLink')}
               </Link>
             </div>
           </div>

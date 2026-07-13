@@ -19,8 +19,10 @@ import {
 } from '@/components/ui/Card';
 import { Link } from '@/i18n/navigation';
 import { Icons } from '@/components/Icons';
+import { useTranslations } from 'next-intl';
 
 export default function SignupPage() {
+  const t = useTranslations('Auth');
   const [showPassword, setShowPassword] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
   const router = useRouter();
@@ -50,23 +52,21 @@ export default function SignupPage() {
     if (error) {
       reset({ email: values.email, password: '' });
       if (error.message.includes('already registered') || error.message.includes('User already registered')) {
-        setAuthError("Bu email allaqachon ro'yxatdan o'tgan. Kirish sahifasiga o'ting.");
+        setAuthError(t('errAlreadyRegistered'));
       } else if (error.message.includes('Password should be')) {
-        setAuthError("Parol kamida 6 ta belgidan iborat bo'lishi kerak.");
+        setAuthError(t('errPasswordTooShort'));
       } else {
-        setAuthError("Ro'yxatdan o'tishda xatolik. Qayta urinib ko'ring.");
+        setAuthError(t('errSignupDefault'));
       }
       return;
     }
 
-    // Email tasdiqlanmagan — verify-email sahifasiga yuborish
     if (!data.session) {
       router.push(`/auth/verify-email?email=${encodeURIComponent(values.email)}`);
       return;
     }
 
-    // Email tasdiqlanmagan bo'lishi yoki email confirmation o'chirilgan bo'lishi mumkin
-    window.location.href = '/dashboard/main';
+    router.push('/dashboard/main');
   };
 
   const handleGoogleSignIn = async () => {
@@ -89,8 +89,8 @@ export default function SignupPage() {
     <div className="md:w-96">
       <Card className="bg-background-light dark:bg-background-dark">
         <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl">Ro&apos;yxatdan o&apos;tish</CardTitle>
-          <CardDescription>Ma&apos;lumotlaringizni kiriting</CardDescription>
+          <CardTitle className="text-2xl">{t('signupTitle')}</CardTitle>
+          <CardDescription>{t('signupDesc')}</CardDescription>
         </CardHeader>
 
         <CardContent>
@@ -107,12 +107,12 @@ export default function SignupPage() {
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Email</FormLabel>
+                    <FormLabel>{t('email')}</FormLabel>
                     <FormControl>
                       <Input
                         {...register('email')}
                         type="email"
-                        placeholder="Email"
+                        placeholder={t('email')}
                         className="bg-background-light dark:bg-background-dark"
                         {...field}
                       />
@@ -126,14 +126,14 @@ export default function SignupPage() {
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Parol</FormLabel>
+                    <FormLabel>{t('password')}</FormLabel>
                     <FormControl>
                       <div className="relative">
                         <Input
                           className="bg-background-light dark:bg-background-dark"
                           {...register('password')}
                           type={showPassword ? 'text' : 'password'}
-                          placeholder="Parol (kamida 6 belgi)"
+                          placeholder={t('passwordPlaceholder')}
                           {...field}
                         />
                         <div className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-600 cursor-pointer">
@@ -153,7 +153,7 @@ export default function SignupPage() {
               <Button disabled={isSubmitting} className="w-full">
                 {isSubmitting && <Icons.Spinner className="mr-2 h-4 w-4 animate-spin" />}
                 <Icons.Lock className="mr-2 h-4 w-4" />
-                Ro&apos;yxatdan o&apos;tish
+                {t('signupBtn')}
               </Button>
             </form>
           </Form>
@@ -164,21 +164,21 @@ export default function SignupPage() {
                 <span className="w-full border-t" />
               </div>
               <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-background px-2 text-muted-foreground">yoki</span>
+                <span className="bg-background px-2 text-muted-foreground">{t('or')}</span>
               </div>
             </div>
             <Button onClick={handleGoogleSignIn} variant="outline" className="w-full">
               <Icons.Google />
-              <span className="ml-2 font-semibold">Google orqali kirish</span>
+              <span className="ml-2 font-semibold">{t('googleBtn')}</span>
             </Button>
           </div>
         </CardContent>
 
         <CardFooter>
           <div className="text-sm text-gray-500 w-full text-center">
-            Hisobingiz bormi?{' '}
+            {t('haveAccount')}{' '}
             <Link href="/auth/login" className="text-[#FB3640] hover:text-[#FB3640]/80 font-medium">
-              Tizimga kirish
+              {t('loginLink')}
             </Link>
           </div>
         </CardFooter>

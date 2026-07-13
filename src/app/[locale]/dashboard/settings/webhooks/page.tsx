@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import { getDisplayHost } from '@/lib/utils/siteUrl';
+import { useTranslations } from 'next-intl';
 
 interface Webhook {
   id: string;
@@ -25,6 +26,7 @@ interface Site {
 const ALL_EVENTS = ['article.published', 'article.generated'];
 
 export default function WebhooksPage() {
+  const t = useTranslations('Dashboard');
   const [webhooks, setWebhooks] = useState<Webhook[]>([]);
   const [sites, setSites] = useState<Site[]>([]);
   const [loading, setLoading] = useState(true);
@@ -134,23 +136,23 @@ export default function WebhooksPage() {
       <div>
         <h2 className="text-xl font-semibold mb-1">Webhooks</h2>
         <p className="text-sm text-muted-foreground">
-          Maqola publish bo&apos;lganda tashqi tizimga avtomatik signal yuboradi.
+          {t('webhookDesc')}
         </p>
       </div>
 
       {/* Yangi webhook yaratish */}
       <div className="border border-border rounded-xl p-5 space-y-4">
-        <h3 className="font-medium">Yangi Webhook</h3>
+        <h3 className="font-medium">{t('newWebhook')}</h3>
 
         <div className="space-y-3">
           <div>
-            <label className="text-sm text-muted-foreground mb-1 block">Sayt</label>
+            <label className="text-sm text-muted-foreground mb-1 block">{t('site')}</label>
             <select
               className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm"
               value={form.site_id}
               onChange={e => setForm(f => ({ ...f, site_id: e.target.value }))}
             >
-              <option value="">Sayt tanlang...</option>
+              <option value="">{t('selectSite')}</option>
               {sites.map(s => (
                 <option key={s.id} value={s.id}>{getDisplayHost(s)}</option>
               ))}
@@ -158,7 +160,7 @@ export default function WebhooksPage() {
           </div>
 
           <div>
-            <label className="text-sm text-muted-foreground mb-1 block">Endpoint URL</label>
+            <label className="text-sm text-muted-foreground mb-1 block">{t('endpointUrl')}</label>
             <input
               type="url"
               placeholder="https://your-server.com/webhook"
@@ -169,7 +171,7 @@ export default function WebhooksPage() {
           </div>
 
           <div>
-            <label className="text-sm text-muted-foreground mb-1 block">Eventlar</label>
+            <label className="text-sm text-muted-foreground mb-1 block">{t('events')}</label>
             <div className="flex gap-4">
               {ALL_EVENTS.map(ev => (
                 <label key={ev} className="flex items-center gap-2 text-sm cursor-pointer">
@@ -190,14 +192,14 @@ export default function WebhooksPage() {
             disabled={creating}
             className="bg-primary text-primary-foreground px-4 py-2 rounded-lg text-sm font-medium disabled:opacity-50"
           >
-            {creating ? 'Yaratilmoqda...' : '+ Webhook yaratish'}
+            {creating ? t('creating') : t('createWebhook')}
           </button>
         </div>
 
         {newSecret && (
           <div className="mt-3 p-3 bg-yellow-900/30 border border-yellow-600 rounded-lg">
             <p className="text-xs text-yellow-400 mb-2 font-medium">
-              ⚠️ Secret key faqat bir marta ko&apos;rsatiladi — hozir nusxa oling!
+              {t('secretOnceWarning')}
             </p>
             <div className="flex items-center gap-2">
               <code className="text-xs font-mono bg-black/30 px-2 py-1 rounded flex-1 break-all">
@@ -207,7 +209,7 @@ export default function WebhooksPage() {
                 onClick={copySecret}
                 className="text-xs bg-yellow-600 text-white px-3 py-1 rounded shrink-0"
               >
-                Nusxa
+                {t('copy')}
               </button>
             </div>
           </div>
@@ -216,11 +218,11 @@ export default function WebhooksPage() {
 
       {/* Webhook ro'yxati */}
       <div className="space-y-3">
-        <h3 className="font-medium">Mavjud Webhooklar</h3>
+        <h3 className="font-medium">{t('existingWebhooks')}</h3>
         {loading ? (
-          <p className="text-sm text-muted-foreground">Yuklanmoqda...</p>
+          <p className="text-sm text-muted-foreground">{t('loading')}</p>
         ) : webhooks.length === 0 ? (
-          <p className="text-sm text-muted-foreground">Hech qanday webhook yo&apos;q.</p>
+          <p className="text-sm text-muted-foreground">{t('noWebhooks')}</p>
         ) : (
           webhooks.map(wh => (
             <div key={wh.id} className="border border-border rounded-xl p-4 space-y-2">

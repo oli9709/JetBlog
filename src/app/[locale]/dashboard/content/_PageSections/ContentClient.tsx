@@ -37,6 +37,7 @@ import { ContentQueue } from './ContentQueue';
 import { ArticleEditor } from './ArticleEditor';
 import { GenerationProgressModal } from '@/components/content/GenerationProgressModal';
 import { getDisplayHost } from '@/lib/utils/siteUrl';
+import { useTranslations } from 'next-intl';
 
 interface ContentClientPropsI {
   initialSites: SiteT[];
@@ -48,6 +49,7 @@ const MOCK_ARTICLES: Record<string, ArticleT[]> = {
 };
 
 export default function ContentClient({ initialSites, userId }: ContentClientPropsI) {
+  const t = useTranslations('Dashboard');
   const [sites, setSites] = useState<SiteT[]>(initialSites);
   const [selectedSiteId, setSelectedSiteId] = useState<string>(
     initialSites.length > 0 ? initialSites[0].id : 'default'
@@ -248,10 +250,10 @@ export default function ContentClient({ initialSites, userId }: ContentClientPro
         <div>
           <h1 className="text-3xl font-extrabold tracking-tight flex items-center gap-2 bg-gradient-to-r from-[#FB3640] to-[#FB3640] bg-clip-text text-transparent">
             <FileText className="h-8 w-8 text-[#FB3640]" />
-            Content Queue & Editor
+            {t('contentHero')}
           </h1>
           <p className="text-muted-foreground mt-1">
-            Rejalashtirilgan maqolalarni ko'ring, tahrirlang yoki darhol nashr qiling.
+            {t('contentSubtitle')}
           </p>
         </div>
 
@@ -280,14 +282,14 @@ export default function ContentClient({ initialSites, userId }: ContentClientPro
               <Globe className="h-6 w-6 text-[#FB3640]" />
             </div>
             <div className="max-w-md mx-auto space-y-1">
-              <CardTitle>WordPress sayt bog'lanmagan</CardTitle>
+              <CardTitle>{t('noSiteConnected')}</CardTitle>
               <CardDescription>
-                Maqolalar ro'yxatini va rejalarini ko'rish uchun avval WordPress saytini ulanishi kerak.
+                {t('contentNoSiteDesc')}
               </CardDescription>
             </div>
             <Link href="/dashboard/connections">
               <Button className="bg-[#FB3640] hover:bg-[#e02d36] mt-2">
-                <Plus className="mr-1.5 h-4 w-4" /> Sayt ulashtirish
+                <Plus className="mr-1.5 h-4 w-4" /> {t('connectSiteBtn')}
               </Button>
             </Link>
           </CardContent>

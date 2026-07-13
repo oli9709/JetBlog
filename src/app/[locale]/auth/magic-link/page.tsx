@@ -4,12 +4,7 @@ import { useState } from 'react';
 import { useRouter } from '@/i18n/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import {
-  EmailFormSchema,
-  EmailFormValues,
-  authFormSchema,
-  authFormValues
-} from '@/lib/types/validations';
+import { EmailFormSchema, EmailFormValues } from '@/lib/types/validations';
 import { SupabaseSignInWithMagicLink } from '@/lib/API/Services/supabase/auth';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -25,10 +20,11 @@ import {
 import { Icons } from '@/components/Icons';
 import { Link } from '@/i18n/navigation';
 import config from '@/lib/config/auth';
+import { useTranslations } from 'next-intl';
 
 export default function MagicLink() {
+  const t = useTranslations('Auth');
   const [errorMessage, setErrorMessage] = useState('');
-
   const router = useRouter();
 
   const form = useForm<EmailFormValues>({
@@ -39,7 +35,7 @@ export default function MagicLink() {
     const { error } = await SupabaseSignInWithMagicLink(values.email);
 
     if (error) {
-      setErrorMessage(error.message);
+      setErrorMessage(t('magicError'));
       return;
     }
     router.push(config.redirects.authConfirm);
@@ -54,10 +50,8 @@ export default function MagicLink() {
     <div className="md:w-96">
       <Card className="bg-background-light dark:bg-background-dark">
         <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl">Email Link to Login</CardTitle>
-          <CardDescription>
-            Enter your email below to receive a clickable link to login.
-          </CardDescription>
+          <CardTitle className="text-2xl">{t('magicTitle')}</CardTitle>
+          <CardDescription>{t('magicDesc')}</CardDescription>
           {errors && <div className="text-sm text-red-500 pt-2">{errorMessage}</div>}
         </CardHeader>
 
@@ -69,9 +63,9 @@ export default function MagicLink() {
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Email</FormLabel>
+                    <FormLabel>{t('email')}</FormLabel>
                     <FormControl>
-                      <Input type="text" placeholder="Email" {...register('email')} className="bg-background-light dark:bg-background-dark" {...field} />
+                      <Input type="text" placeholder={t('email')} {...register('email')} className="bg-background-light dark:bg-background-dark" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -80,7 +74,7 @@ export default function MagicLink() {
               <Button disabled={isSubmitting} className="w-full" type="submit">
                 {isSubmitting && <Icons.Spinner className="mr-2 h-4 w-4 animate-spin" />}
                 <Icons.Mail className="mr-2 h-4 w-4" />
-                Submit
+                {t('sendMagicLink')}
               </Button>
             </form>
           </Form>
@@ -88,8 +82,8 @@ export default function MagicLink() {
         <CardFooter>
           <div className="flex flex-col">
             <div className="text-left text-sm text-gray-500">
-              <Link href="/auth/login" className="leading-7 text-indigo-600 hover:text-indigo-500">
-                Back to login page
+              <Link href="/auth/login" className="leading-7 text-[#FB3640] hover:text-[#FB3640]/80">
+                {t('backToLogin')}
               </Link>
             </div>
           </div>

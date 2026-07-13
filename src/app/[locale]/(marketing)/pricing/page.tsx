@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import configuration from '@/lib/config/dashboard';
+import configuration, { PLAN_TRANSLATIONS } from '@/lib/config/dashboard';
 import { ProductI } from '@/lib/types/types';
 import { IntervalE } from '@/lib/types/enums';
 import { cn } from '@/lib/utils/helpers';
@@ -9,7 +9,7 @@ import { Link } from '@/i18n/navigation';
 import { Check, Sparkles } from 'lucide-react';
 import { NumberTicker } from '@/components/magicui/number-ticker';
 import { ScrollReveal } from '@/components/ScrollReveal';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 
 interface PriceCardProps {
   product: ProductI;
@@ -18,7 +18,10 @@ interface PriceCardProps {
 
 const PriceCard = ({ product, timeInterval }: PriceCardProps) => {
   const t = useTranslations('Pricing');
-  const { name, description, features, plans } = product;
+  const locale = useLocale();
+  const { name, plans } = product;
+  const localeContent = PLAN_TRANSLATIONS[name]?.[locale] ?? PLAN_TRANSLATIONS[name]?.uz ?? { description: '', features: [] };
+  const { description, features } = localeContent;
 
   const activePlan = plans.find((p) => p.interval === timeInterval) || plans[0];
   const isPopular = name === 'Pro';

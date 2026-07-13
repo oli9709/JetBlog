@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { InvoiceT } from '@/lib/types/supabase';
 import { SupabaseInsertInvoice } from '@/lib/API/Database/invoices/mutations';
+import { useTranslations } from 'next-intl';
 
 interface BillingPropsI {
   initialInvoices: InvoiceT[];
@@ -32,6 +33,7 @@ const TOPUP_PACKAGES = [
 ];
 
 const Billing = ({ initialInvoices, userId, initialCredits }: BillingPropsI) => {
+  const t = useTranslations('Dashboard');
   const [invoices, setInvoices] = useState<InvoiceT[]>(initialInvoices);
   const [credits, setCredits] = useState<number>(initialCredits);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -106,10 +108,10 @@ const Billing = ({ initialInvoices, userId, initialCredits }: BillingPropsI) => 
           <CardHeader>
             <div className="flex items-center gap-2">
               <Coins className="w-6 h-6 text-amber-400" />
-              <CardTitle className="text-xl font-bold text-white">Hisob Balansi</CardTitle>
+              <CardTitle className="text-xl font-bold text-white">{t('accountBalance')}</CardTitle>
             </div>
             <CardDescription className="text-zinc-400 mt-2">
-              AI SEO Autopilot maqolalari yozish uchun sizning joriy hisobingiz
+              {t('balanceDesc')}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -117,10 +119,10 @@ const Billing = ({ initialInvoices, userId, initialCredits }: BillingPropsI) => 
               <span className="text-5xl font-extrabold tracking-tight bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent">
                 {credits.toLocaleString()}
               </span>
-              <span className="text-sm font-semibold text-zinc-400">maqola krediti qoldi</span>
+              <span className="text-sm font-semibold text-zinc-400">{t('articleCreditsLeft')}</span>
             </div>
             <p className="text-xs text-zinc-500 leading-relaxed">
-              Autopilot tizimida tasdiqlangan har bir kalit so'z bo'yicha Claude 3.5 Sonnet to'liq SEO maqola yozib, WordPress-ga yuklaganda balansdan 1 kredit yechiladi.
+              {t('creditDeductDesc')}
             </p>
           </CardContent>
         </Card>
@@ -130,20 +132,20 @@ const Billing = ({ initialInvoices, userId, initialCredits }: BillingPropsI) => 
           <CardHeader>
             <div className="flex items-center gap-2">
               <Receipt className="w-5 h-5 text-[#FF6B6B]" />
-              <CardTitle className="text-lg font-bold text-white">Qo'lda hisob-faktura to'lovi</CardTitle>
+              <CardTitle className="text-lg font-bold text-white">{t('manualInvoicePayment')}</CardTitle>
             </div>
             <CardDescription className="text-zinc-400">
-              To'lov qo'lda hisob-fakturalar va balans to'ldirish orqali amalga oshiriladi.
+              {t('manualInvoiceDesc')}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4 pt-2">
             <div className="p-3.5 rounded-xl bg-zinc-950/60 border border-zinc-800/60 space-y-1">
               <div className="text-xs font-semibold text-zinc-300 flex items-center gap-2">
                 <Sparkles className="w-3.5 h-3.5 text-[#FB3640]" />
-                Faol tarif: PRO Autopilot
+                {t('activePlanValue')}: PRO Autopilot
               </div>
               <p className="text-[10px] text-zinc-500">
-                PRO ustuvor AI kontent generatsiyasi va cheksiz ulangan bloglar.
+                {t('proAutopilotDesc')}
               </p>
             </div>
             <a
@@ -151,7 +153,7 @@ const Billing = ({ initialInvoices, userId, initialCredits }: BillingPropsI) => 
               className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-zinc-800 hover:bg-zinc-700 text-white text-xs font-semibold rounded-xl transition-all"
             >
               <MessageSquare className="w-3.5 h-3.5" />
-              To'lov bo'yicha yordamga murojaat
+              {t('contactBillingSupport')}
             </a>
           </CardContent>
         </Card>
@@ -161,10 +163,10 @@ const Billing = ({ initialInvoices, userId, initialCredits }: BillingPropsI) => 
       <Card className="bg-zinc-900/40 backdrop-blur-md border border-zinc-800/80 p-2">
         <CardHeader>
           <CardTitle className="text-lg font-bold text-white flex items-center gap-2">
-            <Plus className="w-5 h-5 text-[#FB3640]" /> Balansni To'ldirish Paketlari
+            <Plus className="w-5 h-5 text-[#FB3640]" /> {t('topupPackages')}
           </CardTitle>
           <CardDescription className="text-zinc-400">
-            Biznesingiz yoki blogingiz hajmidan kelib chiqib hisobni chiroyli avtomatik hisob-faktura varaqasi orqali to'ldiring.
+            {t('topupPackagesDesc')}
           </CardDescription>
         </CardHeader>
         <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">

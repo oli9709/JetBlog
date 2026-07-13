@@ -18,8 +18,10 @@ import {
 } from '@/components/ui/Card';
 import { Link } from '@/i18n/navigation';
 import { Icons } from '@/components/Icons';
+import { useTranslations } from 'next-intl';
 
 export default function ForgotPasswordPage() {
+  const t = useTranslations('Auth');
   const [sent, setSent] = useState(false);
   const [sentEmail, setSentEmail] = useState('');
 
@@ -42,7 +44,7 @@ export default function ForgotPasswordPage() {
     if (error) {
       setError('email', {
         type: 'root.serverError',
-        message: "Xatolik yuz berdi. Email manzilingizni tekshiring."
+        message: t('forgotError')
       });
       return;
     }
@@ -51,7 +53,6 @@ export default function ForgotPasswordPage() {
     setSent(true);
   };
 
-  // Muvaffaqiyatli holat
   if (sent) {
     return (
       <div className="md:w-96">
@@ -62,24 +63,22 @@ export default function ForgotPasswordPage() {
                 <Icons.Mail className="h-8 w-8 text-green-600 dark:text-green-400" />
               </div>
             </div>
-            <CardTitle className="text-2xl">Xat yuborildi</CardTitle>
+            <CardTitle className="text-2xl">{t('forgotSentTitle')}</CardTitle>
             <CardDescription>
-              <span className="font-semibold text-foreground">{sentEmail}</span> manziliga
-              parolni tiklash xati yuborildi.
+              <span className="font-semibold text-foreground">{sentEmail}</span> {t('forgotSentDesc1')}
             </CardDescription>
           </CardHeader>
           <CardContent className="text-center space-y-3">
             <p className="text-sm text-muted-foreground">
-              Pochta qutingizni tekshiring va havolani bosing.
-              Havola <strong>1 soat</strong> davomida amal qiladi.
+              {t('forgotSentDesc2')} <strong>{t('forgotSentDesc3')}</strong>{t('forgotSentDesc4')}
             </p>
             <p className="text-xs text-muted-foreground">
-              Xat kelmadimi? Spam papkasini ham tekshirib ko&apos;ring.
+              {t('forgotSentSpam')}
             </p>
           </CardContent>
           <CardFooter className="justify-center">
             <Link href="/auth/login" className="text-sm text-[#FB3640] hover:text-[#FB3640]/80 font-medium">
-              ← Kirish sahifasiga qaytish
+              {t('backLogin')}
             </Link>
           </CardFooter>
         </Card>
@@ -91,11 +90,8 @@ export default function ForgotPasswordPage() {
     <div className="md:w-96">
       <Card className="bg-background-light dark:bg-background-dark">
         <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl">Parolni tiklash</CardTitle>
-          <CardDescription>
-            Email manzilingizni kiriting — parolni tiklash havolasi yuboramiz.
-            Google orqali ro&apos;yxatdan o&apos;tgan bo&apos;lsangiz ham — email orqali parol o&apos;rnatishingiz mumkin.
-          </CardDescription>
+          <CardTitle className="text-2xl">{t('forgotTitle')}</CardTitle>
+          <CardDescription>{t('forgotDescLong')}</CardDescription>
         </CardHeader>
 
         <CardContent className="grid gap-4">
@@ -106,11 +102,11 @@ export default function ForgotPasswordPage() {
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Email</FormLabel>
+                    <FormLabel>{t('email')}</FormLabel>
                     <FormControl>
                       <Input
                         {...register('email')}
-                        placeholder="Email"
+                        placeholder={t('email')}
                         type="email"
                         className="bg-background-light dark:bg-background-dark"
                         {...field}
@@ -122,7 +118,7 @@ export default function ForgotPasswordPage() {
               />
               <Button disabled={isSubmitting} className="w-full">
                 {isSubmitting && <Icons.Spinner className="mr-2 h-4 w-4 animate-spin" />}
-                Tiklash havolasini yuborish
+                {t('forgotBtn')}
               </Button>
             </form>
           </Form>
@@ -133,7 +129,7 @@ export default function ForgotPasswordPage() {
             href="/auth/login"
             className="text-sm text-[#FB3640] hover:text-[#FB3640]/80"
           >
-            ← Kirish sahifasiga qaytish
+            {t('backLogin')}
           </Link>
         </CardFooter>
       </Card>

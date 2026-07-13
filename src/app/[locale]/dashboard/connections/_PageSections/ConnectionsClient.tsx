@@ -11,6 +11,7 @@ import { SiteCard } from './SiteCard';
 import { AddConnectionWizard } from '@/components/connections/AddConnectionWizard';
 import { AIBuilderPrompt } from '@/components/connections/AIBuilderPrompt';
 import { cn } from '@/lib/utils/helpers';
+import { useTranslations } from 'next-intl';
 
 interface ConnectionsClientPropsI {
   initialSites: SiteT[];
@@ -27,6 +28,7 @@ const tabTriggerCls = (active = false) =>
   );
 
 export default function ConnectionsClient({ initialSites, userId }: ConnectionsClientPropsI) {
+  const t = useTranslations('Dashboard');
   const [sites, setSites] = useState<SiteT[]>(initialSites);
   const [showWizard, setShowWizard] = useState(false);
 
@@ -101,10 +103,10 @@ export default function ConnectionsClient({ initialSites, userId }: ConnectionsC
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 bg-zinc-900/40 backdrop-blur-md p-6 rounded-2xl border border-zinc-800/80">
         <div>
           <h1 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-[#FB3640]">
-            Connections
+            {t('connectionsTitle')}
           </h1>
           <p className="text-zinc-400 mt-2">
-            Avtomatik nashr qilish (Autopilot) uchun saytlaringizni bog&apos;lang va boshqaring.
+            {t('connectionsSubtitle')}
           </p>
         </div>
         <button
@@ -112,7 +114,7 @@ export default function ConnectionsClient({ initialSites, userId }: ConnectionsC
           className="flex items-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-[#FB3640] hover:from-cyan-400 text-white font-semibold transition-all duration-300 shadow-[0_0_15px_rgba(6,182,212,0.15)] hover:shadow-[0_0_20px_rgba(6,182,212,0.3)] transform hover:-translate-y-0.5 active:translate-y-0"
         >
           <Plus className="w-5 h-5" />
-          Sayt qo&apos;shish
+          {t('addSite')}
         </button>
       </div>
 
@@ -125,7 +127,7 @@ export default function ConnectionsClient({ initialSites, userId }: ConnectionsC
             className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 text-zinc-400 hover:text-zinc-300 data-[state=active]:bg-zinc-800 data-[state=active]:text-white data-[state=active]:shadow-sm"
           >
             <Globe className="w-4 h-4" />
-            Saytlar
+            {t('sitesTab')}
           </Tabs.Trigger>
           <Tabs.Trigger
             value="ai-builder"
@@ -144,20 +146,20 @@ export default function ConnectionsClient({ initialSites, userId }: ConnectionsC
           {/* STATS */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="bg-zinc-900/30 backdrop-blur-md border border-zinc-800/60 p-6 rounded-2xl">
-              <div className="text-zinc-400 text-sm font-semibold uppercase tracking-wider">Jami ulanishlar</div>
-              <div className="text-4xl font-extrabold text-white mt-2">{sites.length} ta</div>
+              <div className="text-zinc-400 text-sm font-semibold uppercase tracking-wider">{t('totalConnections')}</div>
+              <div className="text-4xl font-extrabold text-white mt-2">{sites.length} {t('count')}</div>
             </div>
             <div className="bg-zinc-900/30 backdrop-blur-md border border-zinc-800/60 p-6 rounded-2xl">
-              <div className="text-zinc-400 text-sm font-semibold uppercase tracking-wider">Faol autopilotlar</div>
+              <div className="text-zinc-400 text-sm font-semibold uppercase tracking-wider">{t('activeAutopilots')}</div>
               <div className="text-4xl font-extrabold text-cyan-400 mt-2">
-                {sites.filter((s) => s.is_active).length} ta
+                {sites.filter((s) => s.is_active).length} {t('count')}
               </div>
             </div>
             <div className="bg-zinc-900/30 backdrop-blur-md border border-zinc-800/60 p-6 rounded-2xl">
-              <div className="text-zinc-400 text-sm font-semibold uppercase tracking-wider">Navbatdagi nashr kuni</div>
+              <div className="text-zinc-400 text-sm font-semibold uppercase tracking-wider">{t('nextPublishDay')}</div>
               <div className="text-lg font-semibold text-zinc-300 mt-3 flex items-center gap-2">
                 <Calendar className="w-5 h-5 text-[#FF6B6B]" />
-                Har kuni soat 03:00 UTC
+                {t('everyDayAt')} 03:00 UTC
               </div>
             </div>
           </div>
@@ -166,16 +168,16 @@ export default function ConnectionsClient({ initialSites, userId }: ConnectionsC
           {sites.length === 0 ? (
             <div className="flex flex-col items-center justify-center p-12 bg-zinc-900/20 backdrop-blur-md border border-zinc-800/60 rounded-3xl text-center">
               <Globe className="w-16 h-16 text-zinc-600 mb-4 animate-pulse" />
-              <h3 className="text-xl font-bold text-zinc-300">Hech qanday sayt ulanmagan</h3>
+              <h3 className="text-xl font-bold text-zinc-300">{t('noSitesTitle')}</h3>
               <p className="text-zinc-500 mt-2 max-w-md">
-                TextPilot.AI yordamida saytingizga avtomatik AI SEO maqolalarni yuklash uchun birinchi saytingizni bog&apos;lang.
+                {t('noSitesDesc')}
               </p>
               <button
                 onClick={() => setShowWizard(true)}
                 className="mt-6 flex items-center gap-2 px-5 py-2.5 rounded-xl border border-cyan-500/30 hover:border-cyan-500 text-cyan-400 hover:text-cyan-300 font-semibold transition-all duration-300"
               >
                 <Plus className="w-5 h-5" />
-                Birinchi saytni ulash
+                {t('connectFirstSite')}
               </button>
             </div>
           ) : (

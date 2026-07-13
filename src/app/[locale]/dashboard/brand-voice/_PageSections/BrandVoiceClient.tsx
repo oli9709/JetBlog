@@ -18,6 +18,7 @@ import { SiteScanner } from './SiteScanner';
 import { Analytics } from './Analytics';
 import type { GSCStats } from '@/lib/API/Services/gsc/fetch';
 import { getDisplayHost } from '@/lib/utils/siteUrl';
+import { useTranslations } from 'next-intl';
 
 interface BrandVoiceClientPropsI {
   initialSites: SiteT[];
@@ -40,6 +41,7 @@ const EMPTY_STATS = {
 };
 
 export default function BrandVoiceClient({ initialSites, userId }: BrandVoiceClientPropsI) {
+  const t = useTranslations('Dashboard');
   const [sites] = useState<SiteT[]>(initialSites);
   const [selectedSiteId, setSelectedSiteId] = useState<string>(
     initialSites.length > 0 ? initialSites[0].id : 'default'
@@ -153,10 +155,10 @@ export default function BrandVoiceClient({ initialSites, userId }: BrandVoiceCli
         <div>
           <h1 className="text-3xl font-extrabold tracking-tight flex items-center gap-2 bg-gradient-to-r from-[#FB3640] to-[#FB3640] bg-clip-text text-transparent">
             <Sparkles className="h-8 w-8 text-[#FB3640]" />
-            Brend ovozi DNK
+            {t('brandVoiceHero')}
           </h1>
           <p className="text-muted-foreground mt-1">
-            Sun'iy intellekt yozish uslubini biznesingiz shaxsiyatiga moslashtiring.
+            {t('brandVoiceSubtitle')}
           </p>
         </div>
 
@@ -178,7 +180,7 @@ export default function BrandVoiceClient({ initialSites, userId }: BrandVoiceCli
         ) : (
           <Link href="/dashboard/connections">
             <Button size="sm" className="bg-[#FB3640] hover:bg-[#e02d36]">
-              Bog'lanish
+              {t('connect')}
             </Button>
           </Link>
         )}
@@ -191,14 +193,14 @@ export default function BrandVoiceClient({ initialSites, userId }: BrandVoiceCli
               <Globe className="h-6 w-6 text-[#FB3640]" />
             </div>
             <div className="max-w-md mx-auto space-y-1">
-              <CardTitle>WordPress sayt bog'lanmagan</CardTitle>
+              <CardTitle>{t('noSiteConnected')}</CardTitle>
               <CardDescription>
-                Brend ovozi va AI yozish DNKsini o'rnatish uchun avval bitta WordPress saytini ulashingiz kerak.
+                {t('brandNoSiteDesc')}
               </CardDescription>
             </div>
             <Link href="/dashboard/connections">
               <Button className="bg-[#FB3640] hover:bg-[#e02d36] mt-2">
-                <Plus className="mr-1.5 h-4 w-4" /> Sayt ulashtirish
+                <Plus className="mr-1.5 h-4 w-4" /> {t('connectSiteBtn')}
               </Button>
             </Link>
           </CardContent>

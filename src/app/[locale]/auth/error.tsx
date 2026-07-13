@@ -1,9 +1,10 @@
 'use client';
 import { Card, CardHeader, CardDescription, CardContent, CardTitle } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
-import config from '@/lib/config/api';
+import { useTranslations } from 'next-intl';
 
 export default function Error({ error, reset }: { error: Error; reset: () => void }) {
+  const t = useTranslations('Auth');
   console.log('Error', error);
 
   return (
@@ -11,12 +12,12 @@ export default function Error({ error, reset }: { error: Error; reset: () => voi
       <div className="mt-6">
         <Card>
           <CardHeader>
-            <CardTitle>{config.errorMessageGeneral}</CardTitle>
-            <CardDescription>Click Below to Try Again</CardDescription>
+            <CardTitle>{t('errPageTitle')}</CardTitle>
+            <CardDescription>{t('errPageDesc')}</CardDescription>
           </CardHeader>
           <CardContent>
             <Button onClick={() => reset()} className="mt-4">
-              Try Again
+              {t('errPageBtn')}
             </Button>
           </CardContent>
         </Card>

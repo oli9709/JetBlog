@@ -3,8 +3,10 @@ import { GetProfileByUserId } from '@/lib/API/Database/profile/queries';
 
 import { Card, CardHeader, CardDescription, CardContent, CardTitle } from '@/components/ui/Card';
 import { UpdateDisplayName, UpdateEmail, UpdatePassword } from '../_PageSections/UpdateForms';
+import { getTranslations } from 'next-intl/server';
 
 export default async function ProfileForm() {
+  const t = await getTranslations('Dashboard');
   const user = await SupabaseUser();
   const profile = await GetProfileByUserId(user?.id);
 
@@ -16,8 +18,8 @@ export default async function ProfileForm() {
     <div>
       <Card className="bg-background-light dark:bg-background-dark">
         <CardHeader>
-          <CardTitle>Update Account</CardTitle>
-          <CardDescription>Update Account display name, email and password</CardDescription>
+          <CardTitle>{t('profileUpdateAccount')}</CardTitle>
+          <CardDescription>{t('profileHeaderDesc')}</CardDescription>
         </CardHeader>
         <CardContent>
           <UpdateDisplayName display_name={display_name} user={user} />

@@ -13,6 +13,7 @@ import {
 } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import type { ArticleRow } from '../page';
+import { useTranslations, useLocale } from 'next-intl';
 
 interface DashboardStats {
   credits: number;
@@ -30,22 +31,30 @@ interface DashboardProps {
 
 // ─── Status badge ──────────────────────────────────────────────────────────────
 function StatusBadge({ status }: { status: string | null }) {
+  const t = useTranslations('Dashboard');
   const map: Record<string, string> = {
     published: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
     draft:     'bg-zinc-500/10 text-zinc-400 border-zinc-500/20',
     scheduled: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
     error:     'bg-red-500/10 text-red-400 border-red-500/20',
   };
+  const labelMap: Record<string, string> = {
+    published: t('published'),
+    draft: t('draft'),
+    scheduled: t('scheduled'),
+    error: t('error'),
+  };
   const cls = map[status ?? ''] ?? 'bg-zinc-500/10 text-zinc-400 border-zinc-500/20';
   return (
     <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${cls}`}>
-      {status ?? '—'}
+      {labelMap[status ?? ''] ?? status ?? '—'}
     </span>
   );
 }
 
 // ─── Keywords Pie (CSS conic-gradient) ─────────────────────────────────────────
 function KeywordsPie({ approved, pending, rejected }: { approved: number; pending: number; rejected: number }) {
+  const t = useTranslations('Dashboard');
   const total = approved + pending + rejected;
 
   if (total === 0) {
@@ -55,7 +64,7 @@ function KeywordsPie({ approved, pending, rejected }: { approved: number; pendin
           className="w-32 h-32 rounded-full"
           style={{ background: 'conic-gradient(#3f3f46 0% 100%)' }}
         />
-        <p className="text-xs text-muted-foreground">Kalit so'zlar yo'q</p>
+        <p className="text-xs text-muted-foreground">{t('noKeywords')}</p>
       </div>
     );
   }
@@ -70,9 +79,9 @@ function KeywordsPie({ approved, pending, rejected }: { approved: number; pendin
   )`;
 
   const items = [
-    { label: 'Tasdiqlangan', value: approved, color: '#22c55e' },
-    { label: 'Kutmoqda',     value: pending,  color: '#eab308' },
-    { label: 'Rad etilgan',  value: rejected, color: '#ef4444' },
+    { label: t('approved'), value: approved, color: '#22c55e' },
+    { label: t('pending'),     value: pending,  color: '#eab308' },
+    { label: t('rejected'),  value: rejected, color: '#ef4444' },
   ];
 
   return (
@@ -104,17 +113,20 @@ function KeywordsPie({ approved, pending, rejected }: { approved: number; pendin
 
 // ─── Custom tooltip for line chart ─────────────────────────────────────────────
 function CustomTooltip({ active, payload, label }: any) {
+  const t = useTranslations('Dashboard');
   if (!active || !payload?.length) return null;
   return (
     <div className="rounded-lg border bg-popover text-popover-foreground shadow-md px-3 py-2 text-xs">
       <p className="font-medium mb-0.5">{label}</p>
-      <p className="text-[#FB3640] font-bold">{payload[0].value} maqola</p>
+      <p className="text-[#FB3640] font-bold">{payload[0].value} {t('articleSuffix')}</p>
     </div>
   );
 }
 
 // ─── Main component ─────────────────────────────────────────────────────────────
 const Dashboard = ({ stats, articlesByDay, keywordStats, recentArticles }: DashboardProps) => {
+  const t = useTranslations('Dashboard');
+  const locale = useLocale();
   // Shorten date labels: "2024-06-04" → "Jun 4"
   const chartData = articlesByDay.map((d) => {
     const dt = new Date(d.date);
@@ -130,28 +142,28 @@ const Dashboard = ({ stats, articlesByDay, keywordStats, recentArticles }: Dashb
       {/* ── 4 Stat Cards ── */}
       <div className="grid gap-2 md:grid-cols-2 lg:grid-cols-4">
         <SummaryCard
-          card_title="Jami maqolalar"
+          card_title={t('totalArticles')}
           icon={<Icons.FileText />}
           content_main={stats.totalArticles}
-          content_secondary="Barcha yaratilgan maqolalar"
+          content_secondary={t('allArticles')}
         />
         <SummaryCard
-          card_title="Faol saytlar"
+          card_title={t('activeSites')}
           icon={<Icons.Link />}
           content_main={stats.activeSites}
-          content_secondary="Ulangan va faol saytlar"
+          content_secondary={t('connectedActiveSites')}
         />
         <SummaryCard
-          card_title="Qolgan kreditlar"
+          card_title={t('creditsRemaining')}
           icon={<Icons.CircleDollarSign />}
           content_main={stats.credits}
-          content_secondary="AI maqola generatsiya krediti"
+          content_secondary={t('aiCreditsDesc')}
         />
         <SummaryCard
-          card_title="Bu oy nashr"
+          card_title={t('publishedThisMonth')}
           icon={<Icons.ScreenShare />}
           content_main={stats.thisMonthPublished}
-          content_secondary="Joriy oyda yaratilgan maqolalar"
+          content_secondary={t('createdThisMonth')}
         />
       </div>
 
@@ -161,12 +173,12 @@ const Dashboard = ({ stats, articlesByDay, keywordStats, recentArticles }: Dashb
         <div className="xl:col-span-3">
           <Card className="bg-background-light dark:bg-background-dark">
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium">So&apos;nggi 30 kun maqolalar</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('articlesLast30Days')}</CardTitle>
             </CardHeader>
             <CardContent className="pt-0">
               {articlesByDay.every((d) => d.count === 0) ? (
                 <div className="flex items-center justify-center h-[220px] text-sm text-muted-foreground">
-                  Hali maqola yo&apos;q
+                  {t('noArticles')}
                 </div>
               ) : (
                 <ResponsiveContainer width="100%" height={220}>
@@ -205,7 +217,7 @@ const Dashboard = ({ stats, articlesByDay, keywordStats, recentArticles }: Dashb
         <div className="xl:col-span-1">
           <Card className="bg-background-light dark:bg-background-dark h-full">
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium">Kalit so&apos;zlar holati</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('keywordsStatus')}</CardTitle>
             </CardHeader>
             <CardContent className="pt-0">
               <KeywordsPie
@@ -221,22 +233,22 @@ const Dashboard = ({ stats, articlesByDay, keywordStats, recentArticles }: Dashb
       {/* ── Recent Articles Table ── */}
       <Card className="bg-background-light dark:bg-background-dark">
         <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium">So&apos;nggi maqolalar</CardTitle>
+          <CardTitle className="text-sm font-medium">{t('recentArticles')}</CardTitle>
         </CardHeader>
         <CardContent className="pt-0">
           {recentArticles.length === 0 ? (
             <p className="text-sm text-muted-foreground py-6 text-center">
-              Hali maqola yaratilmagan
+              {t('noArticlesCreated')}
             </p>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-muted/30">
-                    <th className="text-left pb-2 pr-4 text-xs font-medium text-muted-foreground">Sarlavha</th>
-                    <th className="text-left pb-2 pr-4 text-xs font-medium text-muted-foreground hidden sm:table-cell">Sayt</th>
-                    <th className="text-left pb-2 pr-4 text-xs font-medium text-muted-foreground">Holat</th>
-                    <th className="text-left pb-2 text-xs font-medium text-muted-foreground hidden md:table-cell">Sana</th>
+                    <th className="text-left pb-2 pr-4 text-xs font-medium text-muted-foreground">{t('title')}</th>
+                    <th className="text-left pb-2 pr-4 text-xs font-medium text-muted-foreground hidden sm:table-cell">{t('site')}</th>
+                    <th className="text-left pb-2 pr-4 text-xs font-medium text-muted-foreground">{t('status')}</th>
+                    <th className="text-left pb-2 text-xs font-medium text-muted-foreground hidden md:table-cell">{t('date')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-muted/20">
@@ -258,7 +270,7 @@ const Dashboard = ({ stats, articlesByDay, keywordStats, recentArticles }: Dashb
                       <td className="py-2.5 hidden md:table-cell">
                         <span className="text-xs text-muted-foreground tabular-nums">
                           {a.created_at
-                            ? new Date(a.created_at).toLocaleDateString('uz-UZ', {
+                            ? new Date(a.created_at).toLocaleDateString(locale === 'ru' ? 'ru-RU' : locale === 'en' ? 'en-US' : 'uz-UZ', {
                                 day: '2-digit',
                                 month: '2-digit',
                                 year: 'numeric',

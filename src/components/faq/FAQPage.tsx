@@ -3,7 +3,7 @@
 import React, { useCallback, useState } from 'react';
 import { Link } from '@/i18n/navigation';
 import { BookOpen, MessageCircle, ChevronDown } from 'lucide-react';
-import { FAQ_CATEGORIES, getAllFAQItems, type FAQItem } from '@/lib/constants/faq';
+import { buildFAQCategories, getAllFAQItems, type FAQItem } from '@/lib/constants/faq';
 import { FAQSearch } from './FAQSearch';
 import { FAQCategory } from './FAQCategory';
 import { cn } from '@/lib/utils/helpers';
@@ -79,7 +79,8 @@ function SearchResultItem({ item }: { item: FAQItem }) {
 export function FAQPage() {
   const t = useTranslations('Faq');
   const [searchResults, setSearchResults] = useState<FAQItem[] | null>(null);
-  const allItems = getAllFAQItems();
+  const faqCategories = buildFAQCategories(t as unknown as (key: string) => string);
+  const allItems = faqCategories.flatMap((cat) => cat.items);
 
   const handleResults = useCallback((results: FAQItem[] | null) => {
     setSearchResults(results);
@@ -111,7 +112,7 @@ export function FAQPage() {
         <SearchResults results={searchResults} />
       ) : (
         <div className="flex flex-col gap-5">
-          {FAQ_CATEGORIES.map((category, i) => (
+          {faqCategories.map((category, i) => (
             <FAQCategory
               key={category.id}
               category={category}

@@ -29,6 +29,7 @@ import { KeywordTable } from './KeywordTable';
 import { KeywordFilters } from './KeywordFilters';
 import { KeywordForm } from './KeywordForm';
 import { getDisplayHost } from '@/lib/utils/siteUrl';
+import { useTranslations } from 'next-intl';
 
 interface KeywordsClientPropsI {
   initialSites: SiteT[];
@@ -40,6 +41,7 @@ const MOCK_KEYWORDS: Record<string, KeywordT[]> = {
 };
 
 export default function KeywordsClient({ initialSites, userId }: KeywordsClientPropsI) {
+  const t = useTranslations('Dashboard');
   const [sites, setSites] = useState<SiteT[]>(initialSites);
   const [selectedSiteId, setSelectedSiteId] = useState<string>(
     initialSites.length > 0 ? initialSites[0].id : 'default'
@@ -243,10 +245,10 @@ export default function KeywordsClient({ initialSites, userId }: KeywordsClientP
         <div>
           <h1 className="text-3xl font-extrabold tracking-tight flex items-center gap-2 bg-gradient-to-r from-[#FB3640] to-[#FB3640] bg-clip-text text-transparent">
             <Key className="h-8 w-8 text-[#FB3640]" />
-            Kalit so'zlar avtopiloti
+            {t('keywordsHero')}
           </h1>
           <p className="text-muted-foreground mt-1">
-            SEO kalit so'zlarni tahlil qiling va WordPress autopilotingizni boshqaring.
+            {t('keywordsSubtitle')}
           </p>
         </div>
 
@@ -268,7 +270,7 @@ export default function KeywordsClient({ initialSites, userId }: KeywordsClientP
         ) : (
           <Link href="/dashboard/connections">
             <Button size="sm" className="bg-[#FB3640] hover:bg-[#e02d36]">
-              <Plus className="mr-1.5 h-4 w-4" /> Sayt Bog'lash
+              <Plus className="mr-1.5 h-4 w-4" /> {t('connectSite')}
             </Button>
           </Link>
         )}
@@ -281,14 +283,14 @@ export default function KeywordsClient({ initialSites, userId }: KeywordsClientP
               <Globe className="h-6 w-6 text-[#FB3640]" />
             </div>
             <div className="max-w-md mx-auto space-y-1">
-              <CardTitle>WordPress sayt bog'lanmagan</CardTitle>
+              <CardTitle>{t('noSiteConnected')}</CardTitle>
               <CardDescription>
-                Kalit so'zlar bilan ishlash va AI SEO autopilotini ishga tushirish uchun avval kamida bitta WordPress saytini ulashingiz kerak.
+                {t('noSiteConnectedDesc')}
               </CardDescription>
             </div>
             <Link href="/dashboard/connections">
               <Button className="bg-[#FB3640] hover:bg-[#e02d36] mt-2">
-                <Plus className="mr-1.5 h-4 w-4" /> Hozir bog'lash
+                <Plus className="mr-1.5 h-4 w-4" /> {t('connectNow')}
               </Button>
             </Link>
           </CardContent>
@@ -302,12 +304,12 @@ export default function KeywordsClient({ initialSites, userId }: KeywordsClientP
             <Card className="bg-background-light/60 dark:bg-background-dark/60 backdrop-blur-md border border-white/5 shadow-md">
               <CardContent className="pt-6">
                 <div className="flex justify-between items-center">
-                  <p className="text-sm font-medium text-muted-foreground">Jami kalit so'zlar</p>
+                  <p className="text-sm font-medium text-muted-foreground">{t('totalKeywords')}</p>
                   <Key className="h-4 w-4 text-[#FB3640]" />
                 </div>
                 <div className="mt-2 flex items-baseline gap-2">
                   <span className="text-3xl font-bold">{keywords.length}</span>
-                  <span className="text-xs text-muted-foreground">dona</span>
+                  <span className="text-xs text-muted-foreground">{t('unit')}</span>
                 </div>
               </CardContent>
             </Card>
@@ -315,12 +317,12 @@ export default function KeywordsClient({ initialSites, userId }: KeywordsClientP
             <Card className="bg-background-light/60 dark:bg-background-dark/60 backdrop-blur-md border border-white/5 shadow-md">
               <CardContent className="pt-6">
                 <div className="flex justify-between items-center">
-                  <p className="text-sm font-medium text-muted-foreground">SEO Trafik Potensiali</p>
+                  <p className="text-sm font-medium text-muted-foreground">{t('seoTrafficPotential')}</p>
                   <ArrowUpRight className="h-4 w-4 text-emerald-500" />
                 </div>
                 <div className="mt-2 flex items-baseline gap-2">
                   <span className="text-3xl font-bold">{(totalVolume / 1000).toFixed(1)}k</span>
-                  <span className="text-xs text-muted-foreground">oyiga qidiruv</span>
+                  <span className="text-xs text-muted-foreground">{t('searchesPerMonth')}</span>
                 </div>
               </CardContent>
             </Card>
@@ -328,13 +330,13 @@ export default function KeywordsClient({ initialSites, userId }: KeywordsClientP
             <Card className="bg-background-light/60 dark:bg-background-dark/60 backdrop-blur-md border border-white/5 shadow-md">
               <CardContent className="pt-6">
                 <div className="flex justify-between items-center">
-                  <p className="text-sm font-medium text-muted-foreground">Tasdiqlanganlar</p>
+                  <p className="text-sm font-medium text-muted-foreground">{t('approvedCount')}</p>
                   <Sparkles className="h-4 w-4 text-amber-500" />
                 </div>
                 <div className="mt-2 flex items-baseline gap-2">
                   <span className="text-3xl font-bold">{approvedCount}</span>
                   <span className="text-xs text-amber-600 dark:text-amber-400 font-semibold bg-amber-500/10 px-1.5 py-0.5 rounded">
-                    yozilmoqda
+                    {t('generating')}
                   </span>
                 </div>
               </CardContent>
@@ -343,14 +345,14 @@ export default function KeywordsClient({ initialSites, userId }: KeywordsClientP
             <Card className="bg-background-light/60 dark:bg-background-dark/60 backdrop-blur-md border border-white/5 shadow-md">
               <CardContent className="pt-6">
                 <div className="flex justify-between items-center">
-                  <p className="text-sm font-medium text-muted-foreground">Oson kalit so'zlar</p>
+                  <p className="text-sm font-medium text-muted-foreground">{t('easyKeywords')}</p>
                   <Check className="h-4 w-4 text-[#FB3640]" />
                 </div>
                 <div className="mt-2 flex items-baseline gap-2">
                   <span className="text-3xl font-bold">
                     {keywords.length > 0 ? Math.round((easyKeywordsCount / keywords.length) * 100) : 0}%
                   </span>
-                  <span className="text-xs text-muted-foreground">qiyinchilik &lt; 35</span>
+                  <span className="text-xs text-muted-foreground">{t('difficultyLt35')}</span>
                 </div>
               </CardContent>
             </Card>
