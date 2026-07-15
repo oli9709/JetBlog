@@ -2,6 +2,7 @@ import 'server-only';
 import * as Sentry from '@sentry/nextjs';
 import { createClient } from '@supabase/supabase-js';
 import { refreshGSCToken } from '@/lib/API/Services/gsc/refresh';
+import { normalizeArticleUrl } from '@/lib/utils/normalizeUrl';
 
 /**
  * Google Indexing API orqali nashr etilgan URL ni indekslashga yuborish.
@@ -24,6 +25,27 @@ export async function submitGSCIndexing(
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     );
 
+    // Safety net: eski DB rows'da published_url relative bo'lishi mumkin,
+    // yoki caller bekor URL yuborgan bo'lishi mumkin. site.url ni olib normalize qilamiz.
+    let finalUrl = publishedUrl;
+    if (!/^https?:\/\//i.test(finalUrl ?? '')) {
+      const { data: siteRow } = await serviceClient
+        .from('sites')
+        .select('url')
+        .eq('id', siteId)
+        .single();
+      finalUrl = normalizeArticleUrl(publishedUrl, siteRow?.url);
+    }
+
+    if (!finalUrl || !/^https?:\/\//i.test(finalUrl)) {
+      console.warn('[GSC Indexing] skipped: no valid absolute URL', {
+        siteId,
+        rawUrl: publishedUrl,
+        finalUrl,
+      });
+      return;
+    }
+
     // GSC tokenini olish
     const { data: tokenRow, error: tokenErr } = await serviceClient
       .from('gsc_tokens')
@@ -40,7 +62,7 @@ export async function submitGSCIndexing(
     // GSC property URL ni URL bilan solishtirish
     const gscSiteUrl: string = tokenRow.gsc_site_url || '';
     if (gscSiteUrl) {
-      const publishedHost = new URL(publishedUrl).hostname.replace(/^www\./, '');
+      const publishedHost = new URL(finalUrl).hostname.replace(/^www\./, '');
       const gscHost = gscSiteUrl.replace(/^https?:\/\//, '').replace(/^www\./, '').replace(/\/$/, '');
       if (!gscHost.includes(publishedHost) && !publishedHost.includes(gscHost)) {
         console.log(`[GSC Indexing] Domain mismatch: GSC="${gscHost}" vs published="${publishedHost}" — skipping`);
@@ -80,13 +102,13 @@ export async function submitGSCIndexing(
           Authorization: `Bearer ${accessToken}`,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ url: publishedUrl, type: 'URL_UPDATED' }),
+        body: JSON.stringify({ url: finalUrl, type: 'URL_UPDATED' }),
         signal: AbortSignal.timeout(10_000),
       }
     );
 
     if (res.ok) {
-      console.log(`[GSC Indexing] URL_UPDATED submitted: ${publishedUrl}`);
+      console.log(`[GSC Indexing] URL_UPDATED submitted: ${finalUrl}`);
     } else {
       const body = await res.text().catch(() => '');
       if (res.status === 403 || res.status === 400) {
@@ -96,8 +118,13 @@ export async function submitGSCIndexing(
         console.warn(`[GSC Indexing] Non-OK response (${res.status}): ${body.slice(0, 200)}`);
       }
     }
-  } catch (err: unknown) {
-    console.error('[GSC Indexing] Unexpected error (non-fatal):', err);
+  } catch (err: any) {
+    console.error('[GSC Indexing] failed (non-fatal)', {
+      siteId,
+      url: publishedUrl,
+      message: err?.message,
+      code: err?.code,
+    });
     if (err instanceof Error) Sentry.captureException(err, { tags: { feature: 'gsc-indexing' } });
   }
 }

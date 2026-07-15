@@ -1,6 +1,7 @@
 import 'server-only';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { sendTelegramPost } from './notify';
+import { normalizeArticleUrl } from '@/lib/utils/normalizeUrl';
 
 export interface NotifyArticleParams {
   /** Service-role client (cron/publish) yoki authenticated session client
@@ -83,31 +84,13 @@ export async function notifyArticlePublished(
     // 3. Article URL — published_url (canonical) → wp_post_id fallback → site.url
     const cleanSiteUrl = (site.url ?? '').replace(/\/+$/, '');
 
-    const resolveArticleUrl = (): string => {
-      const pub = article.published_url?.trim();
-
-      if (pub) {
-        // Full URL — o'zini ishlat
-        if (/^https?:\/\//i.test(pub)) return pub;
-        // Relative path — sayt URL bilan birlashtir
-        if (cleanSiteUrl) {
-          const cleanPath = pub.startsWith('/') ? pub : `/${pub}`;
-          return `${cleanSiteUrl}${cleanPath}`;
-        }
-        // Sayt URL yo'q — path'ni qaytar (yaxshi variant emas, lekin
-        // bo'sh qaytarmaslik uchun)
-        return pub;
-      }
-
-      // WordPress-style fallback
-      if (article.wp_post_id && cleanSiteUrl) {
-        return `${cleanSiteUrl}/?p=${article.wp_post_id}`;
-      }
-
-      return cleanSiteUrl;
-    };
-
-    const articleUrl = resolveArticleUrl();
+    // Shared normalize — full URL / relative path / bo'sh holatlarini boshqaradi
+    const normalized = normalizeArticleUrl(article.published_url, site.url);
+    const articleUrl =
+      normalized ||
+      (article.wp_post_id && cleanSiteUrl
+        ? `${cleanSiteUrl}/?p=${article.wp_post_id}`
+        : cleanSiteUrl);
 
     console.info('[notify/telegram] resolved article URL', {
       siteId,

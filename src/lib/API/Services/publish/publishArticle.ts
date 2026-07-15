@@ -4,6 +4,7 @@ import { getAdapter } from '@/lib/adapters';
 import { ArticlePayload, PublishResult } from '@/lib/adapters/base';
 import { ArticleT, SiteT } from '@/lib/types/supabase';
 import { runPostPublishSEO } from '@/lib/API/Services/seo/postPublishSEO';
+import { normalizeArticleUrl } from '@/lib/utils/normalizeUrl';
 
 /**
  * Yagona publish yo'li — ham qo'lda (`/api/publish`) ham avtomatik (`/api/cron`) publish
@@ -30,6 +31,19 @@ export async function publishArticle(
 
   const adapter = getAdapter(site);
   const result = await adapter.publish(payload);
+
+  // Adapter (ayniqsa webhook receiver) relative path qaytarishi mumkin —
+  // shu yerda normalize qilamiz, downstream (DB write, SEO, notify) toza URL oladi.
+  const normalizedUrl = normalizeArticleUrl(result.url, site.url);
+  if (normalizedUrl !== result.url) {
+    console.info('[publishArticle] normalized url', {
+      siteId: site.id,
+      articleId: article.id,
+      adapterUrl: result.url,
+      normalized: normalizedUrl,
+    });
+  }
+  result.url = normalizedUrl;
 
   // SEO signallari — fire-and-forget, publish muvaffaqiyatiga ta'sir qilmaydi
   if (result.url) {
