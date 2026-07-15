@@ -93,15 +93,30 @@ export async function POST(req: NextRequest) {
       });
 
       // 6. Telegram notify — fire-and-forget
-      const origin = getBaseUrl();
-      fetch(`${origin}/api/telegram/notify`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Cookie: req.headers.get('cookie') || '',
-        },
-        body: JSON.stringify({ siteId: site.id, articleId }),
-      }).catch((err) => console.error('Telegram notify error (non-fatal):', err));
+      try {
+        const notifyUrl = new URL('/api/telegram/notify', getBaseUrl()).toString();
+        fetch(notifyUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Cookie: req.headers.get('cookie') || '',
+          },
+          body: JSON.stringify({ siteId: site.id, articleId }),
+        }).catch((err: any) =>
+          console.error('[publish/notify] fetch failed (non-fatal)', {
+            url: notifyUrl,
+            siteId: site.id,
+            articleId,
+            message: err?.message,
+            cause: err?.cause?.message ?? err?.cause,
+          })
+        );
+      } catch (urlErr) {
+        console.error('[publish/notify] URL build failed (non-fatal)', {
+          baseUrl: getBaseUrl(),
+          error: urlErr instanceof Error ? urlErr.message : String(urlErr),
+        });
+      }
 
       return NextResponse.json({
         success: true,

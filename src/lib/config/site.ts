@@ -12,18 +12,32 @@
  *   - production  → https://jetblog.app   (NEXT_PUBLIC_DOMAIN o'rnatilmagan bo'lsa)
  */
 
-/** Joriy muhitga mos kanonik base URL (server-side safe) */
+/** Joriy muhitga mos kanonik base URL (server-side safe).
+ *  Env qanchalik buzuq bo'lmasin (bare host, trailing whitespace, typo),
+ *  new URL() orqali normalizatsiya qilinadi yoki fallback qaytariladi. */
 export function getBaseUrl(): string {
-  // Agar muhit o'zgaruvchisi ochiq belgilangan bo'lsa — uni ishlat (har ikkala muhitda)
-  if (process.env.NEXT_PUBLIC_DOMAIN) {
-    return process.env.NEXT_PUBLIC_DOMAIN.replace(/\/$/, '');
+  const raw = (process.env.NEXT_PUBLIC_DOMAIN ?? '').trim();
+  const fallback =
+    process.env.NODE_ENV === 'development'
+      ? 'http://localhost:3000'
+      : 'https://www.jetblog.app';
+
+  if (!raw) return fallback;
+
+  // Force protocol if the env is a bare host like "jetblog.app"
+  const withScheme = /^https?:\/\//i.test(raw) ? raw : `https://${raw}`;
+
+  // Validate — reject malformed values so callers never build broken URLs
+  try {
+    const u = new URL(withScheme);
+    // .origin => "https://host[:port]" — no trailing slash, safe for new URL(path, origin)
+    return u.origin;
+  } catch {
+    console.error(
+      `[getBaseUrl] NEXT_PUBLIC_DOMAIN is malformed: "${raw}" — falling back to ${fallback}`
+    );
+    return fallback;
   }
-  // Mahalliy dev muhiti
-  if (process.env.NODE_ENV === 'development') {
-    return 'http://localhost:3000';
-  }
-  // Production fallback
-  return 'https://jetblog.app';
 }
 
 /**

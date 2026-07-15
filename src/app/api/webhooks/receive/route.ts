@@ -10,21 +10,32 @@ const supabaseAdmin = createClient(
 );
 
 export async function POST(req: Request) {
+  const ua = req.headers.get('user-agent') ?? '';
+  const webhookIdHeader = req.headers.get('x-jetblog-webhook-id');
+  const signatureHeader = req.headers.get('x-jetblog-signature');
+
   try {
     const rawBody = await req.text();
 
     // 0. Bo'sh payload tekshiruvi
     if (!rawBody) {
+      console.error('[webhook/receive] 400 empty payload', {
+        webhookIdHeader,
+        ua,
+      });
       return NextResponse.json({ error: 'Empty payload' }, { status: 400 });
     }
 
-    // 1. Webhook ID headerdan olish
-    const webhookId = req.headers.get('x-jetblog-webhook-id');
-    const signature  = req.headers.get('x-jetblog-signature');
-
-    if (!webhookId) {
+    if (!webhookIdHeader) {
+      console.error('[webhook/receive] 400 missing webhook id header', {
+        ua,
+        bodyLen: rawBody.length,
+        bodyPreview: rawBody.slice(0, 120),
+      });
       return NextResponse.json({ error: 'Missing webhook ID' }, { status: 400 });
     }
+    const webhookId = webhookIdHeader;
+    const signature = signatureHeader;
 
     // 2. Webhook ma'lumotlarini olish
     const { data: webhook, error: whErr } = await supabaseAdmin
@@ -34,10 +45,18 @@ export async function POST(req: Request) {
       .single();
 
     if (whErr || !webhook) {
+      console.error('[webhook/receive] 404 webhook not found', {
+        webhookId,
+        dbError: whErr?.message,
+      });
       return NextResponse.json({ error: 'Webhook topilmadi' }, { status: 404 });
     }
 
     if (!webhook.is_active) {
+      console.error('[webhook/receive] 403 webhook inactive', {
+        webhookId,
+        siteId: webhook.site_id,
+      });
       return NextResponse.json({ error: 'Webhook faol emas' }, { status: 403 });
     }
 
@@ -63,6 +82,11 @@ export async function POST(req: Request) {
       }
 
       if (!isValid) {
+        console.error('[webhook/receive] 401 invalid signature', {
+          webhookId,
+          siteId: webhook.site_id,
+          providedLen: signature.length,
+        });
         return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
       }
     }
@@ -71,7 +95,13 @@ export async function POST(req: Request) {
     let payload: any;
     try {
       payload = JSON.parse(rawBody);
-    } catch {
+    } catch (parseErr) {
+      console.error('[webhook/receive] 400 invalid JSON', {
+        webhookId,
+        bodyLen: rawBody.length,
+        bodyPreview: rawBody.slice(0, 120),
+        parseErr: parseErr instanceof Error ? parseErr.message : String(parseErr),
+      });
       return NextResponse.json({ error: 'Noto\'g\'ri JSON payload' }, { status: 400 });
     }
 
