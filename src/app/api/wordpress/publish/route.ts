@@ -1,11 +1,17 @@
-import { NextResponse } from 'next/server';
+import { NextResponse, after } from 'next/server';
+import { createClient } from '@supabase/supabase-js';
 import { SupabaseServerClient } from '@/lib/API/Services/init/supabase';
 import { GetArticleById } from '@/lib/API/Database/articles/queries';
 import { GetSiteById } from '@/lib/API/Database/sites/queries';
 import { SupabaseUpdateArticle } from '@/lib/API/Database/articles/mutations';
 import { PublishToWordPress } from '@/lib/API/Services/wordpress/publish';
 import { decryptText } from '@/lib/utils/encryption';
-import { getBaseUrl } from '@/lib/config/site';
+import { notifyArticlePublished } from '@/lib/API/Services/telegram/notifyArticle';
+
+const supabaseAdmin = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
 
 /**
  * POST /api/wordpress/publish
@@ -73,32 +79,29 @@ export async function POST(req: Request) {
       error_message: null
     });
 
-    // 5. Telegram notify — async fire-and-forget (WP nashrini kutmaydi)
-    try {
-      const notifyUrl = new URL('/api/telegram/notify', getBaseUrl()).toString();
-      fetch(notifyUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          // session cookie larni o'tkazish uchun
-          'Cookie': req.headers.get('cookie') || ''
-        },
-        body: JSON.stringify({ siteId: site.id, articleId })
-      }).catch((err: any) =>
-        console.error('[wp/publish/notify] fetch failed (non-fatal)', {
-          url: notifyUrl,
+    // 5. Telegram notify — after() bilan response yuborilgandan keyin bajariladi.
+    //    Service-role: cookie / session shart emas, RLS bypass.
+    after(async () => {
+      try {
+        const result = await notifyArticlePublished({
+          supabase: supabaseAdmin,
+          siteId: site.id,
+          articleId,
+        });
+        console.info('[wp/publish/notify] telegram result', {
+          siteId: site.id,
+          articleId,
+          ...result,
+        });
+      } catch (err: any) {
+        console.error('[wp/publish/notify] telegram threw (non-fatal)', {
           siteId: site.id,
           articleId,
           message: err?.message,
           cause: err?.cause?.message ?? err?.cause,
-        })
-      );
-    } catch (urlErr) {
-      console.error('[wp/publish/notify] URL build failed (non-fatal)', {
-        baseUrl: getBaseUrl(),
-        error: urlErr instanceof Error ? urlErr.message : String(urlErr),
-      });
-    }
+        });
+      }
+    });
 
     return NextResponse.json({
       success: true,

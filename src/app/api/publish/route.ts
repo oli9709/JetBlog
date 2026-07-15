@@ -1,5 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse, after } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
+import { createClient } from '@supabase/supabase-js';
 import { cookies } from 'next/headers';
 import { GetArticleById } from '@/lib/API/Database/articles/queries';
 import { GetSiteById } from '@/lib/API/Database/sites/queries';
@@ -8,10 +9,14 @@ import { publishArticle } from '@/lib/API/Services/publish/publishArticle';
 import { withRateLimit } from '@/lib/withRateLimit';
 import { rateLimiters } from '@/lib/ratelimit';
 import { capturePublishError } from '@/lib/monitoring';
-import { getBaseUrl } from '@/lib/config/site';
+import { notifyArticlePublished } from '@/lib/API/Services/telegram/notifyArticle';
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+
+/** Service-role admin — Telegram notify uchun (cron/publish flow'da user session yo'q). */
+const supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
 /**
  * POST /api/publish
@@ -92,31 +97,29 @@ export async function POST(req: NextRequest) {
         error_message: null,
       });
 
-      // 6. Telegram notify — fire-and-forget
-      try {
-        const notifyUrl = new URL('/api/telegram/notify', getBaseUrl()).toString();
-        fetch(notifyUrl, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Cookie: req.headers.get('cookie') || '',
-          },
-          body: JSON.stringify({ siteId: site.id, articleId }),
-        }).catch((err: any) =>
-          console.error('[publish/notify] fetch failed (non-fatal)', {
-            url: notifyUrl,
+      // 6. Telegram notify — after() bilan response yuborilgandan keyin bajariladi.
+      //    Service-role client — RLS bypass, cookie / session shart emas.
+      after(async () => {
+        try {
+          const result = await notifyArticlePublished({
+            supabase: supabaseAdmin,
+            siteId: site.id,
+            articleId,
+          });
+          console.info('[publish/notify] telegram result', {
+            siteId: site.id,
+            articleId,
+            ...result,
+          });
+        } catch (err: any) {
+          console.error('[publish/notify] telegram threw (non-fatal)', {
             siteId: site.id,
             articleId,
             message: err?.message,
             cause: err?.cause?.message ?? err?.cause,
-          })
-        );
-      } catch (urlErr) {
-        console.error('[publish/notify] URL build failed (non-fatal)', {
-          baseUrl: getBaseUrl(),
-          error: urlErr instanceof Error ? urlErr.message : String(urlErr),
-        });
-      }
+          });
+        }
+      });
 
       return NextResponse.json({
         success: true,
