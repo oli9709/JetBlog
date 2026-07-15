@@ -82,12 +82,40 @@ export async function notifyArticlePublished(
 
     // 3. Article URL — published_url (canonical) → wp_post_id fallback → site.url
     const cleanSiteUrl = (site.url ?? '').replace(/\/+$/, '');
-    const articleUrl =
-      article.published_url ||
-      (article.wp_post_id && cleanSiteUrl
-        ? `${cleanSiteUrl}/?p=${article.wp_post_id}`
-        : cleanSiteUrl) ||
-      '';
+
+    const resolveArticleUrl = (): string => {
+      const pub = article.published_url?.trim();
+
+      if (pub) {
+        // Full URL — o'zini ishlat
+        if (/^https?:\/\//i.test(pub)) return pub;
+        // Relative path — sayt URL bilan birlashtir
+        if (cleanSiteUrl) {
+          const cleanPath = pub.startsWith('/') ? pub : `/${pub}`;
+          return `${cleanSiteUrl}${cleanPath}`;
+        }
+        // Sayt URL yo'q — path'ni qaytar (yaxshi variant emas, lekin
+        // bo'sh qaytarmaslik uchun)
+        return pub;
+      }
+
+      // WordPress-style fallback
+      if (article.wp_post_id && cleanSiteUrl) {
+        return `${cleanSiteUrl}/?p=${article.wp_post_id}`;
+      }
+
+      return cleanSiteUrl;
+    };
+
+    const articleUrl = resolveArticleUrl();
+
+    console.info('[notify/telegram] resolved article URL', {
+      siteId,
+      articleId,
+      publishedUrl: article.published_url,
+      siteUrl: cleanSiteUrl,
+      finalUrl: articleUrl,
+    });
 
     // 4. Telegram POST
     const excerpt = extractExcerpt(article.content);

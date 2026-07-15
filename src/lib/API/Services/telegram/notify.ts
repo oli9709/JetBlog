@@ -14,7 +14,7 @@ function buildMessage(title: string, excerpt: string, url: string): string {
   return (
     `🔥 <b>${title}</b>\n\n` +
     `${excerpt}\n\n` +
-    `🔗 <a href="${url}">Batafsil o'qish</a>`
+    `🔗 <a href="${url}">Read more</a>`
   );
 }
 
