@@ -6,14 +6,15 @@ import { cn } from '@/lib/utils/helpers';
 import { PlatformSelector, type PlatformType } from './PlatformSelector';
 import { ConnectionForm, type ConnectionFormData } from './ConnectionForm';
 import { ConnectionTest } from './ConnectionTest';
-
-const STEPS = ['Platform', 'Ma\'lumotlar', 'Test', 'Tayyor'];
+import { useTranslations } from 'next-intl';
 
 interface AddConnectionWizardProps {
   onComplete: (site: any) => void;
 }
 
 export function AddConnectionWizard({ onComplete }: AddConnectionWizardProps) {
+  const t = useTranslations('Dashboard.wizard');
+  const STEPS = [t('stepPlatform'), t('stepDetails'), t('stepTest'), t('stepReady')];
   const [step, setStep] = useState(0);
   const [platform, setPlatform] = useState<PlatformType | null>(null);
   const [formData, setFormData] = useState<ConnectionFormData>({
@@ -94,7 +95,7 @@ export function AddConnectionWizard({ onComplete }: AddConnectionWizardProps) {
       <div className="min-h-[280px]">
         {step === 0 && (
           <div className="flex flex-col gap-4">
-            <p className="text-sm text-zinc-400">Qaysi platforma bilan ulanmoqchisiz?</p>
+            <p className="text-sm text-zinc-400">{t('stepPlatform')}</p>
             <PlatformSelector selected={platform} onSelect={handlePlatformSelect} />
           </div>
         )}
@@ -102,7 +103,7 @@ export function AddConnectionWizard({ onComplete }: AddConnectionWizardProps) {
         {step === 1 && platform && (
           <div className="flex flex-col gap-4">
             <p className="text-sm text-zinc-400">
-              <span className="capitalize font-semibold text-white">{platform}</span> ulanish ma&apos;lumotlarini kiriting
+              {t('detailsHeading', { platform: platform.charAt(0).toUpperCase() + platform.slice(1) })}
             </p>
             <ConnectionForm platform={platform} data={formData} onChange={handleFormChange} />
           </div>
@@ -118,9 +119,9 @@ export function AddConnectionWizard({ onComplete }: AddConnectionWizardProps) {
               <CheckCircle2 className="w-10 h-10 text-emerald-400" />
             </div>
             <div>
-              <h3 className="text-xl font-bold text-white">Muvaffaqiyatli ulandi!</h3>
+              <h3 className="text-xl font-bold text-white">{t('successTitle')}</h3>
               <p className="text-sm text-zinc-400 mt-2 max-w-sm">
-                Saytingiz TextPilot.AI ga bog&apos;landi. Endi AI maqolalarni avtomatik nashr qilishni boshlashingiz mumkin.
+                {t('successDesc')}
               </p>
             </div>
             <button
@@ -133,7 +134,7 @@ export function AddConnectionWizard({ onComplete }: AddConnectionWizardProps) {
               )}
             >
               <Sparkles className="w-5 h-5" />
-              Birinchi maqolani yaratish →
+              {t('goToDashboard')} →
             </button>
           </div>
         )}
@@ -153,7 +154,7 @@ export function AddConnectionWizard({ onComplete }: AddConnectionWizardProps) {
             )}
           >
             <ArrowLeft className="w-4 h-4" />
-            Orqaga
+            {t('back')}
           </button>
 
           {step < 2 && (
@@ -168,7 +169,7 @@ export function AddConnectionWizard({ onComplete }: AddConnectionWizardProps) {
                 'disabled:opacity-40 disabled:cursor-not-allowed disabled:scale-100'
               )}
             >
-              Keyingi
+              {t('next')}
               <ArrowRight className="w-4 h-4" />
             </button>
           )}

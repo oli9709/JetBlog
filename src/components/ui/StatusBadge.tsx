@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { cn } from '@/lib/utils/helpers';
+import { useTranslations } from 'next-intl';
 
 interface StatusBadgeProps {
   status: 'draft' | 'scheduled' | 'published' | 'error';
@@ -9,6 +10,13 @@ interface StatusBadgeProps {
 }
 
 export const StatusBadge: React.FC<StatusBadgeProps> = ({ status, className }) => {
+  const t = useTranslations('Dashboard.contentQueue');
+  const labelMap: Record<StatusBadgeProps['status'], string> = {
+    published: t('statusPublished'),
+    scheduled: t('statusScheduled'),
+    draft: t('statusDraft'),
+    error: t('statusError'),
+  };
   return (
     <div
       className={cn(
@@ -50,10 +58,7 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({ status, className }) =
         status === 'draft' && "text-slate-400 group-hover:text-slate-300",
         status === 'error' && "text-rose-400 group-hover:text-rose-300"
       )}>
-        {status === 'published' && "Nashr qilindi"}
-        {status === 'scheduled' && "Rejalashtirilgan"}
-        {status === 'draft' && "Qoralama"}
-        {status === 'error' && "Xatolik"}
+        {labelMap[status]}
       </span>
     </div>
   );

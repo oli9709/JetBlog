@@ -4,6 +4,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher';
 import { cn } from '@/lib/utils/helpers';
 import { formatDate } from '@/lib/utils/helpers';
+import { useTranslations } from 'next-intl';
 
 export interface ArticleT {
   id: string;
@@ -33,6 +34,7 @@ export function ArticleCard({
   onDelete,
   isSelected,
 }: ArticleCardProps) {
+  const t = useTranslations('Dashboard.contentQueue');
   // Tanlangan holat uchun class
   const selectedStyle = isSelected
     ? 'ring-2 ring-[#FB3640] shadow-[0_0_20px_rgba(251,54,64,0.2)] bg-[#111111]'
@@ -129,7 +131,7 @@ export function ArticleCard({
                 }}
                 className="text-xs font-semibold text-white bg-[#FB3640]/20 hover:bg-[#FB3640]/30 px-3 py-1.5 rounded-lg transition-colors border border-[#FB3640]/20"
               >
-                Nashr
+                {t('publishNowBtn')}
               </button>
             )}
           </div>

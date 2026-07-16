@@ -5,6 +5,7 @@ import { Eye, EyeOff, Globe, Key, User, Loader2, ChevronDown, Check } from 'luci
 import { cn } from '@/lib/utils/helpers';
 import type { PlatformType } from './PlatformSelector';
 import { AIBuilderPrompt } from './AIBuilderPrompt';
+import { useTranslations } from 'next-intl';
 
 const WEBHOOK_RECEIVE_URL = 'https://jetblog.app/api/webhooks/receive';
 
@@ -399,10 +400,11 @@ function LanguageSelect({
   value: 'uz' | 'en';
   onChange: (v: 'uz' | 'en') => void;
 }) {
+  const t = useTranslations('Dashboard.wizard');
   return (
     <div className="flex flex-col gap-1.5">
       <label htmlFor="connection-lang" className="text-xs font-medium text-zinc-400 pl-1">
-        Maqolalar tili
+        {t('articleLangLabel')}
       </label>
       <select
         id="connection-lang"
@@ -418,7 +420,7 @@ function LanguageSelect({
         <option value="en">English (en)</option>
       </select>
       <p className="text-[11px] text-zinc-500 pl-1">
-        Autopilot va qo&apos;lda generatsiyada maqolalar shu tilda yoziladi.
+        {t('articleLangHint')}
       </p>
     </div>
   );
@@ -562,6 +564,7 @@ function WebhookBlock({
   secretKey: string;
   langSelect: React.ReactNode;
 }) {
+  const t = useTranslations('Dashboard.wizard');
   type Mode = 'have' | 'build';
   const [mode, setMode] = useState<Mode>('have');
 
@@ -569,7 +572,7 @@ function WebhookBlock({
     <>
       <FloatingInput
         id="webhook-endpoint"
-        label="Receiver endpoint URL (https://...)"
+        label={`${t('receiverUrlLabel')} (https://...)`}
         type="url"
         value={data.webhookEndpoint ?? ''}
         onChange={(v) => update({ webhookEndpoint: v, siteUrl: v })}
@@ -577,10 +580,7 @@ function WebhookBlock({
         required
         placeholder="https://your-site.com"
       />
-      <HintBox>
-        Deploy qilingan saytingiz URL manzilini kiriting. Masalan: https://audit-dashboard.onrender.com
-        &nbsp;—&nbsp;saytda <code>/api/jetblog</code> endpoint bo&apos;lishi kerak.
-      </HintBox>
+      <HintBox>{t('receiverUrlHint')}</HintBox>
     </>
   );
 
@@ -606,10 +606,10 @@ function WebhookBlock({
             )}>
               {mode === 'have' && <div className="w-2 h-2 rounded-full bg-[#FB3640]" />}
             </div>
-            <span className="text-sm font-semibold text-white">Menda tayyor webhook endpoint bor</span>
+            <span className="text-sm font-semibold text-white">{t('webhookOption1Title')}</span>
           </div>
           <p className="text-xs text-zinc-500 pl-6">
-            URL va Secret keyni bilaman — to&apos;g&apos;ridan-to&apos;g&apos;ri kiritaman
+            {t('webhookOption1Desc')}
           </p>
         </button>
 
@@ -631,10 +631,10 @@ function WebhookBlock({
             )}>
               {mode === 'build' && <div className="w-2 h-2 rounded-full bg-[#FB3640]" />}
             </div>
-            <span className="text-sm font-semibold text-white">Endpointim yo&apos;q — AI Builder bilan yasayman</span>
+            <span className="text-sm font-semibold text-white">{t('webhookOption2Title')}</span>
           </div>
           <p className="text-xs text-zinc-500 pl-6">
-            Cursor / v0 / Lovable uchun tayyor prompt olaman
+            {t('webhookOption2Desc')}
           </p>
         </button>
       </div>
@@ -653,12 +653,12 @@ function WebhookBlock({
           />
           <div className="p-4 rounded-xl bg-zinc-900/40 border border-zinc-800/80 space-y-2">
             <p className="text-xs font-semibold text-zinc-300 uppercase tracking-wider">
-              Keyingi qadamlar
+              {t('nextStepsLabel')}
             </p>
             <ol className="text-xs text-zinc-400 space-y-1 leading-relaxed list-decimal list-inside">
-              <li>Yuqoridagi promptni nusxa oling</li>
-              <li>Cursor / Windsurf / Lovable / v0 kabi AI builder&apos;ga bering</li>
-              <li>Deploy bo&apos;lgach, quyida Endpoint URL va Secret key&apos;ni kiriting</li>
+              <li>{t('nextStep1')}</li>
+              <li>{t('nextStep2')}</li>
+              <li>{t('nextStep3')}</li>
             </ol>
           </div>
           {endpointInput}

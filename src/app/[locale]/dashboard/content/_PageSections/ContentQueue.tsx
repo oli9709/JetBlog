@@ -4,6 +4,7 @@ import { ArticleCard, ArticleT } from './ArticleCard';
 import { NumberTicker } from '@/components/magicui/number-ticker';
 import { TypingAnimation } from '@/components/magicui/typing-animation';
 import { cn } from '@/lib/utils/helpers';
+import { useTranslations } from 'next-intl';
 
 interface ContentQueueProps {
   articles: ArticleT[];
@@ -14,14 +15,6 @@ interface ContentQueueProps {
   isLoading: boolean;
 }
 
-const TABS = [
-  { id: 'all', label: 'Barchasi' },
-  { id: 'draft', label: 'Qoralama' },
-  { id: 'scheduled', label: 'Navbatda' },
-  { id: 'published', label: 'Nashr' },
-  { id: 'error', label: 'Xato' },
-];
-
 export function ContentQueue({
   articles,
   selectedId,
@@ -30,8 +23,17 @@ export function ContentQueue({
   onDelete,
   isLoading,
 }: ContentQueueProps) {
+  const t = useTranslations('Dashboard.contentQueue');
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState('all');
+
+  const TABS = [
+    { id: 'all', label: t('tabAll') },
+    { id: 'draft', label: t('tabDraft') },
+    { id: 'scheduled', label: t('tabScheduled') },
+    { id: 'published', label: t('tabPublished') },
+    { id: 'error', label: t('tabError') },
+  ];
 
   // Filtrlar
   const filteredArticles = articles.filter((article) => {
@@ -49,20 +51,20 @@ export function ContentQueue({
     <div className="flex flex-col h-full bg-[#0a0a0a] rounded-2xl border border-[#222222] shadow-xl overflow-hidden">
       {/* Yuqori Header Qismi */}
       <div className="p-5 border-b border-[#222222] bg-[#111111]/80 backdrop-blur-xl shrink-0">
-        <h2 className="text-xl font-bold text-white mb-4">Kontent Navbati</h2>
-        
+        <h2 className="text-xl font-bold text-white mb-4">{t('queueTitle')}</h2>
+
         {/* Stats */}
         <div className="flex gap-4 text-xs font-semibold mb-5">
           <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-900 border border-zinc-800 text-zinc-300">
-            <span>Jami:</span>
+            <span>{t('statTotal')}:</span>
             <NumberTicker value={total} className="text-white font-bold" />
           </div>
           <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#FB3640]/10 border border-[#FB3640]/20 text-[#FF6B6B]">
-            <span>Navbatda:</span>
+            <span>{t('statInQueue')}:</span>
             <NumberTicker value={scheduled} className="text-white font-bold" />
           </div>
           <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
-            <span>Nashr:</span>
+            <span>{t('statPublished')}:</span>
             <NumberTicker value={published} className="text-white font-bold" />
           </div>
         </div>
@@ -79,7 +81,7 @@ export function ContentQueue({
           {/* Fake Animated Placeholder */}
           {!searchQuery && (
             <div className="absolute left-9 top-2.5 pointer-events-none z-10 opacity-50">
-              <TypingAnimation duration={100} className="text-sm text-zinc-400 font-normal">Sarlavha yoki kalit so&apos;z...</TypingAnimation>
+              <TypingAnimation duration={100} className="text-sm text-zinc-400 font-normal">{t('searchPlaceholder')}</TypingAnimation>
             </div>
           )}
         </div>
@@ -137,16 +139,7 @@ export function ContentQueue({
             <div className="w-16 h-16 rounded-full bg-[#111111] border border-white/5 flex items-center justify-center mb-4 shadow-xl">
               <Search className="h-6 w-6 text-zinc-500" />
             </div>
-            {searchQuery ? (
-              <TypingAnimation duration={50} className="text-lg font-bold text-zinc-300 mb-2">Bunday maqola topilmadi</TypingAnimation>
-            ) : (
-              <TypingAnimation duration={50} className="text-lg font-bold text-zinc-300 mb-2">Hali maqola yo&apos;q...</TypingAnimation>
-            )}
-            <p className="text-sm text-zinc-500">
-              {searchQuery 
-                ? "Boshqa so'z bilan qidirib ko'ring" 
-                : "Keywords menyusiga o'tib yangi kalit so'z tasdiqlang. AI siz uchun maqolalarni o'zi yozib chiqadi."}
-            </p>
+            <TypingAnimation duration={50} className="text-lg font-bold text-zinc-300 mb-2">{t('emptyState')}</TypingAnimation>
           </div>
         )}
       </div>

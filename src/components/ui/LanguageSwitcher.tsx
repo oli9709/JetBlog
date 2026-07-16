@@ -10,15 +10,18 @@ interface LanguageSwitcherProps {
   includeAll?: boolean;
 }
 
+// RU vaqtincha yashirilgan (routing/UI'da yo'q). Tip 'ru' kod ichida qoladi.
 const LANGUAGES = [
   { id: 'uz', label: 'UZ' },
-  { id: 'ru', label: 'RU' },
   { id: 'en', label: 'EN' },
 ] as const;
 
 export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({ value, onChange, className, includeAll }) => {
   const options = includeAll ? [{ id: 'all', label: 'BARCHASI' }, ...LANGUAGES] : LANGUAGES;
-  const activeIndex = options.findIndex(lang => lang.id === value);
+  // Agar joriy qiymat ko'rinuvchi ro'yxatda bo'lmasa (masalan eski 'ru' maqolalar) —
+  // indicator birinchi option'da tursin, badge shunchaki active bo'lmaydi.
+  const idx = options.findIndex(lang => lang.id === value);
+  const activeIndex = idx === -1 ? 0 : idx;
 
   return (
     <div 

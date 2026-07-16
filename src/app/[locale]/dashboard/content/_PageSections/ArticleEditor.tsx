@@ -5,6 +5,7 @@ import { CheckCircle2, Rocket, Save, Edit3, Loader2 } from 'lucide-react';
 import { ArticleT } from './ArticleCard';
 import { TipTapEditor } from '@/components/ui/TipTapEditor';
 import { cn } from '@/lib/utils/helpers';
+import { useTranslations } from 'next-intl';
 
 interface ArticleEditorProps {
   article: ArticleT | null;
@@ -21,6 +22,7 @@ export function ArticleEditor({
   isSaving,
   isPublishing,
 }: ArticleEditorProps) {
+  const t = useTranslations('Dashboard.contentQueue');
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
@@ -60,9 +62,9 @@ export function ArticleEditor({
         <TypingAnimation
           duration={50}
           className="text-2xl font-bold bg-gradient-to-r from-white to-zinc-500 bg-clip-text text-transparent mb-2"
-        >Maqola tanlanmadi</TypingAnimation>
+        >{t('editorNoSelection')}</TypingAnimation>
         <p className="text-zinc-500 text-center max-w-sm">
-          Tahrirlash va nashr qilish uchun chap paneldan maqola tanlang.
+          {t('editorNoSelectionDesc')}
         </p>
       </div>
     );
@@ -75,7 +77,7 @@ export function ArticleEditor({
       <div className="absolute top-4 right-5 z-10 flex items-center gap-2 px-3 py-1.5 rounded-full bg-green-500/10 border border-green-500/20 backdrop-blur-md transition-opacity">
         <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
         <span className="text-xs font-medium text-green-400">
-          {isSaving ? 'Saqlanmoqda...' : 'Saqlangan'}
+          {isSaving ? t('savingLabel') : t('savedIndicator')}
         </span>
       </div>
 
@@ -88,7 +90,7 @@ export function ArticleEditor({
             type="text"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            placeholder="Maqola sarlavhasi..."
+            placeholder={t('titlePlaceholder')}
             className="w-full bg-transparent text-3xl font-bold text-white placeholder:text-transparent placeholder:bg-clip-text placeholder:bg-gradient-to-r placeholder:from-zinc-600 placeholder:to-zinc-800 focus:outline-none border-none ring-0 leading-tight"
           />
         </div>
@@ -108,7 +110,7 @@ export function ArticleEditor({
           <div className="flex items-center gap-2 pl-2">
             <CheckCircle2 className="h-4 w-4 text-zinc-500" />
             <span className="text-xs text-zinc-500 font-medium">
-              Oxirgi marta: {lastSaved ? lastSaved.toLocaleTimeString() : 'Hozir'}
+              {t('lastSaved')}: {lastSaved ? lastSaved.toLocaleTimeString() : t('justNow')}
             </span>
           </div>
 
@@ -120,7 +122,7 @@ export function ArticleEditor({
               className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-white/5 hover:bg-white/10 rounded-lg transition-colors border border-white/10 disabled:opacity-50"
             >
               {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-              Saqlash
+              {t('saveBtn')}
             </button>
 
             <ShimmerButton
@@ -138,7 +140,7 @@ export function ArticleEditor({
                 <Rocket className="h-4 w-4" />
               )}
               <span className="whitespace-nowrap z-10 relative">
-                {article.status === 'published' ? 'Nashr qilingan' : 'Hozir nashr qil'}
+                {article.status === 'published' ? t('alreadyPublished') : t('publishNowBtn')}
               </span>
             </ShimmerButton>
           </div>

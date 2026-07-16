@@ -27,6 +27,7 @@ const tabTriggerCls = (active = false) =>
 
 export default function ConnectionsClient({ initialSites, userId }: ConnectionsClientPropsI) {
   const t = useTranslations('Dashboard');
+  const tWiz = useTranslations('Dashboard.wizard');
   const [sites, setSites] = useState<SiteT[]>(initialSites);
   const [showWizard, setShowWizard] = useState(false);
 
@@ -192,7 +193,7 @@ export default function ConnectionsClient({ initialSites, userId }: ConnectionsC
 
             <div className="relative flex items-center justify-between pb-5 border-b border-zinc-800 mb-6">
               <DialogPrimitive.Title className="text-xl font-bold text-white">
-                Yangi sayt ulash
+                {tWiz('title')}
               </DialogPrimitive.Title>
               <DialogPrimitive.Close className="p-1.5 text-zinc-400 hover:text-white rounded-lg hover:bg-zinc-800/80 transition-colors">
                 <X className="w-5 h-5" />

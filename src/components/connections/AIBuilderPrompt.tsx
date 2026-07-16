@@ -3,6 +3,7 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { Copy, Check, Zap, RefreshCw, ExternalLink } from 'lucide-react';
 import { generateUniversalPrompt } from '@/lib/ai-builder-prompts';
+import { useTranslations } from 'next-intl';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -48,6 +49,7 @@ const STEPS: { num: string; title: string; desc: string }[] = [
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export function AIBuilderPrompt({ userId, webhookUrl, secretKey: secretKeyProp }: AIBuilderPromptProps) {
+  const t = useTranslations('Dashboard.wizard');
   const isStaticMode = !!(webhookUrl && secretKeyProp);
 
   const [webhook, setWebhook] = useState<WebhookData | null>(
@@ -215,10 +217,9 @@ export function AIBuilderPrompt({ userId, webhookUrl, secretKey: secretKeyProp }
           <Zap className="w-5 h-5" />
         </div>
         <div>
-          <h3 className="text-sm font-bold text-white">AI Builder Prompts</h3>
+          <h3 className="text-sm font-bold text-white">{t('aiBuilderCardTitle')}</h3>
           <p className="text-xs text-zinc-400 mt-1 leading-relaxed">
-            Quyidagi universal promptni AI Builder ga bering — loyihangizni avtomatik
-            skanlab, blog tizimini to&apos;liq sozlab beradi. WordPress kerak emas.
+            {t('aiBuilderCardDesc')}
           </p>
         </div>
       </div>
@@ -227,7 +228,7 @@ export function AIBuilderPrompt({ userId, webhookUrl, secretKey: secretKeyProp }
       <div>
         <div className="flex items-center justify-between mb-3">
           <p className="text-xs font-bold text-zinc-400 uppercase tracking-widest">
-            Tayyor prompt
+            {t('readyPromptLabel')}
           </p>
           <button
             onClick={handleCopy}
@@ -239,7 +240,7 @@ export function AIBuilderPrompt({ userId, webhookUrl, secretKey: secretKeyProp }
               }`}
           >
             {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-            {copied ? 'Nusxalandi!' : 'Nusxalash'}
+            {copied ? t('copiedBtn') : t('copyBtn')}
           </button>
         </div>
 
