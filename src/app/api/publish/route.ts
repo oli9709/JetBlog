@@ -74,10 +74,41 @@ export async function POST(req: NextRequest) {
       platform = site.platform_type;
 
       // 3-4. Yagona publish yo'li — to'liq SEO (seoTitle/seoDescription/tags) bilan
+      console.log('[publish] boshlandi', {
+        siteId,
+        articleId,
+        platform: site.platform_type,
+        userId,
+      });
+
       let result;
       try {
         result = await publishArticle(site, article);
       } catch (err: unknown) {
+        // TO'LIQ log — receiver javob body'si, status, stack barchasi Vercel logда ko'rinsin
+        const e = err as {
+          message?: string;
+          status?: number;
+          response?: unknown;
+          stack?: string;
+          cause?: any;
+          name?: string;
+        };
+        console.error('[publish] XATOSI', {
+          siteId,
+          articleId,
+          platform,
+          name: e?.name,
+          status: e?.status,
+          message: e?.message,
+          response:
+            typeof e?.response === 'string'
+              ? e.response.slice(0, 500)
+              : JSON.stringify(e?.response ?? '').slice(0, 500),
+          cause: e?.cause?.message ?? (e?.cause ? String(e.cause).slice(0, 200) : undefined),
+          stack: e?.stack?.split('\n').slice(0, 5).join(' | '),
+        });
+
         const msg = err instanceof Error ? err.message : 'Publish xatosi';
         await SupabaseUpdateArticle(articleId, { status: 'error', error_message: msg });
 
@@ -129,7 +160,29 @@ export async function POST(req: NextRequest) {
         article: updatedRes.data,
       });
     } catch (error: unknown) {
-      console.error('Universal Publish Route error:', error);
+      const e = error as {
+        message?: string;
+        status?: number;
+        response?: unknown;
+        stack?: string;
+        cause?: any;
+        name?: string;
+      };
+      console.error('[publish] OUTER XATOSI', {
+        siteId,
+        articleId,
+        platform,
+        userId,
+        name: e?.name,
+        status: e?.status,
+        message: e?.message,
+        response:
+          typeof e?.response === 'string'
+            ? e.response.slice(0, 500)
+            : JSON.stringify(e?.response ?? '').slice(0, 500),
+        cause: e?.cause?.message ?? (e?.cause ? String(e.cause).slice(0, 200) : undefined),
+        stack: e?.stack?.split('\n').slice(0, 5).join(' | '),
+      });
 
       if (error instanceof Error && userId) {
         capturePublishError(error, { userId, siteId, platform, articleId });

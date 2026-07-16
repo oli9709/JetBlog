@@ -1,15 +1,13 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Globe, Calendar, Plus, X, Zap } from 'lucide-react';
+import { Globe, Calendar, Plus, X } from 'lucide-react';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
-import * as Tabs from '@radix-ui/react-tabs';
 import { SiteT } from '@/lib/types/supabase';
 import { SupabaseUpdateSite, SupabaseDeleteSite } from '@/lib/API/Database/sites/mutations';
 import { toast } from 'react-toastify';
 import { SiteCard } from './SiteCard';
 import { AddConnectionWizard } from '@/components/connections/AddConnectionWizard';
-import { AIBuilderPrompt } from '@/components/connections/AIBuilderPrompt';
 import { cn } from '@/lib/utils/helpers';
 import { useTranslations } from 'next-intl';
 
@@ -118,31 +116,8 @@ export default function ConnectionsClient({ initialSites, userId }: ConnectionsC
         </button>
       </div>
 
-      {/* TABS */}
-      <Tabs.Root defaultValue="sites" className="space-y-6">
-        {/* Tab list */}
-        <Tabs.List className="flex items-center gap-1 p-1 bg-zinc-900/40 backdrop-blur-md border border-zinc-800/60 rounded-2xl w-fit">
-          <Tabs.Trigger
-            value="sites"
-            className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 text-zinc-400 hover:text-zinc-300 data-[state=active]:bg-zinc-800 data-[state=active]:text-white data-[state=active]:shadow-sm"
-          >
-            <Globe className="w-4 h-4" />
-            {t('sitesTab')}
-          </Tabs.Trigger>
-          <Tabs.Trigger
-            value="ai-builder"
-            className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 text-zinc-400 hover:text-zinc-300 data-[state=active]:bg-zinc-800 data-[state=active]:text-white data-[state=active]:shadow-sm"
-          >
-            <Zap className="w-4 h-4 text-[#FB3640]" />
-            AI Builder
-            <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded-full bg-[#FB3640]/20 text-[#FF8A8F] border border-[#FB3640]/30">
-              NEW
-            </span>
-          </Tabs.Trigger>
-        </Tabs.List>
-
-        {/* ─── Sites tab ─── */}
-        <Tabs.Content value="sites" className="space-y-6">
+      {/* Sites section — AI Builder tab olib tashlandi (endi Webhook oqimi ichida ko'rsatiladi) */}
+      <div className="space-y-6">
           {/* STATS */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="bg-zinc-900/30 backdrop-blur-md border border-zinc-800/60 p-6 rounded-2xl">
@@ -194,15 +169,7 @@ export default function ConnectionsClient({ initialSites, userId }: ConnectionsC
               ))}
             </div>
           )}
-        </Tabs.Content>
-
-        {/* ─── AI Builder tab ─── */}
-        <Tabs.Content value="ai-builder">
-          <div className="bg-zinc-900/30 backdrop-blur-md border border-zinc-800/60 p-6 md:p-8 rounded-2xl">
-            <AIBuilderPrompt userId={userId} />
-          </div>
-        </Tabs.Content>
-      </Tabs.Root>
+        </div>
 
       {/* WIZARD DIALOG */}
       <DialogPrimitive.Root open={showWizard} onOpenChange={setShowWizard}>

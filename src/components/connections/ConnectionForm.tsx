@@ -538,9 +538,35 @@ export function ConnectionForm({ platform, data, onChange }: ConnectionFormProps
     );
   }
 
-  // webhook → endpoint URL input + AI Builder Prompt
+  // webhook: two paths — user already has an endpoint OR needs to build one with AI
   return (
-    <div className="flex flex-col gap-4">
+    <WebhookBlock
+      data={data}
+      update={update}
+      secretKey={secretKey}
+      langSelect={langSelect}
+    />
+  );
+}
+
+// ─── Webhook block with "have endpoint" vs "build with AI" choice ─────────────
+
+function WebhookBlock({
+  data,
+  update,
+  secretKey,
+  langSelect,
+}: {
+  data: ConnectionFormData;
+  update: (patch: Partial<ConnectionFormData>) => void;
+  secretKey: string;
+  langSelect: React.ReactNode;
+}) {
+  type Mode = 'have' | 'build';
+  const [mode, setMode] = useState<Mode>('have');
+
+  const endpointInput = (
+    <>
       <FloatingInput
         id="webhook-endpoint"
         label="Receiver endpoint URL (https://...)"
@@ -555,10 +581,90 @@ export function ConnectionForm({ platform, data, onChange }: ConnectionFormProps
         Deploy qilingan saytingiz URL manzilini kiriting. Masalan: https://audit-dashboard.onrender.com
         &nbsp;—&nbsp;saytda <code>/api/jetblog</code> endpoint bo&apos;lishi kerak.
       </HintBox>
-      <AIBuilderPrompt
-        webhookUrl={WEBHOOK_RECEIVE_URL}
-        secretKey={secretKey}
-      />
+    </>
+  );
+
+  return (
+    <div className="flex flex-col gap-4">
+      {/* Choice cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <button
+          type="button"
+          onClick={() => setMode('have')}
+          className={cn(
+            'text-left p-4 rounded-xl border transition-all duration-200',
+            'flex flex-col gap-1.5',
+            mode === 'have'
+              ? 'border-[#FB3640] bg-[#FB3640]/8 ring-1 ring-[#FB3640]/50'
+              : 'border-zinc-800 bg-zinc-900/40 hover:border-zinc-700'
+          )}
+        >
+          <div className="flex items-center gap-2">
+            <div className={cn(
+              'w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0',
+              mode === 'have' ? 'border-[#FB3640]' : 'border-zinc-600'
+            )}>
+              {mode === 'have' && <div className="w-2 h-2 rounded-full bg-[#FB3640]" />}
+            </div>
+            <span className="text-sm font-semibold text-white">Menda tayyor webhook endpoint bor</span>
+          </div>
+          <p className="text-xs text-zinc-500 pl-6">
+            URL va Secret keyni bilaman — to&apos;g&apos;ridan-to&apos;g&apos;ri kiritaman
+          </p>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setMode('build')}
+          className={cn(
+            'text-left p-4 rounded-xl border transition-all duration-200',
+            'flex flex-col gap-1.5',
+            mode === 'build'
+              ? 'border-[#FB3640] bg-[#FB3640]/8 ring-1 ring-[#FB3640]/50'
+              : 'border-zinc-800 bg-zinc-900/40 hover:border-zinc-700'
+          )}
+        >
+          <div className="flex items-center gap-2">
+            <div className={cn(
+              'w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0',
+              mode === 'build' ? 'border-[#FB3640]' : 'border-zinc-600'
+            )}>
+              {mode === 'build' && <div className="w-2 h-2 rounded-full bg-[#FB3640]" />}
+            </div>
+            <span className="text-sm font-semibold text-white">Endpointim yo&apos;q — AI Builder bilan yasayman</span>
+          </div>
+          <p className="text-xs text-zinc-500 pl-6">
+            Cursor / v0 / Lovable uchun tayyor prompt olaman
+          </p>
+        </button>
+      </div>
+
+      {mode === 'have' && (
+        <>
+          {endpointInput}
+        </>
+      )}
+
+      {mode === 'build' && (
+        <>
+          <AIBuilderPrompt
+            webhookUrl={WEBHOOK_RECEIVE_URL}
+            secretKey={secretKey}
+          />
+          <div className="p-4 rounded-xl bg-zinc-900/40 border border-zinc-800/80 space-y-2">
+            <p className="text-xs font-semibold text-zinc-300 uppercase tracking-wider">
+              Keyingi qadamlar
+            </p>
+            <ol className="text-xs text-zinc-400 space-y-1 leading-relaxed list-decimal list-inside">
+              <li>Yuqoridagi promptni nusxa oling</li>
+              <li>Cursor / Windsurf / Lovable / v0 kabi AI builder&apos;ga bering</li>
+              <li>Deploy bo&apos;lgach, quyida Endpoint URL va Secret key&apos;ni kiriting</li>
+            </ol>
+          </div>
+          {endpointInput}
+        </>
+      )}
+
       {langSelect}
     </div>
   );
