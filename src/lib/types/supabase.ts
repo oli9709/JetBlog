@@ -86,6 +86,7 @@ export type SiteT = {
   is_active: boolean;
   telegram_chat_id?: string | null;
   indexnow_key?: string | null;
+  default_language?: 'uz' | 'en' | 'ru';
   created_at: string;
 };
 

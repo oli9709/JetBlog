@@ -19,12 +19,13 @@ export function AddConnectionWizard({ onComplete }: AddConnectionWizardProps) {
   const [formData, setFormData] = useState<ConnectionFormData>({
     platform: 'wordpress',
     siteUrl: '',
+    defaultLanguage: 'uz',
   });
   const [createdSite, setCreatedSite] = useState<any>(null);
 
   const handlePlatformSelect = (p: PlatformType) => {
     setPlatform(p);
-    setFormData({ platform: p, siteUrl: '' });
+    setFormData({ platform: p, siteUrl: '', defaultLanguage: formData.defaultLanguage ?? 'uz' });
   };
 
   const handleFormChange = (data: ConnectionFormData) => setFormData(data);

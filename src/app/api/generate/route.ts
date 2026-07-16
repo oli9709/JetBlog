@@ -132,10 +132,13 @@ export async function POST(req: NextRequest) {
         console.warn('[Generate] Prior articles fetch error (non-fatal):', err);
       }
 
+      // Language fallback chain: keyword's language → site default → 'uz'
+      const genLanguage = keywordData.language ?? siteData.default_language ?? 'uz';
+
       const articleDraft = await GenerateArticleWithClaude({
         keyword: keywordData.keyword,
         brandVoice: siteData.brand_voice,
-        language: keywordData.language,
+        language: genLanguage,
         priorArticles,
       });
 
@@ -150,7 +153,7 @@ export async function POST(req: NextRequest) {
         coverUrl = await GenerateCoverImage({
           keyword: keywordData.keyword,
           title: articleDraft.title,
-          language: keywordData.language,
+          language: genLanguage,
         });
       } catch (imgErr) {
         console.error('Rasm generatsiyasida xatolik yuz berdi:', imgErr);

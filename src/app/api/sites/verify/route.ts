@@ -145,6 +145,12 @@ export async function POST(request: NextRequest) {
       }
 
       const platform = ((body.platform_type ?? body.platform) as string | undefined) ?? 'wordpress';
+
+      // Article generation / autopilot language — DB CHECK allows uz/en/ru; default 'uz'
+      const allowedLangs = ['uz', 'en', 'ru'] as const;
+      const bodyLang = (body.default_language as string | undefined) ?? 'uz';
+      const defaultLanguage: 'uz' | 'en' | 'ru' =
+        (allowedLangs as readonly string[]).includes(bodyLang) ? (bodyLang as 'uz' | 'en' | 'ru') : 'uz';
       const adapterCfg = (body.adapter_config ?? {}) as Record<string, string>;
 
       // ── Webhook ───────────────────────────────────────────────────────────
@@ -274,6 +280,7 @@ export async function POST(request: NextRequest) {
           publish_time: '09:00:00',
           is_active: true,
           platform_type: 'webhook',
+          default_language: defaultLanguage,
           adapter_config: { endpointUrl: baseUrl, secretKey: secretKey ? encryptText(secretKey) : '' },
         });
       }
@@ -311,6 +318,7 @@ export async function POST(request: NextRequest) {
             publish_time: '09:00:00',
             is_active: true,
             platform_type: 'wordpress',
+            default_language: defaultLanguage,
             adapter_config: {},
           });
         }
@@ -341,6 +349,7 @@ export async function POST(request: NextRequest) {
             publish_time: '09:00:00',
             is_active: true,
             platform_type: 'wordpress',
+            default_language: defaultLanguage,
             adapter_config: {},
           });
         } catch {
@@ -388,6 +397,7 @@ export async function POST(request: NextRequest) {
             publish_time: '09:00:00',
             is_active: true,
             platform_type: 'ghost',
+            default_language: defaultLanguage,
             adapter_config: { apiUrl, adminApiKey: encryptText(adminApiKey) },
           });
         } catch {
@@ -446,6 +456,7 @@ export async function POST(request: NextRequest) {
             publish_time: '09:00:00',
             is_active: true,
             platform_type: 'webflow',
+            default_language: defaultLanguage,
             adapter_config: {
               apiToken:       encryptText(token),
               siteId,

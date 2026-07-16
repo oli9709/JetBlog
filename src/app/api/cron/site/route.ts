@@ -156,11 +156,14 @@ async function processOneSite(siteId: string): Promise<{ status: string; reason?
       console.warn('[Worker] Oldingi maqolalarni olishda xatolik (kritik emas):', e);
     }
 
+    // Language fallback chain: keyword's language → site default → 'uz'
+    const genLanguage = keyword.language ?? site.default_language ?? 'uz';
+
     // ── 6. Claude bilan maqola generatsiya ──────────────────────────────
     const draft = await GenerateArticleWithClaude({
       keyword: keyword.keyword,
       brandVoice: site.brand_voice,
-      language: keyword.language,
+      language: genLanguage,
       priorArticles,
     });
 
@@ -170,7 +173,7 @@ async function processOneSite(siteId: string): Promise<{ status: string; reason?
       coverUrl = await GenerateCoverImage({
         keyword: keyword.keyword,
         title: draft.title,
-        language: keyword.language,
+        language: genLanguage,
       });
     } catch (imgErr) {
       console.error('[Worker] Rasm yaratishda xatolik (kritik emas):', imgErr);

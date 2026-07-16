@@ -142,11 +142,13 @@ interface ConnectionTestProps {
 function buildApiBody(formData: ConnectionFormData) {
   const url = formData.siteUrl.trim();
   const platform = formData.platform;
+  const default_language = formData.defaultLanguage ?? 'uz';
 
   if (platform === 'wordpress') {
     return {
       platform_type: 'wordpress',
       url,
+      default_language,
       wp_username: formData.wpUsername ?? '',
       wp_password: formData.wpPassword ?? '',
     };
@@ -155,6 +157,7 @@ function buildApiBody(formData: ConnectionFormData) {
     return {
       platform_type: 'ghost',
       url,
+      default_language,
       adapter_config: {
         apiUrl: url,
         adminApiKey: formData.ghostApiKey ?? '',
@@ -165,6 +168,7 @@ function buildApiBody(formData: ConnectionFormData) {
     return {
       platform_type: 'webflow',
       url,
+      default_language,
       adapter_config: {
         apiToken:       formData.webflowToken ?? '',
         siteId:         formData.webflowSiteId ?? '',
@@ -179,6 +183,7 @@ function buildApiBody(formData: ConnectionFormData) {
   return {
     platform_type: 'webhook',
     url: endpointUrl,
+    default_language,
     adapter_config: {
       endpointUrl,
       secretKey: formData.webhookSecret ?? '',

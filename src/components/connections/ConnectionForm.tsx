@@ -25,6 +25,8 @@ export interface WebflowFieldMap {
 export interface ConnectionFormData {
   platform: PlatformType;
   siteUrl: string;
+  /** Article generation / autopilot language. DB'da: sites.default_language. */
+  defaultLanguage?: 'uz' | 'en';
   wpUsername?: string;
   wpPassword?: string;
   ghostApiKey?: string;
@@ -390,6 +392,38 @@ function WebflowForm({
   );
 }
 
+function LanguageSelect({
+  value,
+  onChange,
+}: {
+  value: 'uz' | 'en';
+  onChange: (v: 'uz' | 'en') => void;
+}) {
+  return (
+    <div className="flex flex-col gap-1.5">
+      <label htmlFor="connection-lang" className="text-xs font-medium text-zinc-400 pl-1">
+        Maqolalar tili
+      </label>
+      <select
+        id="connection-lang"
+        value={value}
+        onChange={(e) => onChange(e.target.value as 'uz' | 'en')}
+        className={cn(
+          'w-full px-4 py-3 bg-black/50 border border-zinc-800 rounded-xl text-white text-sm',
+          'focus:outline-none focus:ring-1 focus:ring-[#FB3640] focus:border-[#FB3640]',
+          'transition-all duration-300'
+        )}
+      >
+        <option value="uz">O&apos;zbekcha (uz)</option>
+        <option value="en">English (en)</option>
+      </select>
+      <p className="text-[11px] text-zinc-500 pl-1">
+        Autopilot va qo&apos;lda generatsiyada maqolalar shu tilda yoziladi.
+      </p>
+    </div>
+  );
+}
+
 export function ConnectionForm({ platform, data, onChange }: ConnectionFormProps) {
   const [showPassword, setShowPassword] = useState(false);
   const [showToken, setShowToken]       = useState(false);
@@ -397,6 +431,13 @@ export function ConnectionForm({ platform, data, onChange }: ConnectionFormProps
   const [secretKey]                     = useState(() => generateSecret());
 
   const update = (patch: Partial<ConnectionFormData>) => onChange({ ...data, ...patch });
+
+  const langSelect = (
+    <LanguageSelect
+      value={data.defaultLanguage ?? 'uz'}
+      onChange={(v) => update({ defaultLanguage: v })}
+    />
+  );
 
   // Webhook platformi tanlanganida faqat secretKey ni avtomatik to'ldirish.
   // webhookEndpoint foydalanuvchi o'zi kiritadi (quyidagi input orqali).
@@ -445,6 +486,7 @@ export function ConnectionForm({ platform, data, onChange }: ConnectionFormProps
             </button>
           }
         />
+        {langSelect}
       </div>
     );
   }
@@ -482,13 +524,17 @@ export function ConnectionForm({ platform, data, onChange }: ConnectionFormProps
         <HintBox>
           Settings → Integrations → Add custom integration — &quot;Admin API Key&quot; ni nusxa oling.
         </HintBox>
+        {langSelect}
       </div>
     );
   }
 
   if (platform === 'webflow') {
     return (
-      <WebflowForm data={data} onChange={onChange} showToken={showToken} setShowToken={setShowToken} />
+      <div className="flex flex-col gap-4">
+        <WebflowForm data={data} onChange={onChange} showToken={showToken} setShowToken={setShowToken} />
+        {langSelect}
+      </div>
     );
   }
 
@@ -513,6 +559,7 @@ export function ConnectionForm({ platform, data, onChange }: ConnectionFormProps
         webhookUrl={WEBHOOK_RECEIVE_URL}
         secretKey={secretKey}
       />
+      {langSelect}
     </div>
   );
 }
