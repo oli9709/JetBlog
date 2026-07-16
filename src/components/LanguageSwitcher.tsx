@@ -5,7 +5,7 @@ export function LanguageSwitcher() {
   const locale = useLocale();
   const pathname = usePathname();
   const router = useRouter();
-  const langs = [['uz', "O'zbek"], ['ru', 'Русский'], ['en', 'English']] as const;
+  const langs = [['uz', "O'zbek"], ['en', 'English']] as const;
   return (
     <div className="flex gap-1 text-sm">
       {langs.map(([code, label]) => (
