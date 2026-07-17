@@ -21,139 +21,119 @@ export const PLATFORM_META: Record<AIPlatform, { label: string; icon: string; co
 // ─── Universal prompt ─────────────────────────────────────────────────────────
 
 export function generateUniversalPrompt(
-  webhookUrl: string,
-  secretKey: string
+  _webhookUrl: string,
+  _secretKey: string
 ): string {
+  // Signature: (webhookUrl, secretKey) kept for backwards compat.
+  // Actual creds are injected via env — the prompt shows YOUR_JETBLOG_SECRET
+  // as a placeholder so users don't paste real secrets into public chats.
+  void _webhookUrl;
+  void _secretKey;
+
   return `You are an expert developer. Analyze my existing project structure and implement a complete blog system integrated with JetBlog AI.
 
-IMPORTANT: Do not ask any questions. Detect everything automatically from the codebase and implement in one go.
+IMPORTANT: Do not ask questions. Detect everything automatically and implement in one go.
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-JETBLOG CREDENTIALS (do not change)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Webhook endpoint (JetBlog will POST here):
-POST /api/jetblog
+━━━ JETBLOG CREDENTIALS (do not change) ━━━
+Webhook endpoint (JetBlog will POST here): POST /api/jetblog
+Secret key: YOUR_JETBLOG_SECRET (from the JetBlog dashboard)
+Signature header: X-JetBlog-Signature (HMAC-SHA256 of the RAW body)
+Event header: X-JetBlog-Event ("ping" or "article.published")
 
-Secret key: YOUR_JETBLOG_SECRET (see credentials below)
-Signature header: X-JetBlog-Signature (HMAC-SHA256)
+━━━ STEP 1: AUTO-DETECT PROJECT ━━━
+Framework: Next.js App Router / Pages / Nuxt / Laravel / Django / Express — detect
+Database: Supabase / Prisma / MongoDB / MySQL / Postgres / none (file-based)
+Styling: Tailwind / CSS modules / plain — match the existing design exactly
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-STEP 1: AUTO-DETECT PROJECT
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-First, scan the project and detect:
+━━━ STEP 2: WEBHOOK RECEIVER — CRITICAL RULES ━━━
 
-Framework:
-- Next.js App Router → /app/api/jetblog/route.ts
-- Next.js Pages Router → /pages/api/jetblog.ts
-- Nuxt.js → /server/api/jetblog.post.ts
-- Laravel → /app/Http/Controllers/JetBlogController.php
-- Django → blog/views.py
-- Express/Node → routes/jetblog.js
-- Other → detect and implement accordingly
+Create POST /api/jetblog with these EXACT rules — each rule addresses a real bug
+seen in production integrations:
 
-Database:
-- Supabase → create blog_posts table via migration
-- Prisma → add BlogPost model to schema.prisma
-- MongoDB → create BlogPost mongoose model
-- MySQL/PostgreSQL → create migration file
-- No database → use /public/posts/ JSON files
+RULE A — Body structure (avoids "data is not defined" ReferenceError):
+The article payload is NOT top-level. It sits inside body.data:
+  {
+    "event": "article.published",
+    "timestamp": "2026-07-15T09:55:46.000Z",
+    "data": {
+      "title": "...",
+      "content": "<h1>...</h1>",         // HTML string
+      "featuredImageUrl": "https://images.pexels.com/...",
+      "seoTitle": "...",
+      "seoDescription": "...",
+      "tags": ["..."]
+    }
+  }
+Always declare data explicitly:
+  const payload = JSON.parse(rawBody);
+  const event = req.headers['x-jetblog-event'] || payload.event;
+  const data = payload.data || {};   // NEVER skip this line
+Never destructure { title, content } from the top-level body.
 
-Styling:
-- Tailwind CSS → use Tailwind classes
-- CSS Modules → use .module.css files
-- Styled Components → use styled components
-- Plain CSS → use stylesheet
-- Match EXACTLY the existing design system
+RULE B — Raw body for signature (avoids 401 "Invalid signature"):
+Signature = HMAC-SHA256(RAW_body_string, JETBLOG_SECRET).
+If you JSON.parse first and re-stringify to verify, whitespace/order will differ
+and the signature will always fail.
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-STEP 2: WEBHOOK RECEIVER
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Create webhook endpoint that:
+For Express, register the route with raw parser BEFORE any global express.json():
+  app.post('/api/jetblog', express.raw({ type: '*/*' }), handler);
+  app.use(express.json());   // for other routes only
 
-1. Accepts POST /api/jetblog
-2. Verifies HMAC-SHA256 signature:
-   - Get raw request body as text
-   - Compute: HMAC-SHA256(body, YOUR_JETBLOG_SECRET)
-   - Compare with X-JetBlog-Signature header
-   - Return 401 if mismatch
-3. On event "article.published":
-   - Save to database with these fields:
-     title: data.title
-     content: data.content       (HTML string)
-     featuredImage: data.featuredImageUrl
-     slug: auto-generate from title
-     seoTitle: data.seoTitle
-     seoDescription: data.seoDescription
-     tags: data.tags             (array)
-     readTime: calculate from word count
-     publishedAt: current timestamp
-4. Return { received: true }
-5. Also handle GET → return { status: "JetBlog webhook active" }
+For Next.js API route, read the raw body via req or Web API before parsing:
+  const rawBody = await req.text();
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-STEP 3: DATABASE / STORAGE
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Based on detected database, create:
+Verification:
+  const expected = 'sha256=' + crypto.createHmac('sha256', process.env.JETBLOG_SECRET)
+    .update(rawBody).digest('hex');
+  if (req.headers['x-jetblog-signature'] !== expected) return 401;
 
-blog_posts table/model/collection with:
-- id (auto-generated primary key)
-- title (string, required)
-- slug (string, unique, auto-generated)
-- content (text/longtext, HTML)
-- featured_image (string, nullable, URL)
-- seo_title (string, nullable)
-- seo_description (text, nullable)
-- tags (json/array, default empty)
-- read_time (integer, minutes)
-- published_at (timestamp)
-- created_at (timestamp, auto)
+RULE C — Ping event (avoids failed connection test):
+Connection setup sends { "event": "ping", "data": {} } first.
+Handle it BEFORE trying to read data.title:
+  if (event === 'ping') return res.status(200).json({ ok: true });
 
-If no database exists in project:
-Create /lib/posts.ts with file-based storage:
-- Save each post as /public/posts/[slug].json
-- /public/posts/index.json keeps list of all posts
+RULE D — Public URL for post links (avoids Telegram link pointing to backend):
+Frontend and backend often have DIFFERENT domains. Telegram notifications and
+social shares must open the PUBLIC frontend URL, not the API backend.
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-STEP 4: BLOG INDEX PAGE
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Create /blog page:
+Add env var PUBLIC_SITE_URL = your real public site
+(e.g. https://www.example.com, not https://api-backend.onrender.com).
 
-Layout:
-- Page title: "Blog" (or translated if site uses another language)
-- Responsive grid: 3 cols desktop, 2 cols tablet, 1 col mobile
-- Match existing page layout (header/footer)
+Return the FULL public URL in the webhook response:
+  return res.status(200).json({
+    postId: inserted.id,
+    url: \`\${process.env.PUBLIC_SITE_URL}/blog/\${slug}\`
+  });
 
-Each post card must show:
-- Featured image (aspect-video, object-cover)
-  Fallback: gradient placeholder if no image
-- Title (2 lines max, font-bold)
-- Published date (formatted: "12 May 2025")
-- Read time ("5 daqiqa" or "5 min")
-- Excerpt: first 150 characters, strip HTML tags
-- Hover: subtle scale or border effect
+Never return a bare path ("/blog/slug") or the backend domain.
 
-Empty state (no posts yet):
-- Icon + "Tez kunda yangi maqolalar..." text
-- Do not show error
+RULE E — Route order (Express — avoids "Cannot POST /"):
+Register /api/jetblog BEFORE any catch-all handler, 404 middleware, or
+app.use('*', ...). Catch-all 404 must be the very last handler.
 
-SEO: Add meta title and description to page
+━━━ STEP 3: DATABASE — blog_posts table/model ━━━
+Fields: id (uuid/auto), title, slug (unique, auto from title), content (HTML text),
+featured_image (nullable), seo_title (nullable), seo_description (nullable),
+tags (array/json), read_time (int, minutes — compute from word count),
+published_at (timestamptz), created_at (timestamptz, default now()).
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-STEP 5: BLOG POST PAGE
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Create /blog/[slug] page:
+Slug generation:
+  const slug = title.toLowerCase().replace(/[^a-z0-9\\s-]/g, '').trim()
+    .replace(/\\s+/g, '-').slice(0, 80) + '-' + Date.now();
 
-Layout:
-- Hero: full-width featured image (max-height 400px, object-cover)
-  Show gradient placeholder if no image
-- Breadcrumb: Home → Blog → [Title]
-- Title: large (text-3xl or text-4xl), bold
-- Meta row: date + read time + tags (as badges)
-- Horizontal divider
-- Content: render HTML safely
+━━━ STEP 4: BLOG INDEX PAGE (/blog) ━━━
+Responsive grid (3 / 2 / 1 cols). Each card: featured image (aspect-video, object-cover,
+gradient placeholder fallback), title (2 lines max, bold), formatted date, read time,
+150-char excerpt (strip HTML). Empty state: "New articles coming soon..." — no error.
+SEO meta title and description on the page.
 
-Content CSS (add to global or scoped styles):
-  .blog-content h1,h2,h3 { font-weight: bold; margin: 1.5rem 0 0.75rem; }
+━━━ STEP 5: BLOG POST PAGE (/blog/[slug]) ━━━
+Hero: full-width featured image (max-h 400, object-cover, gradient fallback).
+Breadcrumb Home → Blog → Title. Large bold title. Meta row: date + read time + tag badges.
+Divider. Render content HTML safely.
+
+Content CSS:
+  .blog-content h1,h2,h3 { font-weight: bold; margin: 1.5rem 0 .75rem; }
   .blog-content h2 { font-size: 1.5rem }
   .blog-content h3 { font-size: 1.25rem }
   .blog-content p { margin: 1rem 0; line-height: 1.8; }
@@ -163,73 +143,65 @@ Content CSS (add to global or scoped styles):
   .blog-content blockquote { border-left: 3px solid #FB3640; padding-left: 1rem; font-style: italic; color: gray; }
   .blog-content code { background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px; font-family: monospace; }
 
-- "← Blog ga qaytish" back button
-- Dynamic SEO meta (use seoTitle, seoDescription)
-- If framework supports: static generation with revalidation every 60 seconds
+Back button "← Back to Blog". Dynamic SEO meta from seoTitle/seoDescription.
+If supported, static generation with revalidate = 60.
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-STEP 6: NAVIGATION
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Find the main navigation/header component.
-Add "Blog" link pointing to /blog.
-Place it naturally among existing nav items.
-Match existing nav link style exactly.
+━━━ STEP 6: SITEMAP (avoids "sitemap not found") ━━━
+Create /sitemap.xml on the FRONTEND that includes all blog posts:
+  \${PUBLIC_SITE_URL}/blog/\${slug} — each with <lastmod> and <changefreq>weekly</changefreq>
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-STEP 7: VERIFY EVERYTHING WORKS
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-After implementation:
+Next.js App Router: create app/sitemap.ts that fetches all posts from DB and returns
+MetadataRoute.Sitemap. Include the home page and /blog too.
 
-1. Check GET /api/jetblog returns:
-   { "status": "JetBlog webhook active" }
+Update /robots.txt (or app/robots.ts) to include:
+  Sitemap: \${PUBLIC_SITE_URL}/sitemap.xml
 
-2. Check /blog page loads without errors
+━━━ STEP 7: NAVIGATION ━━━
+Add "Blog" → /blog to the main header. Match the existing nav link style exactly.
 
-3. Check /blog/test-slug shows 404 gracefully (not a crash)
+━━━ STEP 8: LOGGING (makes debugging possible) ━━━
+Every log line must be prefixed [JetBlog] so it's greppable in production logs.
+Log entry, event type, and outcome:
+  console.log('[JetBlog] POST received, event:', event);
+  console.log('[JetBlog] Article saved:', inserted.slug);
+Catch block must log FULL error (not just message):
+  catch (err) {
+    console.error('[JetBlog] Webhook error:', err?.stack || err);
+    return res.status(500).json({ error: String(err?.message || err) });
+  }
 
-4. Confirm "Blog" appears in navigation
+━━━ STEP 9: VERIFY ━━━
+1) GET /api/jetblog → { "status": "JetBlog webhook active" }
+2) /blog loads without errors, empty state shows if no posts
+3) /blog/non-existent-slug shows 404 (not a crash)
+4) "Blog" appears in navigation
+5) /sitemap.xml is accessible
 
-Tell me when done and show me:
-- The webhook endpoint URL
-- The /blog page URL
-- Any environment variables I need to add
+━━━ STEP 10: DEPLOY & ENVIRONMENT ━━━
+Detect hosting (vercel.json / netlify.toml / other) and deploy.
+Webhook does NOT work on localhost — must be on public URL first.
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-STEP 8: DEPLOY TO PRODUCTION
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-After implementation, deploy the project
-so JetBlog can test the webhook.
+Environment variables to add (production, not just .env.local):
+  JETBLOG_SECRET = <from JetBlog dashboard, keep secret>
+  PUBLIC_SITE_URL = <your real public frontend URL, e.g. https://www.example.com>
 
-Detect hosting platform automatically:
-- vercel.json exists → run: vercel --prod
-- netlify.toml exists → run: netlify deploy --prod
-- package.json has "build" script → build first
-- Other → use existing deploy method
+For Vercel: vercel env add JETBLOG_SECRET (and PUBLIC_SITE_URL)
+For Netlify: Site settings → Environment variables → Add
 
-After deploy, the webhook URL will be:
-https://YOUR-DOMAIN.com/api/jetblog
+━━━ COMMON PITFALLS TO AVOID ━━━
+- Do NOT use body.title — use body.data.title (see RULE A)
+- Do NOT parse JSON before verifying signature (see RULE B)
+- Do NOT skip the ping handler (see RULE C)
+- Do NOT return backend domain in the url field (see RULE D)
+- Do NOT put /api/jetblog after a catch-all 404 (see RULE E)
+- Do NOT hardcode JETBLOG_SECRET — use process.env
+- Do NOT log the secret or full request body in production logs
 
-IMPORTANT:
-- Webhook does NOT work on localhost
-- Must be deployed to public URL first
-- Add JETBLOG_SECRET to your hosting
-  environment variables (not just .env.local)
-
-For Vercel:
-  vercel env add JETBLOG_SECRET
-
-For Netlify:
-  Site settings → Environment variables → Add
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-ENVIRONMENT VARIABLE NEEDED
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Add to your .env.local file:
-JETBLOG_SECRET=YOUR_JETBLOG_SECRET
-
-Then in your webhook file use:
-const SECRET = process.env.JETBLOG_SECRET!
-(never hardcode the secret key)`;
+Report back with:
+- Webhook URL (must be POST /api/jetblog on your public domain)
+- Blog index URL (/blog)
+- Sitemap URL (/sitemap.xml)
+- Env vars added (JETBLOG_SECRET, PUBLIC_SITE_URL)`;
 }
 
 // ─── Legacy per-platform generator (backward compatibility) ──────────────────
