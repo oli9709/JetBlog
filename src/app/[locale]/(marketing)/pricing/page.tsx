@@ -188,8 +188,9 @@ const Pricing = () => {
 
         {/* Pricing Cards Grid */}
         <ScrollReveal delay="200">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8 max-w-6xl mx-auto items-center">
-            {products.map((prod, idx) => (
+          {/* Agency tarifi vaqtincha yashirilgan — kod dashboard.ts da saqlanadi. */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 max-w-5xl mx-auto items-center">
+            {products.filter((p) => p.name !== 'Agency').map((prod, idx) => (
               <div key={idx} className="flex justify-center h-full w-full">
                 <PriceCard product={prod} timeInterval={timeInterval} />
               </div>
