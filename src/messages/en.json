@@ -478,7 +478,38 @@
       "nextStepsLabel": "Next steps",
       "nextStep1": "Copy the prompt above",
       "nextStep2": "Give it to an AI builder like Cursor / Windsurf / Lovable / v0",
-      "nextStep3": "Once deployed, enter the Endpoint URL and Secret key below"
+      "nextStep3": "Once deployed, enter the Endpoint URL and Secret key below",
+      "platformWpDesc": "Automatic publishing via REST API. The most widely used CMS.",
+      "platformGhostDesc": "Fast and modern integration via the Admin API.",
+      "platformWebflowDesc": "Publish to designer sites via CMS Collection API.",
+      "platformWebhookDesc": "Integrate any platform via webhook.",
+      "popularBadge": "Popular"
+    },
+    "connections": {
+      "activeToggle": "Active",
+      "pauseToggle": "Paused",
+      "publishDaysLabel": "Publish days",
+      "publishTimeLabel": "Publish time",
+      "toneLabel": "Tone",
+      "toneNeutral": "Neutral",
+      "toneProfessional": "Professional",
+      "toneCasual": "Casual",
+      "toneAuthoritative": "Authoritative",
+      "toneFriendly": "Friendly",
+      "telegramConnect": "Connect Telegram",
+      "telegramDisconnect": "Disconnect",
+      "telegramConfirmDisconnect": "Are you sure you want to disconnect the Telegram channel?",
+      "telegramModalTitle": "Connect Telegram channel",
+      "telegramChannelId": "Channel ID",
+      "telegramIdHint": "Get the channel ID from @userinfobot",
+      "telegramHowTitle": "How to get it?",
+      "telegramHowStep1": "Add the bot as an admin to your channel",
+      "telegramHowStep2": "Forward any message from the channel to @userinfobot",
+      "telegramHowStep3": "Paste the ID (starts with -100) above",
+      "cancel": "Cancel",
+      "connecting": "Connecting...",
+      "connect": "Connect",
+      "deleteSite": "Delete site"
     }
   }
 }

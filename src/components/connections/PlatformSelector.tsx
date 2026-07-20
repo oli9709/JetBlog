@@ -3,13 +3,14 @@
 import React from 'react';
 import { Globe, Ghost, Webhook, Layers } from 'lucide-react';
 import { cn } from '@/lib/utils/helpers';
+import { useTranslations } from 'next-intl';
 
 export type PlatformType = 'wordpress' | 'ghost' | 'webflow' | 'webhook';
 
 interface Platform {
   id: PlatformType;
   name: string;
-  description: string;
+  descKey: 'platformWpDesc' | 'platformGhostDesc' | 'platformWebflowDesc' | 'platformWebhookDesc';
   icon: React.ReactNode;
   popular?: boolean;
 }
@@ -18,26 +19,26 @@ const PLATFORMS: Platform[] = [
   {
     id: 'wordpress',
     name: 'WordPress',
-    description: 'REST API orqali avtomatik nashr. Eng keng tarqalgan CMS.',
+    descKey: 'platformWpDesc',
     icon: <Globe className="w-7 h-7" />,
   },
   {
     id: 'ghost',
     name: 'Ghost',
-    description: 'Admin API orqali tez va zamonaviy integratsiya.',
+    descKey: 'platformGhostDesc',
     icon: <Ghost className="w-7 h-7" />,
     popular: true,
   },
   {
     id: 'webflow',
     name: 'Webflow',
-    description: "CMS Collection API orqali dizayner saytlarga nashr.",
+    descKey: 'platformWebflowDesc',
     icon: <Layers className="w-7 h-7" />,
   },
   {
     id: 'webhook',
     name: 'Custom (Webhook)',
-    description: 'Istalgan platforma bilan webhook orqali integratsiya.',
+    descKey: 'platformWebhookDesc',
     icon: <Webhook className="w-7 h-7" />,
   },
 ];
@@ -48,6 +49,7 @@ interface PlatformSelectorProps {
 }
 
 export function PlatformSelector({ selected, onSelect }: PlatformSelectorProps) {
+  const t = useTranslations('Dashboard.wizard');
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
       {PLATFORMS.map((platform) => (
@@ -65,7 +67,7 @@ export function PlatformSelector({ selected, onSelect }: PlatformSelectorProps) 
         >
           {platform.popular && (
             <span className="absolute top-3 right-3 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30">
-              Mashhur
+              {t('popularBadge')}
             </span>
           )}
 
@@ -82,7 +84,7 @@ export function PlatformSelector({ selected, onSelect }: PlatformSelectorProps) 
 
           <div>
             <div className="font-bold text-white text-sm">{platform.name}</div>
-            <div className="text-xs text-zinc-500 mt-1 leading-relaxed">{platform.description}</div>
+            <div className="text-xs text-zinc-500 mt-1 leading-relaxed">{t(platform.descKey)}</div>
           </div>
         </button>
       ))}

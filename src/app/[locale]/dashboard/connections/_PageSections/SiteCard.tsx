@@ -7,6 +7,7 @@ import { Switch } from '@/components/ui/Switch';
 import { cn } from '@/lib/utils/helpers';
 import { getDisplayUrl, getDisplayHost } from '@/lib/utils/siteUrl';
 import { ShimmerButton } from '@/components/magicui/shimmer-button';
+import { useTranslations } from 'next-intl';
 
 const PLATFORM_BADGE: Record<string, { label: string; className: string }> = {
   wordpress: { label: 'WordPress', className: 'bg-blue-500/15 text-blue-400 border-blue-500/25' },
@@ -39,6 +40,16 @@ const DAYS_MAP: Record<string, string> = {
 };
 
 export const SiteCard: React.FC<SiteCardProps> = ({ site, onDelete, onToggle, onConnectTelegram, onDisconnectTelegram }) => {
+  const t = useTranslations('Dashboard.connections');
+  const toneMap: Record<string, string> = {
+    neutral: t('toneNeutral'),
+    professional: t('toneProfessional'),
+    casual: t('toneCasual'),
+    authoritative: t('toneAuthoritative'),
+    friendly: t('toneFriendly'),
+  };
+  const toneRaw = (site.brand_voice?.tone ?? '').toLowerCase();
+  const toneLabel = toneMap[toneRaw] ?? (site.brand_voice?.tone || t('toneNeutral'));
   const [showTgModal, setShowTgModal] = useState(false);
   const [tgChatId, setTgChatId] = useState('');
   const [isTgSubmitting, setIsTgSubmitting] = useState(false);
@@ -64,7 +75,7 @@ export const SiteCard: React.FC<SiteCardProps> = ({ site, onDelete, onToggle, on
 
   const handleTgDisconnect = async () => {
     if (!onDisconnectTelegram) return;
-    if (confirm("Haqiqatan ham Telegram kanalni uzmoqchimisiz?")) {
+    if (confirm(t('telegramConfirmDisconnect'))) {
       await onDisconnectTelegram(site.id);
     }
   };
@@ -111,7 +122,7 @@ export const SiteCard: React.FC<SiteCardProps> = ({ site, onDelete, onToggle, on
               <span className="relative inline-flex rounded-full h-2 w-2 bg-zinc-600"></span>
             )}
           </span>
-          <span className="text-xs font-medium text-zinc-400 mr-2">{site.is_active ? 'Faol' : 'Pauza'}</span>
+          <span className="text-xs font-medium text-zinc-400 mr-2">{site.is_active ? t('activeToggle') : t('pauseToggle')}</span>
           <Switch 
             checked={site.is_active}
             onCheckedChange={(checked) => onToggle(site.id, checked)}
@@ -123,7 +134,7 @@ export const SiteCard: React.FC<SiteCardProps> = ({ site, onDelete, onToggle, on
       {/* Body */}
       <div className="flex flex-col gap-4 mb-6 z-10">
         <div className="flex items-center justify-between text-sm">
-          <span className="text-zinc-500">Nashr kunlari</span>
+          <span className="text-zinc-500">{t('publishDaysLabel')}</span>
           <div className="flex gap-1">
             {(site.publish_days ?? []).length > 0
               ? (site.publish_days ?? []).map(day => (
@@ -136,14 +147,14 @@ export const SiteCard: React.FC<SiteCardProps> = ({ site, onDelete, onToggle, on
           </div>
         </div>
         <div className="flex items-center justify-between text-sm">
-          <span className="text-zinc-500">Nashr vaqti</span>
+          <span className="text-zinc-500">{t('publishTimeLabel')}</span>
           <span className="text-zinc-300 font-mono bg-zinc-800/50 px-2 py-0.5 rounded border border-white/5 shadow-inner">
             {site.publish_time ?? '—'}
           </span>
         </div>
         <div className="flex items-center justify-between text-sm">
-          <span className="text-zinc-500">Ohang</span>
-          <span className="text-zinc-300 capitalize">{site.brand_voice?.tone || 'Neutral'}</span>
+          <span className="text-zinc-500">{t('toneLabel')}</span>
+          <span className="text-zinc-300 capitalize">{toneLabel}</span>
         </div>
       </div>
 
@@ -159,7 +170,7 @@ export const SiteCard: React.FC<SiteCardProps> = ({ site, onDelete, onToggle, on
               onClick={handleTgDisconnect}
               className="text-[10px] px-2 py-0.5 rounded bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 transition-colors"
             >
-              Uzish
+              {t('telegramDisconnect')}
             </button>
           </div>
         ) : (
@@ -168,14 +179,14 @@ export const SiteCard: React.FC<SiteCardProps> = ({ site, onDelete, onToggle, on
             className="flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg bg-zinc-800/50 hover:bg-zinc-800 text-zinc-400 hover:text-white border border-white/5 transition-all duration-300 group-hover:border-white/10"
           >
             <Send className="w-3.5 h-3.5" />
-            Telegram ulash
+            {t('telegramConnect')}
           </button>
         )}
 
         <button 
           onClick={() => onDelete(site.id, getDisplayUrl(site))}
           className="p-2 text-zinc-500 hover:text-rose-400 hover:bg-rose-500/10 rounded-xl transition-all duration-300"
-          title="Saytni o'chirish"
+          title={t('deleteSite')}
         >
           <Trash2 className="w-4 h-4" />
         </button>
@@ -195,7 +206,7 @@ export const SiteCard: React.FC<SiteCardProps> = ({ site, onDelete, onToggle, on
                   <div className="p-2 rounded-xl bg-[#229ED9]/10 border border-[#229ED9]/20">
                     <MessageCircle className="w-5 h-5 text-[#229ED9]" />
                   </div>
-                  <h3 className="text-lg font-bold text-white">Telegram Kanalini Ulash</h3>
+                  <h3 className="text-lg font-bold text-white">{t('telegramModalTitle')}</h3>
                 </div>
                 <button 
                   onClick={() => setShowTgModal(false)}
@@ -208,7 +219,7 @@ export const SiteCard: React.FC<SiteCardProps> = ({ site, onDelete, onToggle, on
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-zinc-300 mb-1.5">
-                    Kanal ID
+                    {t('telegramChannelId')}
                   </label>
                   <input
                     type="text"
@@ -219,24 +230,24 @@ export const SiteCard: React.FC<SiteCardProps> = ({ site, onDelete, onToggle, on
                   />
                   <p className="text-[11px] text-zinc-500 mt-2 flex items-center gap-1.5">
                     <Info className="w-3.5 h-3.5 text-[#229ED9]" />
-                    @userinfobot dan kanal ID ni oling
+                    {t('telegramIdHint')}
                   </p>
                 </div>
 
                 <div className="bg-[#111111] border border-white/5 rounded-xl p-4">
-                  <h4 className="text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-3">Qanday olish mumkin?</h4>
+                  <h4 className="text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-3">{t('telegramHowTitle')}</h4>
                   <ul className="space-y-2 text-sm text-zinc-400">
                     <li className="flex gap-2">
                       <span className="text-[#229ED9] font-bold">1.</span>
-                      <span>Botni kanalga admin qilib qo'shing</span>
+                      <span>{t('telegramHowStep1')}</span>
                     </li>
                     <li className="flex gap-2">
                       <span className="text-[#229ED9] font-bold">2.</span>
-                      <span>@userinfobot ga kanaldan istalgan xabarni forward qiling</span>
+                      <span>{t('telegramHowStep2')}</span>
                     </li>
                     <li className="flex gap-2">
                       <span className="text-[#229ED9] font-bold">3.</span>
-                      <span>Kelgan ID ni (-100 bilan boshlanadi) yuqoriga kiriting</span>
+                      <span>{t('telegramHowStep3')}</span>
                     </li>
                   </ul>
                 </div>
@@ -246,7 +257,7 @@ export const SiteCard: React.FC<SiteCardProps> = ({ site, onDelete, onToggle, on
                     onClick={() => setShowTgModal(false)}
                     className="flex-1 px-4 py-2.5 rounded-xl text-sm font-medium text-zinc-300 bg-zinc-800/50 hover:bg-zinc-800 border border-white/5 transition-colors"
                   >
-                    Bekor qilish
+                    {t('cancel')}
                   </button>
                   <div className="flex-1">
                     <ShimmerButton
@@ -255,7 +266,7 @@ export const SiteCard: React.FC<SiteCardProps> = ({ site, onDelete, onToggle, on
                       className="w-full h-[42px] shadow-lg text-sm font-bold flex items-center justify-center gap-2"
                       background="linear-gradient(90deg, #229ED9 0%, #1a7bb0 100%)"
                     >
-                      {isTgSubmitting ? 'Ulanmoqda...' : 'Ulash'}
+                      {isTgSubmitting ? t('connecting') : t('connect')}
                     </ShimmerButton>
                   </div>
                 </div>

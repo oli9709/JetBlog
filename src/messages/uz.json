@@ -478,7 +478,38 @@
       "nextStepsLabel": "Keyingi qadamlar",
       "nextStep1": "Yuqoridagi promptni nusxa oling",
       "nextStep2": "Cursor / Windsurf / Lovable / v0 kabi AI builder'ga bering",
-      "nextStep3": "Deploy bo'lgach, quyida Endpoint URL va Secret key'ni kiriting"
+      "nextStep3": "Deploy bo'lgach, quyida Endpoint URL va Secret key'ni kiriting",
+      "platformWpDesc": "REST API orqali avtomatik nashr. Eng keng tarqalgan CMS.",
+      "platformGhostDesc": "Admin API orqali tez va zamonaviy integratsiya.",
+      "platformWebflowDesc": "CMS Collection API orqali dizayner saytlarga nashr.",
+      "platformWebhookDesc": "Istalgan platforma bilan webhook orqali integratsiya.",
+      "popularBadge": "Mashhur"
+    },
+    "connections": {
+      "activeToggle": "Faol",
+      "pauseToggle": "Pauza",
+      "publishDaysLabel": "Nashr kunlari",
+      "publishTimeLabel": "Nashr vaqti",
+      "toneLabel": "Ohang",
+      "toneNeutral": "Neytral",
+      "toneProfessional": "Professional",
+      "toneCasual": "Erkin",
+      "toneAuthoritative": "Kuchli",
+      "toneFriendly": "Do'stona",
+      "telegramConnect": "Telegram ulash",
+      "telegramDisconnect": "Uzish",
+      "telegramConfirmDisconnect": "Haqiqatan ham Telegram kanalni uzmoqchimisiz?",
+      "telegramModalTitle": "Telegram Kanalini Ulash",
+      "telegramChannelId": "Kanal ID",
+      "telegramIdHint": "@userinfobot dan kanal ID ni oling",
+      "telegramHowTitle": "Qanday olish mumkin?",
+      "telegramHowStep1": "Botni kanalga admin qilib qo'shing",
+      "telegramHowStep2": "@userinfobot ga kanaldan istalgan xabarni forward qiling",
+      "telegramHowStep3": "Kelgan ID ni (-100 bilan boshlanadi) yuqoriga kiriting",
+      "cancel": "Bekor qilish",
+      "connecting": "Ulanmoqda...",
+      "connect": "Ulash",
+      "deleteSite": "Saytni o'chirish"
     }
   }
 }
