@@ -41,7 +41,7 @@ async function loadData(): Promise<{
   const dayAgoISO = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
 
   const [users, articlesMonth, failures, payments] = await Promise.all([
-    svc.from('profiles').select('id, subscription_status, subscription_plan, created_at'),
+    svc.from('profiles').select('id, subscription_status, subscription_plan'),
     svc.from('articles').select('id', { count: 'exact' }).gte('created_at', startOfMonthISO),
     svc
       .from('articles')
@@ -62,9 +62,8 @@ async function loadData(): Promise<{
   const active = profiles.filter((p) => p.subscription_status === 'active');
   const starterSubs = active.filter((p) => p.subscription_plan === 'starter').length;
   const proSubs = active.filter((p) => p.subscription_plan === 'pro').length;
-  const newThisMonth = profiles.filter(
-    (p) => p.created_at && new Date(p.created_at) >= startOfMonth
-  ).length;
+  // "New this month" — auth.users.created_at bo'yicha (profiles'да created_at yo'q)
+  let newThisMonth = 0;
 
   // Enrich failure rows + payment rows with email
   const userIds = new Set<string>();
@@ -77,12 +76,12 @@ async function loadData(): Promise<{
   paymentsRaw.forEach((p: any) => p.user_id && userIds.add(p.user_id));
 
   const emailMap: Record<string, string> = {};
-  if (userIds.size > 0) {
-    const { data: authList } = await svc.auth.admin.listUsers({ perPage: 1000, page: 1 });
-    (authList?.users as Array<{ id: string; email?: string }> | undefined)?.forEach((u) => {
-      if (u.email && userIds.has(u.id)) emailMap[u.id] = u.email;
-    });
-  }
+  // authList always needed — for newThisMonth count too
+  const { data: authList } = await svc.auth.admin.listUsers({ perPage: 1000, page: 1 });
+  (authList?.users as Array<{ id: string; email?: string; created_at?: string }> | undefined)?.forEach((u) => {
+    if (u.email && userIds.has(u.id)) emailMap[u.id] = u.email;
+    if (u.created_at && new Date(u.created_at) >= startOfMonth) newThisMonth += 1;
+  });
 
   const failureRows: FailureRow[] = failuresRaw.map((f: any) => ({
     id: f.id,

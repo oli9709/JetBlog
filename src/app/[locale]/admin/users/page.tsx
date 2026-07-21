@@ -25,11 +25,11 @@ export default async function AdminUsersPage({ searchParams }: Props) {
   const admin = (await requireAdmin())!; // middleware guaranteed
   const svc = adminServiceClient();
 
-  // 1. Query profiles
+  // 1. Query profiles (NOTE: profiles jadvalida created_at yo'q — auth.users'дан olamiz)
   let query = svc
     .from('profiles')
     .select(
-      'id, credits_remaining, subscription_status, subscription_plan, is_suspended, role, created_at',
+      'id, credits_remaining, subscription_status, subscription_plan, is_suspended, role',
       { count: 'exact' }
     );
 
@@ -55,9 +55,10 @@ export default async function AdminUsersPage({ searchParams }: Props) {
   const from = (pageNum - 1) * PAGE_SIZE;
   const to = from + PAGE_SIZE - 1;
 
-  const { data: profiles, count } = await query
-    .order('created_at', { ascending: false })
-    .range(from, to);
+  const { data: profiles, count, error: queryErr } = await query.range(from, to);
+  if (queryErr) {
+    console.error('[admin/users] query failed', queryErr.message);
+  }
 
   // 2. Emails
   const ids = new Set((profiles ?? []).map((p) => p.id));
@@ -88,7 +89,13 @@ export default async function AdminUsersPage({ searchParams }: Props) {
       isSuspended: !!p.is_suspended,
       role: p.role ?? 'user',
     }))
-    .filter((r) => (q ? r.email.toLowerCase().includes(q.toLowerCase()) : true));
+    .filter((r) => (q ? r.email.toLowerCase().includes(q.toLowerCase()) : true))
+    .sort((a, b) => {
+      // Sort by signup date (from auth.users), newest first
+      const ta = createdMap[a.id] ? new Date(createdMap[a.id]).getTime() : 0;
+      const tb = createdMap[b.id] ? new Date(createdMap[b.id]).getTime() : 0;
+      return tb - ta;
+    });
 
   const totalPages = Math.max(1, Math.ceil((count ?? 0) / PAGE_SIZE));
 
