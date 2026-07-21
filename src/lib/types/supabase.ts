@@ -126,17 +126,6 @@ export type ArticleT = {
   created_at: string;
 };
 
-export type InvoiceT = {
-  id: string;
-  user_id: string;
-  amount_usd: number;
-  credits_to_add: number;
-  status: 'pending' | 'paid' | 'cancelled';
-  invoice_pdf_url?: string | null;
-  paid_at?: string | null;
-  created_at: string;
-};
-
 export type TSupabaseUserSession =
   | {
       user: User;

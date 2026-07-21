@@ -8,33 +8,24 @@ async function getStats() {
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   );
 
-  const [users, invoices, articles] = await Promise.all([
-    supabase.from('profiles').select('id, plan, credits_remaining', { count: 'exact' }),
-    supabase.from('invoices').select('status, amount_usd, created_at'),
+  const [users, articles] = await Promise.all([
+    supabase.from('profiles').select('id, plan, credits_remaining, subscription_status, subscription_plan', { count: 'exact' }),
     supabase.from('articles').select('id', { count: 'exact' }).eq('status', 'published')
   ]);
 
   const totalUsers = users.count ?? 0;
-  const allInvoices = invoices.data ?? [];
-  const pendingInvoices = allInvoices.filter(i => i.status === 'pending').length;
-  const paidInvoices = allInvoices.filter(i => i.status === 'paid');
-  const totalRevenue = paidInvoices.reduce((sum, i) => sum + (i.amount_usd || 0), 0);
-  const now = new Date();
-  const thisMonthRevenue = paidInvoices
-    .filter(i => {
-      const d = new Date(i.created_at);
-      return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
-    })
-    .reduce((sum, i) => sum + (i.amount_usd || 0), 0);
-
-  const activeSubs = (users.data ?? []).filter(u => u.plan && u.plan !== 'FREE').length;
+  const activeSubs = (users.data ?? []).filter(u => u.subscription_status === 'active').length;
+  const starterSubs = (users.data ?? []).filter(u => u.subscription_status === 'active' && u.subscription_plan === 'starter').length;
+  const proSubs = (users.data ?? []).filter(u => u.subscription_status === 'active' && u.subscription_plan === 'pro').length;
+  // Baholovchi MRR — actual to'lovlar PayPal tomonda, bu faqat approx
+  const monthlyMRR = starterSubs * 9 + proSubs * 29;
 
   return {
     totalUsers,
     activeSubs,
-    pendingInvoices,
-    thisMonthRevenue,
-    totalRevenue,
+    starterSubs,
+    proSubs,
+    monthlyMRR,
     publishedArticles: articles.count ?? 0
   };
 }
@@ -61,39 +52,15 @@ export default async function AdminPage() {
 
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
         <StatCard label="Jami foydalanuvchilar" value={stats.totalUsers} />
-        <StatCard label="Faol obunalar" value={stats.activeSubs} sub="FREE emas" accent="text-blue-400" />
+        <StatCard label="Faol obunalar" value={stats.activeSubs} sub={`${stats.starterSubs} Starter · ${stats.proSubs} Pro`} accent="text-blue-400" />
         <StatCard
-          label="Pending invoicelar"
-          value={stats.pendingInvoices}
-          sub="Tasdiqlash kutilmoqda"
-          accent={stats.pendingInvoices > 0 ? 'text-yellow-400' : 'text-white'}
-        />
-        <StatCard
-          label="Bu oy daromad"
-          value={`$${stats.thisMonthRevenue.toFixed(2)}`}
+          label="MRR (oylik daromad)"
+          value={`$${stats.monthlyMRR.toFixed(2)}`}
+          sub="PayPal Subscriptions"
           accent="text-green-400"
-        />
-        <StatCard
-          label="Jami daromad"
-          value={`$${stats.totalRevenue.toFixed(2)}`}
-          accent="text-green-300"
         />
         <StatCard label="Nashr qilingan maqolalar" value={stats.publishedArticles} />
       </div>
-
-      {stats.pendingInvoices > 0 && (
-        <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-2xl p-4 flex items-center gap-3">
-          <span className="text-yellow-400 text-lg">⚠️</span>
-          <div>
-            <p className="text-yellow-400 font-medium text-sm">
-              {stats.pendingInvoices} ta invoice tasdiqlash kutilmoqda
-            </p>
-            <a href="/admin/invoices" className="text-yellow-400/70 text-xs hover:text-yellow-400 underline">
-              Invoices sahifasiga o&apos;ting →
-            </a>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
