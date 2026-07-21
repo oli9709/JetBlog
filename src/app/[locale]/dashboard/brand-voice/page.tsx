@@ -1,6 +1,6 @@
 import { GetSitesByUser } from '@/lib/API/Database/sites/queries';
 import BrandVoiceClient from './_PageSections/BrandVoiceClient';
-import { SupabaseSession } from '@/lib/API/Services/supabase/user';
+import { getDashboardUserId } from '@/lib/API/Services/admin/dashboardUser';
 
 export const metadata = {
   title: 'Brand Voice DNA - JetBlog.app',
@@ -8,10 +8,10 @@ export const metadata = {
 };
 
 export default async function BrandVoicePage() {
-  const { data } = await SupabaseSession();
-  const session = data?.session;
+  const { userId } = await getDashboardUserId();
+  
 
-  if (!session?.user) {
+  if (!userId) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] text-center p-6">
         <h2 className="text-2xl font-bold text-red-500">Avtorizatsiya xatoligi</h2>
@@ -23,7 +23,7 @@ export default async function BrandVoicePage() {
   // 1. Foydalanuvchi bog'lagan saytlar ro'yxati
   let sites = [];
   try {
-    const res = await GetSitesByUser(session.user.id);
+    const res = await GetSitesByUser(userId);
     if (res.data) {
       sites = res.data;
     }
@@ -33,7 +33,7 @@ export default async function BrandVoicePage() {
 
   return (
     <div className="flex flex-col items-center w-full min-h-screen py-6">
-      <BrandVoiceClient initialSites={sites} userId={session.user.id} />
+      <BrandVoiceClient initialSites={sites} userId={userId} />
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import { GetSitesByUser } from '@/lib/API/Database/sites/queries';
 import ContentClient from './_PageSections/ContentClient';
-import { SupabaseSession } from '@/lib/API/Services/supabase/user';
+import { getDashboardUserId } from '@/lib/API/Services/admin/dashboardUser';
 
 export const metadata = {
   title: 'Content Queue & Editor - JetBlog.app',
@@ -8,10 +8,10 @@ export const metadata = {
 };
 
 export default async function ContentPage() {
-  const { data } = await SupabaseSession();
-  const session = data?.session;
+  const { userId } = await getDashboardUserId();
+  
 
-  if (!session?.user) {
+  if (!userId) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] text-center p-6">
         <h2 className="text-2xl font-bold text-red-500">Avtorizatsiya xatoligi</h2>
@@ -23,7 +23,7 @@ export default async function ContentPage() {
   // 1. Bog'langan saytlar ro'yxatini olish
   let sites = [];
   try {
-    const res = await GetSitesByUser(session.user.id);
+    const res = await GetSitesByUser(userId);
     if (res.data) {
       sites = res.data;
     }
@@ -33,7 +33,7 @@ export default async function ContentPage() {
 
   return (
     <div className="flex flex-col items-center w-full min-h-screen py-6">
-      <ContentClient initialSites={sites} userId={session.user.id} />
+      <ContentClient initialSites={sites} userId={userId} />
     </div>
   );
 }

@@ -4,6 +4,7 @@ import { GetProfileByUserId } from '@/lib/API/Database/profile/queries';
 import { GetSitesByUser } from '@/lib/API/Database/sites/queries';
 import { SupabaseServerClient as supabaseClient } from '@/lib/API/Services/init/supabase';
 import { redirect } from 'next/navigation';
+import { getDashboardUserId } from '@/lib/API/Services/admin/dashboardUser';
 
 export const dynamic = 'force-dynamic';
 
@@ -18,10 +19,9 @@ export type ArticleRow = {
 
 export default async function DashboardPage() {
   const client = await supabaseClient();
-  const { data: { user } } = await client.auth.getUser();
+  const { userId } = await getDashboardUserId();
 
-  if (!user?.id) redirect('/auth/login');
-  const userId = user.id;
+  if (!userId) redirect('/auth/login');
 
   // ─── Default values ───────────────────────────────────────────
   const stats = { credits: 0, activeSites: 0, totalArticles: 0, thisMonthPublished: 0 };

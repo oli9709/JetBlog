@@ -7,6 +7,7 @@ import { SupabaseServerClient } from '@/lib/API/Services/init/supabase';
 import { LayoutProps } from '@/lib/types/types';
 import { getEffectiveUser } from '@/lib/API/Services/admin/impersonation';
 import { ImpersonationBanner } from '@/components/admin/ImpersonationBanner';
+import { adminServiceClient } from '@/lib/API/Services/admin/guard';
 
 export const dynamic = 'force-dynamic';
 
@@ -16,16 +17,35 @@ export default async function DashboardLayout({ children }: LayoutProps) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user?.id) redirect('/auth/login');
 
-  const profile = await GetProfileByUserId(user.id);
-  const profileData = profile?.data?.[0];
+  // Real admin's profile — for role check (Admin button, onboarding is checked on real user)
+  const realProfile = await GetProfileByUserId(user.id);
+  const realProfileData = realProfile?.data?.[0];
+  const onboarding_completed: boolean = realProfileData?.onboarding_completed ?? false;
+  const role: string = (realProfileData as { role?: string } | undefined)?.role ?? 'user';
 
-  const display_name: string = profileData?.display_name ?? '';
-  const email: string = user.email ?? '';
-  const avatar_url: string = (user.user_metadata?.avatar_url as string) ?? '';
-  const onboarding_completed: boolean = profileData?.onboarding_completed ?? false;
-  const plan: string = profileData?.plan ?? 'FREE';
-  const credits_remaining: number = profileData?.credits_remaining ?? 0;
-  const role: string = (profileData as { role?: string } | undefined)?.role ?? 'user';
+  // Effective user (impersonation-aware) — for the actual dashboard data
+  const effective = await getEffectiveUser(user.id);
+  let effProfileData = realProfileData;
+  let effEmail: string = user.email ?? '';
+  let effAvatarUrl: string = (user.user_metadata?.avatar_url as string) ?? '';
+
+  if (effective.isImpersonating && effective.effectiveUserId !== user.id) {
+    const svc = adminServiceClient();
+    const [effProf, effAuth] = await Promise.all([
+      svc.from('profiles').select('display_name, plan, credits_remaining').eq('id', effective.effectiveUserId).maybeSingle(),
+      svc.auth.admin.getUserById(effective.effectiveUserId),
+    ]);
+    if (effProf.data) effProfileData = effProf.data as typeof realProfileData;
+    if (effAuth.data?.user?.email) effEmail = effAuth.data.user.email;
+    const meta = effAuth.data?.user?.user_metadata as { avatar_url?: string } | undefined;
+    if (meta?.avatar_url) effAvatarUrl = meta.avatar_url;
+  }
+
+  const display_name: string = effProfileData?.display_name ?? '';
+  const email: string = effEmail;
+  const avatar_url: string = effAvatarUrl;
+  const plan: string = effProfileData?.plan ?? 'FREE';
+  const credits_remaining: number = effProfileData?.credits_remaining ?? 0;
 
   // Server-side onboarding redirect — YAGONA joy
   const headersList = await headers();
@@ -33,8 +53,6 @@ export default async function DashboardLayout({ children }: LayoutProps) {
   if (!onboarding_completed && pathname && !pathname.includes('onboarding')) {
     redirect('/dashboard/onboarding');
   }
-
-  const effective = await getEffectiveUser(user.id);
 
   return (
     <>
