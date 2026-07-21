@@ -79,7 +79,7 @@ async function loadData(): Promise<{
   const emailMap: Record<string, string> = {};
   if (userIds.size > 0) {
     const { data: authList } = await svc.auth.admin.listUsers({ perPage: 1000, page: 1 });
-    authList?.users.forEach((u) => {
+    (authList?.users as Array<{ id: string; email?: string }> | undefined)?.forEach((u) => {
       if (u.email && userIds.has(u.id)) emailMap[u.id] = u.email;
     });
   }

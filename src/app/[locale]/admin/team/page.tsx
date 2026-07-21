@@ -34,7 +34,7 @@ async function loadTeam(): Promise<{ admins: AdminRow[]; logs: AuditRow[] }> {
   ]);
 
   const emailMap: Record<string, string> = {};
-  authListRes.data?.users.forEach((u) => {
+  (authListRes.data?.users as Array<{ id: string; email?: string }> | undefined)?.forEach((u) => {
     if (u.email) emailMap[u.id] = u.email;
   });
 

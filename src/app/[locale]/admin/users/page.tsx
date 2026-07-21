@@ -65,7 +65,7 @@ export default async function AdminUsersPage({ searchParams }: Props) {
   const createdMap: Record<string, string> = {};
   if (ids.size > 0) {
     const { data: authList } = await svc.auth.admin.listUsers({ perPage: 1000, page: 1 });
-    authList?.users.forEach((u) => {
+    (authList?.users as Array<{ id: string; email?: string; created_at?: string }> | undefined)?.forEach((u) => {
       if (ids.has(u.id)) {
         if (u.email) emailMap[u.id] = u.email;
         createdMap[u.id] = u.created_at ?? '';
