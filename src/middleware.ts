@@ -7,11 +7,12 @@ const intlMiddleware = createMiddleware(routing);
 
 export async function middleware(request: NextRequest) {
   const response = intlMiddleware(request);
-
   const { pathname } = request.nextUrl;
-  const dash = pathname.match(/^\/(uz|ru|en)\/dashboard(\/|$)/);
-  if (!dash) return response;
-  const locale = dash[1];
+
+  const guarded = pathname.match(/^\/(uz|ru|en)\/(dashboard|admin)(\/|$)/);
+  if (!guarded) return response;
+  const locale = guarded[1];
+  const section = guarded[2] as 'dashboard' | 'admin';
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -32,6 +33,24 @@ export async function middleware(request: NextRequest) {
   if (!session) {
     return NextResponse.redirect(new URL(`/${locale}/auth/login`, request.url));
   }
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role, is_suspended')
+    .eq('id', session.user.id)
+    .maybeSingle();
+
+  if (section === 'admin') {
+    if (!profile || (profile.role !== 'admin' && profile.role !== 'super_admin')) {
+      // 404 — don't reveal admin route existence
+      return NextResponse.rewrite(new URL(`/${locale}/not-found`, request.url));
+    }
+  } else if (section === 'dashboard') {
+    if (profile?.is_suspended) {
+      return NextResponse.rewrite(new URL(`/${locale}/suspended`, request.url));
+    }
+  }
+
   return response;
 }
 

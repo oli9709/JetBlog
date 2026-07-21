@@ -5,6 +5,8 @@ import { redirect } from 'next/navigation';
 import { headers } from 'next/headers';
 import { SupabaseServerClient } from '@/lib/API/Services/init/supabase';
 import { LayoutProps } from '@/lib/types/types';
+import { getEffectiveUser } from '@/lib/API/Services/admin/impersonation';
+import { ImpersonationBanner } from '@/components/admin/ImpersonationBanner';
 
 export const dynamic = 'force-dynamic';
 
@@ -31,19 +33,26 @@ export default async function DashboardLayout({ children }: LayoutProps) {
     redirect('/dashboard/onboarding');
   }
 
+  const effective = await getEffectiveUser(user.id);
+
   return (
-    <main className="grid md:grid-cols-[auto_1fr]">
-      <SideBar />
-      <div>
-        <Header
-          email={email}
-          display_name={display_name}
-          avatar_url={avatar_url}
-          plan={plan}
-          credits_remaining={credits_remaining}
-        />
-        <div className="m-6">{children}</div>
-      </div>
-    </main>
+    <>
+      {effective.isImpersonating && <ImpersonationBanner targetEmail={effective.targetEmail} />}
+      <main
+        className={`grid md:grid-cols-[auto_1fr] ${effective.isImpersonating ? 'pt-10' : ''}`}
+      >
+        <SideBar />
+        <div>
+          <Header
+            email={email}
+            display_name={display_name}
+            avatar_url={avatar_url}
+            plan={plan}
+            credits_remaining={credits_remaining}
+          />
+          <div className="m-6">{children}</div>
+        </div>
+      </main>
+    </>
   );
 }
