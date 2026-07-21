@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import configuration, { PLAN_TRANSLATIONS } from '@/lib/config/dashboard';
 import { ProductI } from '@/lib/types/types';
 import { IntervalE } from '@/lib/types/enums';
@@ -10,13 +10,15 @@ import { Check, Sparkles } from 'lucide-react';
 import { NumberTicker } from '@/components/magicui/number-ticker';
 import { ScrollReveal } from '@/components/ScrollReveal';
 import { useTranslations, useLocale } from 'next-intl';
+import { supabaseBrowser } from '@/lib/API/Services/init/supabase-browser';
 
 interface PriceCardProps {
   product: ProductI;
   timeInterval: IntervalE;
+  isAuthed: boolean;
 }
 
-const PriceCard = ({ product, timeInterval }: PriceCardProps) => {
+const PriceCard = ({ product, timeInterval, isAuthed }: PriceCardProps) => {
   const t = useTranslations('Pricing');
   const locale = useLocale();
   const { name, plans } = product;
@@ -80,7 +82,13 @@ const PriceCard = ({ product, timeInterval }: PriceCardProps) => {
 
       <div className="p-0 mt-8">
         <Link
-          href="/auth/signup"
+          href={
+            isFree
+              ? '/auth/signup'
+              : isAuthed
+              ? '/dashboard/settings/billing'
+              : `/auth/signup?plan=${name.toLowerCase().replace(/\s+/g, '-')}`
+          }
           className={cn(
             'w-full font-bold text-xs py-3 rounded-xl transition-all duration-300 flex items-center justify-center',
             isFree
@@ -108,7 +116,16 @@ const PriceCard = ({ product, timeInterval }: PriceCardProps) => {
 const Pricing = () => {
   const t = useTranslations('Pricing');
   const [timeInterval, setTimeInterval] = useState(IntervalE.MONTHLY);
+  const [isAuthed, setIsAuthed] = useState(false);
   const { products } = configuration;
+
+  useEffect(() => {
+    const supabase = supabaseBrowser();
+    supabase.auth
+      .getUser()
+      .then(({ data }) => setIsAuthed(!!data.user))
+      .catch(() => setIsAuthed(false));
+  }, []);
 
   const toggleBilling = () => {
     setTimeInterval((prev) =>
@@ -192,7 +209,7 @@ const Pricing = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 max-w-5xl mx-auto items-center">
             {products.filter((p) => p.name !== 'Agency').map((prod, idx) => (
               <div key={idx} className="flex justify-center h-full w-full">
-                <PriceCard product={prod} timeInterval={timeInterval} />
+                <PriceCard product={prod} timeInterval={timeInterval} isAuthed={isAuthed} />
               </div>
             ))}
           </div>

@@ -1,9 +1,11 @@
 import ManageSubscription from '../_PageSections/Billing';
+import { SubscriptionPlans } from '../_PageSections/SubscriptionPlans';
 import { SupabaseUser } from '@/lib/API/Services/supabase/user';
 import { GetProfileByUserId } from '@/lib/API/Database/profile/queries';
 import { GetInvoicesByUser } from '@/lib/API/Database/invoices/queries';
 import { redirect } from 'next/navigation';
 import config from '@/lib/config/auth';
+import { getPaypalPlanId } from '@/lib/API/Services/paypal/client';
 
 export const dynamic = 'force-dynamic';
 
@@ -27,8 +29,14 @@ export default async function Billing() {
     console.error('Error fetching user invoices:', error);
   }
 
+  // Plan ID lar env dan (sandbox / live'ga qarab client.ts avtomatik tanlaydi).
+  // Env yo'q bo'lsa bo'sh string — subscribe tugmasi "tarif sozlanmagan" ko'rsatadi.
+  const starterPlanId = getPaypalPlanId('starter');
+  const proPlanId = getPaypalPlanId('pro');
+
   return (
-    <div>
+    <div className="space-y-6">
+      <SubscriptionPlans starterPlanId={starterPlanId} proPlanId={proPlanId} />
       <ManageSubscription
         initialInvoices={invoices}
         userId={user.id}

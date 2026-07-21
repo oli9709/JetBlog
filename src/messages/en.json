@@ -510,6 +510,30 @@
       "connecting": "Connecting...",
       "connect": "Connect",
       "deleteSite": "Delete site"
+    },
+    "billing": {
+      "subscriptionsTitle": "Subscription plans",
+      "subscriptionsSubtitle": "Monthly automatic billing — cancel any time.",
+      "starterPlanName": "Starter",
+      "proPlanName": "Pro",
+      "starterPrice": "$9 / month",
+      "proPrice": "$29 / month",
+      "starterFeatures": "30 AI articles/month · 1 site · Email support",
+      "proFeatures": "80 AI articles/month · 3 sites · 24/7 priority support",
+      "subscribeBtn": "Subscribe",
+      "cancelBtn": "Cancel subscription",
+      "activePlan": "Active plan",
+      "nextBilling": "Next billing",
+      "subscribeStarter": "Subscribe to Starter",
+      "subscribePro": "Subscribe to Pro",
+      "subscribeError": "Failed to subscribe. Please try again.",
+      "subscribeSuccess": "Subscription activated! Credits added to your account.",
+      "subscribeCancelled": "Subscription flow cancelled.",
+      "paypalNotConfigured": "PayPal not configured yet",
+      "planNotConfigured": "{plan} plan not configured yet",
+      "cancelConfirm": "Are you sure you want to cancel? Your credits will be preserved.",
+      "cancelling": "Cancelling...",
+      "recommended": "Recommended"
     }
   }
 }

@@ -510,6 +510,30 @@
       "connecting": "Ulanmoqda...",
       "connect": "Ulash",
       "deleteSite": "Saytni o'chirish"
+    },
+    "billing": {
+      "subscriptionsTitle": "Obuna tariflar",
+      "subscriptionsSubtitle": "Oylik avtomatik to'lov — istalgan vaqt bekor qilishingiz mumkin.",
+      "starterPlanName": "Starter",
+      "proPlanName": "Pro",
+      "starterPrice": "$9 / oyiga",
+      "proPrice": "$29 / oyiga",
+      "starterFeatures": "Oyiga 30 ta AI maqola · 1 ta sayt · Email yordam",
+      "proFeatures": "Oyiga 80 ta AI maqola · 3 ta sayt · 24/7 tezkor yordam",
+      "subscribeBtn": "Obuna bo'lish",
+      "cancelBtn": "Obunani bekor qilish",
+      "activePlan": "Faol tarif",
+      "nextBilling": "Keyingi to'lov",
+      "subscribeStarter": "Starter'ga obuna bo'lish",
+      "subscribePro": "Pro'ga obuna bo'lish",
+      "subscribeError": "Obuna qo'shishda xatolik yuz berdi. Qayta urinib ko'ring.",
+      "subscribeSuccess": "Obuna faollashtirildi! Kreditlar hisobingizga qo'shildi.",
+      "subscribeCancelled": "Obuna bo'lish bekor qilindi.",
+      "paypalNotConfigured": "PayPal hali sozlanmagan",
+      "planNotConfigured": "{plan} tarifi hali sozlanmagan",
+      "cancelConfirm": "Haqiqatan obunani bekor qilmoqchimisiz? Kreditlaringiz saqlanadi.",
+      "cancelling": "Bekor qilinmoqda...",
+      "recommended": "Tavsiya etamiz"
     }
   }
 }

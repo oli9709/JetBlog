@@ -18,6 +18,7 @@
     "@anthropic-ai/sdk": "^0.96.0",
     "@google/genai": "^2.10.0",
     "@hookform/resolvers": "^3.3.1",
+    "@paypal/react-paypal-js": "^10.1.2",
     "@radix-ui/react-accordion": "^1.2.12",
     "@radix-ui/react-avatar": "^1.0.4",
     "@radix-ui/react-dialog": "^1.0.4",
