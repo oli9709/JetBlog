@@ -1,6 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
+import { Shield } from 'lucide-react';
 import { UserNav } from './UserNav';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { usePathname } from '@/i18n/navigation';
@@ -13,9 +15,11 @@ interface HeaderProps {
   avatar_url: string;
   plan: string;
   credits_remaining: number;
+  role?: string;
 }
 
-const Header = ({ display_name, email, avatar_url, plan, credits_remaining }: HeaderProps) => {
+const Header = ({ display_name, email, avatar_url, plan, credits_remaining, role }: HeaderProps) => {
+  const isAdmin = role === 'admin' || role === 'super_admin';
   const [headerText, setHeaderText] = useState('');
   const pathname = usePathname().split('/');
   const { routes } = configuration;
@@ -46,6 +50,16 @@ const Header = ({ display_name, email, avatar_url, plan, credits_remaining }: He
         </div>
         <div className="hidden md:inline-block text-lg ml-3">{headerText}</div>
         <div className="ml-auto flex items-center space-x-4">
+          {isAdmin && (
+            <Link
+              href="/admin"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-[#FB3640]/10 hover:bg-[#FB3640]/20 text-[#FF6B6B] border border-[#FB3640]/30 transition-colors"
+              title="Admin panel"
+            >
+              <Shield className="w-3.5 h-3.5" />
+              Admin
+            </Link>
+          )}
           <LanguageSwitcher />
           <UserNav
             avatar_url={avatar_url}

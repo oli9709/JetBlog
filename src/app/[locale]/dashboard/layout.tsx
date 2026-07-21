@@ -25,6 +25,7 @@ export default async function DashboardLayout({ children }: LayoutProps) {
   const onboarding_completed: boolean = profileData?.onboarding_completed ?? false;
   const plan: string = profileData?.plan ?? 'FREE';
   const credits_remaining: number = profileData?.credits_remaining ?? 0;
+  const role: string = (profileData as { role?: string } | undefined)?.role ?? 'user';
 
   // Server-side onboarding redirect — YAGONA joy
   const headersList = await headers();
@@ -49,6 +50,7 @@ export default async function DashboardLayout({ children }: LayoutProps) {
             avatar_url={avatar_url}
             plan={plan}
             credits_remaining={credits_remaining}
+            role={role}
           />
           <div className="m-6">{children}</div>
         </div>
