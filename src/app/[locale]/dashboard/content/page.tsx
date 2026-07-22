@@ -8,7 +8,7 @@ export const metadata = {
 };
 
 export default async function ContentPage() {
-  const { userId } = await getDashboardUserId();
+  const { userId, db } = await getDashboardUserId();
   
 
   if (!userId) {
@@ -23,7 +23,7 @@ export default async function ContentPage() {
   // 1. Bog'langan saytlar ro'yxatini olish
   let sites = [];
   try {
-    const res = await GetSitesByUser(userId);
+    const res = await GetSitesByUser(userId, db ?? undefined);
     if (res.data) {
       sites = res.data;
     }

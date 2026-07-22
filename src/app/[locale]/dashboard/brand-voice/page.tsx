@@ -8,7 +8,7 @@ export const metadata = {
 };
 
 export default async function BrandVoicePage() {
-  const { userId } = await getDashboardUserId();
+  const { userId, db } = await getDashboardUserId();
   
 
   if (!userId) {
@@ -23,7 +23,7 @@ export default async function BrandVoicePage() {
   // 1. Foydalanuvchi bog'lagan saytlar ro'yxati
   let sites = [];
   try {
-    const res = await GetSitesByUser(userId);
+    const res = await GetSitesByUser(userId, db ?? undefined);
     if (res.data) {
       sites = res.data;
     }

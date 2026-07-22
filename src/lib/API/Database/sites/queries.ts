@@ -2,17 +2,20 @@
 
 import { SupabaseServerClient as supabase } from '@/lib/API/Services/init/supabase';
 import { SiteT } from '@/lib/types/supabase';
-import { PostgrestSingleResponse } from '@supabase/supabase-js';
+import { PostgrestSingleResponse, SupabaseClient } from '@supabase/supabase-js';
 import { SupabaseDBError } from '@/lib/utils/error';
 
 /**
- * Foydalanuvchining barcha bog'langan WordPress saytlarini olish
+ * Foydalanuvchining barcha bog'langan WordPress saytlarini olish.
+ * Ixtiyoriy `client` — impersonation vaqtida service-role client uzatiladi
+ * (admin RLS chetlab, target user'ning sites'larини o'qish uchun).
  */
 export const GetSitesByUser = async (
-  userId: string
+  userId: string,
+  client?: SupabaseClient
 ): Promise<PostgrestSingleResponse<SiteT[]>> => {
-  const client = await supabase();
-  const res = await client
+  const db = client ?? (await supabase());
+  const res = await db
     .from('sites')
     .select()
     .eq('user_id', userId)

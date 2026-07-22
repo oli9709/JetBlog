@@ -18,8 +18,9 @@ export type ArticleRow = {
 };
 
 export default async function DashboardPage() {
-  const client = await supabaseClient();
-  const { userId } = await getDashboardUserId();
+  const { userId, db } = await getDashboardUserId();
+  // Impersonation aktivsa service-role client — RLS bypass; aks holda user client
+  const client = db ?? (await supabaseClient());
 
   if (!userId) redirect('/auth/login');
 
@@ -31,8 +32,8 @@ export default async function DashboardPage() {
 
   try {
     const [profile, sitesRes] = await Promise.all([
-      GetProfileByUserId(userId),
-      GetSitesByUser(userId),
+      GetProfileByUserId(userId, db ?? undefined),
+      GetSitesByUser(userId, db ?? undefined),
     ]);
 
     stats.credits = profile?.data?.[0]?.credits_remaining ?? 0;

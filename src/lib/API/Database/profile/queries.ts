@@ -1,14 +1,16 @@
 'use server';
 import { SupabaseServerClient as supabase } from '@/lib/API/Services/init/supabase';
 import { ProfileT } from '@/lib/types/supabase';
-import { PostgrestSingleResponse } from '@supabase/supabase-js';
+import { PostgrestSingleResponse, SupabaseClient } from '@supabase/supabase-js';
 import { SupabaseDBError } from '@/lib/utils/error';
 
+/** Ixtiyoriy `client` — impersonation vaqtida service-role client uzatiladi. */
 export const GetProfileByUserId = async (
-  id: string
+  id: string,
+  client?: SupabaseClient
 ): Promise<PostgrestSingleResponse<ProfileT[]>> => {
-  const client = await supabase();
-  const res: PostgrestSingleResponse<ProfileT[]> = await client
+  const db = client ?? (await supabase());
+  const res: PostgrestSingleResponse<ProfileT[]> = await db
     .from('profiles')
     .select()
     .eq('id', id);
