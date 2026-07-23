@@ -210,8 +210,8 @@ export function BrandForm({ siteId, initialData, onSave, isSaving }: BrandFormPr
                 <div className="flex flex-wrap gap-3">
                   {[
                     { id: 'uz', label: "O'zbek", icon: "🇺🇿" },
-                    { id: 'ru', label: "Русский", icon: "🇷🇺" },
                     { id: 'en', label: "English", icon: "🇺🇸" }
+                    // RU vaqtincha yashirilgan — kod type language: 'uz'|'ru'|'en' saqlangan
                   ].map((lang) => {
                     const isSelected = language === lang.id;
                     return (

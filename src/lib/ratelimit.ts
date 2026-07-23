@@ -32,6 +32,11 @@ export const rateLimiters = {
     limiter: Ratelimit.slidingWindow(10, '1 m'),
     prefix: 'jetblog:verify',
   }),
+  brandScan: new Ratelimit({
+    redis,
+    limiter: Ratelimit.slidingWindow(10, '1 h'),
+    prefix: 'jetblog:brand-scan',
+  }),
 };
 
 export async function checkRateLimit(

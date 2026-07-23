@@ -527,6 +527,32 @@
       "cancelConfirm": "Haqiqatan obunani bekor qilmoqchimisiz? Kreditlaringiz saqlanadi.",
       "cancelling": "Bekor qilinmoqda...",
       "recommended": "Tavsiya etamiz"
+    },
+    "brandVoice": {
+      "aiScannerTitle": "AI Brend Ovozi Skaneri",
+      "aiScannerDesc": "Sayt URL ni kiriting — AI brendingiz uslubini, ohangini va auditoriyasini avtomatik aniqlaydi.",
+      "urlPlaceholder": "yoursite.com",
+      "scanBtn": "Saytni skanerlash",
+      "analyzing": "AI saytni tahlil qilmoqda...",
+      "beamWebsite": "Veb-sayt",
+      "beamAi": "JetBlog AI",
+      "beamDna": "Brend DNK",
+      "scanSuccess": "Muvaffaqiyatli aniqlandi!",
+      "detectedTone": "AI aniqlagan ohang",
+      "applyBtn": "Brend formaga yuklash",
+      "scanAgain": "Qayta skanerlash",
+      "scanFailedNetwork": "Saytga ulanib bo'lmadi. URL to'g'ri ekanligini tekshiring.",
+      "scanFailedGeneric": "Tahlil amalga oshmadi. Qayta urinib ko'ring.",
+      "tabBusinessDesc": "Biznes tavsifi",
+      "tabTone": "Yozish ohangi",
+      "tabLanguageAudience": "Til va auditoriya",
+      "tabRules": "So'z qoidalari",
+      "languageAudienceDesc": "Kim uchun va qaysi tilda kontent yaratamiz?",
+      "primaryLanguage": "ASOSIY TIL",
+      "targetAudience": "MAQSADLI AUDITORIYA",
+      "saveBtn": "Brend DNK ni saqlash",
+      "businessDescHint": "Sun'iy intellekt biznesingiz nima haqida ekanligini bilishi kerak.",
+      "businessDescPlaceholder": "Biznesingiz haqida yozing. Masalan: Biz Toshkentdagi zamonaviy stomatologik klinika..."
     }
   }
 }

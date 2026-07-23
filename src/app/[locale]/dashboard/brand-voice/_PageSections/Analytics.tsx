@@ -159,28 +159,35 @@ export function Analytics({ siteId, stats, gsc, onConnectGSC, onDisconnectGSC }:
         </div>
 
         <div className="bg-[#0a0a0a]/80 backdrop-blur-xl rounded-3xl border border-white/10 shadow-2xl p-6 flex flex-col justify-center relative overflow-hidden group hover:border-white/20 transition-colors lg:col-span-1">
-          <div className="absolute inset-0 bg-gradient-to-t from-[#111] to-transparent z-10 pointer-events-none" />
-          <div className="text-zinc-400 font-medium text-sm mb-4">Top Kalit So'zlar</div>
-          <div className="relative h-24 w-full flex flex-col items-center justify-center">
-            <Marquee pauseOnHover className="[--duration:20s] absolute inset-x-0 top-0">
-              {stats.topKeywords.slice(0, Math.ceil(stats.topKeywords.length / 2)).map((kw, i) => (
-                <div key={i} className="flex items-center gap-2 px-3 py-1.5 mx-1 bg-white/5 border border-white/10 rounded-full backdrop-blur-md">
-                  <span className="text-xs font-bold text-white">{kw.keyword}</span>
-                  <span className="text-[10px] bg-white/10 px-1.5 rounded-full text-zinc-400">{kw.count}</span>
-                </div>
-              ))}
-            </Marquee>
-            <Marquee reverse pauseOnHover className="[--duration:25s] absolute inset-x-0 bottom-0">
-              {stats.topKeywords.slice(Math.ceil(stats.topKeywords.length / 2)).map((kw, i) => (
-                <div key={i} className="flex items-center gap-2 px-3 py-1.5 mx-1 bg-[#FB3640]/10 border border-[#FB3640]/20 rounded-full backdrop-blur-md">
-                  <span className="text-xs font-bold text-[#FF8A8F]">{kw.keyword}</span>
-                  <span className="text-[10px] bg-[#FB3640]/20 px-1.5 rounded-full text-[#FF6B6B]">{kw.count}</span>
-                </div>
-              ))}
-            </Marquee>
-            <div className="pointer-events-none absolute inset-y-0 left-0 w-1/4 bg-gradient-to-r from-[#0a0a0a] z-20"></div>
-            <div className="pointer-events-none absolute inset-y-0 right-0 w-1/4 bg-gradient-to-l from-[#0a0a0a] z-20"></div>
-          </div>
+          <div className="text-zinc-400 font-medium text-sm mb-4">Top Keywords</div>
+          {stats.topKeywords.length === 0 ? (
+            <div className="h-24 flex items-center justify-center text-xs text-zinc-500 text-center px-4">
+              No keywords yet — publish a few articles first.
+            </div>
+          ) : (
+            <div className="relative h-24 w-full flex flex-col items-center justify-center">
+              <Marquee pauseOnHover className="[--duration:20s] absolute inset-x-0 top-0">
+                {stats.topKeywords.slice(0, Math.ceil(stats.topKeywords.length / 2)).map((kw, i) => (
+                  <div key={i} className="flex items-center gap-2 px-3 py-1.5 mx-1 bg-white/5 border border-white/10 rounded-full backdrop-blur-md">
+                    <span className="text-xs font-bold text-white">{kw.keyword}</span>
+                    <span className="text-[10px] bg-white/10 px-1.5 rounded-full text-zinc-400">{kw.count}</span>
+                  </div>
+                ))}
+              </Marquee>
+              {stats.topKeywords.length > 1 && (
+                <Marquee reverse pauseOnHover className="[--duration:25s] absolute inset-x-0 bottom-0">
+                  {stats.topKeywords.slice(Math.ceil(stats.topKeywords.length / 2)).map((kw, i) => (
+                    <div key={i} className="flex items-center gap-2 px-3 py-1.5 mx-1 bg-[#FB3640]/10 border border-[#FB3640]/20 rounded-full backdrop-blur-md">
+                      <span className="text-xs font-bold text-[#FF8A8F]">{kw.keyword}</span>
+                      <span className="text-[10px] bg-[#FB3640]/20 px-1.5 rounded-full text-[#FF6B6B]">{kw.count}</span>
+                    </div>
+                  ))}
+                </Marquee>
+              )}
+              <div className="pointer-events-none absolute inset-y-0 left-0 w-1/4 bg-gradient-to-r from-[#0a0a0a] z-20"></div>
+              <div className="pointer-events-none absolute inset-y-0 right-0 w-1/4 bg-gradient-to-l from-[#0a0a0a] z-20"></div>
+            </div>
+          )}
         </div>
 
       </div>

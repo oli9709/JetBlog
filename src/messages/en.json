@@ -527,6 +527,32 @@
       "cancelConfirm": "Are you sure you want to cancel? Your credits will be preserved.",
       "cancelling": "Cancelling...",
       "recommended": "Recommended"
+    },
+    "brandVoice": {
+      "aiScannerTitle": "AI Brand Voice Scanner",
+      "aiScannerDesc": "Enter your site URL — AI will automatically detect your brand style, tone, and audience.",
+      "urlPlaceholder": "yoursite.com",
+      "scanBtn": "Scan site",
+      "analyzing": "AI is analyzing the site...",
+      "beamWebsite": "Website",
+      "beamAi": "JetBlog AI",
+      "beamDna": "Brand DNA",
+      "scanSuccess": "Successfully detected!",
+      "detectedTone": "Detected tone",
+      "applyBtn": "Apply to brand form",
+      "scanAgain": "Scan again",
+      "scanFailedNetwork": "Couldn't reach the site. Check the URL and try again.",
+      "scanFailedGeneric": "Analysis failed. Please try again.",
+      "tabBusinessDesc": "Business description",
+      "tabTone": "Writing tone",
+      "tabLanguageAudience": "Language & audience",
+      "tabRules": "Word rules",
+      "languageAudienceDesc": "Who is the content for and in which language?",
+      "primaryLanguage": "PRIMARY LANGUAGE",
+      "targetAudience": "TARGET AUDIENCE",
+      "saveBtn": "Save brand DNA",
+      "businessDescHint": "The AI needs to know what your business is about.",
+      "businessDescPlaceholder": "Describe your business. e.g., We're a modern dental clinic in Tashkent..."
     }
   }
 }

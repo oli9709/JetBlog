@@ -174,6 +174,7 @@ async function processOneSite(siteId: string): Promise<{ status: string; reason?
         keyword: keyword.keyword,
         title: draft.title,
         language: genLanguage,
+        siteId,
       });
     } catch (imgErr) {
       console.error('[Worker] Rasm yaratishda xatolik (kritik emas):', imgErr);

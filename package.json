@@ -49,6 +49,7 @@
     "autoprefixer": "10.4.15",
     "axios": "^1.6.7",
     "canvas-confetti": "^1.9.4",
+    "cheerio": "^1.2.0",
     "class-variance-authority": "^0.7.0",
     "client-only": "^0.0.1",
     "clsx": "^2.0.0",

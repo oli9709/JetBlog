@@ -154,6 +154,7 @@ export async function POST(req: NextRequest) {
           keyword: keywordData.keyword,
           title: articleDraft.title,
           language: genLanguage,
+          siteId: siteData.id,
         });
       } catch (imgErr) {
         console.error('Rasm generatsiyasida xatolik yuz berdi:', imgErr);
