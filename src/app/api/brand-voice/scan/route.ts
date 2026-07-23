@@ -83,23 +83,24 @@ const RESPONSE_SCHEMA = {
     'never_use',
   ],
   properties: {
-    voice_description: { type: Type.STRING },
+    // Length cap in schema so Gemini never generates prose longer than the token budget
+    voice_description: { type: Type.STRING, maxLength: '400' },
     tone: { type: Type.STRING, enum: [...TONES] },
     target_audience: {
       type: Type.ARRAY,
-      items: { type: Type.STRING },
+      items: { type: Type.STRING, maxLength: '60' },
       minItems: '1',
       maxItems: '5',
     },
     language: { type: Type.STRING, enum: [...LANGS] },
     always_use: {
       type: Type.ARRAY,
-      items: { type: Type.STRING },
+      items: { type: Type.STRING, maxLength: '40' },
       maxItems: '8',
     },
     never_use: {
       type: Type.ARRAY,
-      items: { type: Type.STRING },
+      items: { type: Type.STRING, maxLength: '40' },
       maxItems: '5',
     },
   },
@@ -144,17 +145,30 @@ If the site content is empty or unreadable, still return valid JSON with your be
     contents: content,
     config: {
       systemInstruction,
-      maxOutputTokens: 800,
+      // 2048 — Cyrillic/O'zbek characters consume ~2-3× more tokens than English;
+      // 800 was hitting the ceiling mid-JSON and producing "Unterminated string" errors.
+      maxOutputTokens: 2048,
       temperature: 0.4,
       responseMimeType: 'application/json',
       responseSchema: RESPONSE_SCHEMA,
     },
   });
 
+  const finishReason = res.candidates?.[0]?.finishReason;
   console.log('[brand-scan] tokens', {
     input: res.usageMetadata?.promptTokenCount,
     output: res.usageMetadata?.candidatesTokenCount,
+    finishReason,
   });
+
+  // If Gemini hit the max token cap, the payload is truncated — no point parsing.
+  if (finishReason === 'MAX_TOKENS') {
+    return {
+      ok: false,
+      error: 'AI response was cut off. Please try again with a shorter site.',
+      details: { finishReason, outputTokens: res.usageMetadata?.candidatesTokenCount },
+    };
+  }
 
   // ── Defensive parsing ─────────────────────────────────────────────
   let text = (res.text ?? '').trim();
