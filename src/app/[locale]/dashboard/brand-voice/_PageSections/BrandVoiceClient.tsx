@@ -48,6 +48,7 @@ export default function BrandVoiceClient({ initialSites, userId }: BrandVoiceCli
   );
   const [isSaving, setIsSaving] = useState(false);
   const [isScanning, setIsScanning] = useState(false);
+  const [scannedBrand, setScannedBrand] = useState<BrandVoiceData | undefined>(undefined);
   const [gsc, setGsc] = useState<GSCState>({ connected: false, loading: false });
   const [stats, setStats] = useState(EMPTY_STATS);
 
@@ -143,8 +144,16 @@ export default function BrandVoiceClient({ initialSites, userId }: BrandVoiceCli
     setIsScanning(true);
   };
 
-  const handleScanComplete = (_data: BrandVoiceData) => {
+  const handleScanComplete = (data: BrandVoiceData) => {
     setIsScanning(false);
+    // Store the scanned brand DNA so BrandForm can seed itself
+    setScannedBrand(data);
+    // Scroll form into view so user sees the applied values
+    if (typeof window !== 'undefined') {
+      setTimeout(() => {
+        document.getElementById('brand-form-anchor')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
+    }
   };
 
   return (
@@ -229,9 +238,10 @@ export default function BrandVoiceClient({ initialSites, userId }: BrandVoiceCli
           </section>
 
           {/* Brand DNA form */}
-          <section>
+          <section id="brand-form-anchor">
             <BrandForm
               siteId={selectedSiteId}
+              initialData={scannedBrand}
               isSaving={isSaving}
               onSave={handleSaveForm}
             />

@@ -62,7 +62,22 @@ export function SiteScanner({ onScanComplete, isScanning: externalScanning, onSc
   };
 
   const handleApply = () => {
-    if (result) onScanComplete(result);
+    if (!result) return;
+    // Scanner API tones: professional | friendly | casual | authoritative
+    // BrandForm tones:  professional | friendly | expert     | casual
+    // Map 'authoritative' → 'expert' (closest match) so BrandForm highlights it.
+    const toneMap: Record<string, BrandVoiceData['tone']> = {
+      authoritative: 'expert',
+      professional: 'professional',
+      friendly: 'friendly',
+      casual: 'casual',
+      expert: 'expert',
+    };
+    const mapped: BrandVoiceData = {
+      ...result,
+      tone: toneMap[result.tone as string] ?? 'professional',
+    };
+    onScanComplete(mapped);
   };
 
   const handleReset = () => {
