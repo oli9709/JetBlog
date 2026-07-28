@@ -6,6 +6,7 @@ import { ArticleT } from './ArticleCard';
 import { TipTapEditor } from '@/components/ui/TipTapEditor';
 import { cn } from '@/lib/utils/helpers';
 import { useTranslations } from 'next-intl';
+import { CoverImageEditor } from './CoverImageEditor';
 
 interface ArticleEditorProps {
   article: ArticleT | null;
@@ -84,8 +85,22 @@ export function ArticleEditor({
       {/* Editor Content Area (Scrollable) */}
       <div className="flex-1 overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-[#222222] hover:[&::-webkit-scrollbar-thumb]:bg-[#333333] [&::-webkit-scrollbar-thumb]:rounded-full pb-28">
         
+        {/* Cover Image */}
+        <div className="px-8 pt-8 pb-4">
+          <CoverImageEditor
+            articleId={article.id}
+            initialUrl={article.featured_image_url}
+            onChange={(newUrl) => {
+              // Mutate the in-memory article so re-render + save flow reflect the change.
+              // ArticleT type has featured_image_url as optional string.
+              (article as { featured_image_url?: string | null }).featured_image_url =
+                newUrl ?? undefined;
+            }}
+          />
+        </div>
+
         {/* Title Input */}
-        <div className="p-8 pb-4">
+        <div className="px-8 pb-4">
           <input
             type="text"
             value={title}

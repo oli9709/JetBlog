@@ -436,7 +436,18 @@
       "titlePlaceholder": "Maqola sarlavhasi...",
       "savingLabel": "Saqlanmoqda...",
       "justNow": "Hozir",
-      "alreadyPublished": "Nashr qilingan"
+      "alreadyPublished": "Nashr qilingan",
+      "coverImage": "Muqova rasmi",
+      "uploadCover": "Muqova rasmni yuklash",
+      "uploadHint": "JPEG, PNG, WebP · Max 5MB",
+      "replaceCover": "Almashtirish",
+      "removeCover": "O'chirish",
+      "removeConfirm": "Muqova rasmni o'chirasizmi?",
+      "uploading": "Yuklanmoqda...",
+      "uploadSuccess": "Muqova rasm yangilandi",
+      "uploadError": "Yuklashda xato: {message}",
+      "fileTooLarge": "Fayl juda katta. Maksimum 5MB.",
+      "invalidFormat": "Faqat JPEG, PNG, WebP formatlar ruxsat berilgan."
     },
     "wizard": {
       "title": "Yangi sayt ulash",

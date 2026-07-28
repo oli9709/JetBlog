@@ -436,7 +436,18 @@
       "titlePlaceholder": "Article title...",
       "savingLabel": "Saving...",
       "justNow": "Just now",
-      "alreadyPublished": "Already published"
+      "alreadyPublished": "Already published",
+      "coverImage": "Cover image",
+      "uploadCover": "Upload cover image",
+      "uploadHint": "JPEG, PNG, WebP · Max 5MB",
+      "replaceCover": "Replace",
+      "removeCover": "Remove",
+      "removeConfirm": "Remove cover image?",
+      "uploading": "Uploading...",
+      "uploadSuccess": "Cover image updated",
+      "uploadError": "Upload failed: {message}",
+      "fileTooLarge": "File too large. Max 5MB.",
+      "invalidFormat": "Only JPEG, PNG, WebP allowed."
     },
     "wizard": {
       "title": "Add new site",
