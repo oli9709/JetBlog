@@ -43,8 +43,12 @@ ALTER TABLE keywords
   ADD COLUMN IF NOT EXISTS gsc_position numeric(5,2),
   ADD COLUMN IF NOT EXISTS gsc_synced_at timestamptz;
 
-CREATE UNIQUE INDEX IF NOT EXISTS keywords_site_keyword_unique
-  ON keywords (site_id, LOWER(keyword));
+-- Partial: faqat active rows (pending/approved) uchun.
+-- Tarixiy `completed` yozuvlar takrorlanishi mumkin — bu normal
+-- (bir keyword bir necha marta generatsiya qilinsa yoki eski data'да allaqachon bo'lsa).
+CREATE UNIQUE INDEX IF NOT EXISTS keywords_site_keyword_active_unique
+  ON keywords (site_id, LOWER(keyword))
+  WHERE status IN ('pending','approved');
 ```
 
 ---

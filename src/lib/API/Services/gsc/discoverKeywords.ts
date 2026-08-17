@@ -183,11 +183,13 @@ export async function syncGscKeywordsForSite(
     const keyword = row.keys[0]?.trim();
     if (!keyword) continue;
 
-    // Case-insensitive duplicate check
+    // Case-insensitive duplicate check — only against ACTIVE rows
+    // (pending/approved). Historical `completed` rows don't block a fresh cycle.
     const { data: existing } = await db
       .from('keywords')
       .select('id')
       .eq('site_id', siteId)
+      .in('status', ['pending', 'approved'])
       .ilike('keyword', keyword)
       .limit(1)
       .maybeSingle();
