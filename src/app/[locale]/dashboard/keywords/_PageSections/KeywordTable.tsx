@@ -8,6 +8,7 @@ import { NumberTicker } from '@/components/magicui/number-ticker';
 import { ShimmerButton } from '@/components/magicui/shimmer-button';
 import { TypingAnimation } from '@/components/magicui/typing-animation';
 import { cn } from '@/lib/utils/helpers';
+import { useTranslations } from 'next-intl';
 
 interface KeywordT {
   id: string;
@@ -17,6 +18,9 @@ interface KeywordT {
   difficulty: number;
   status: 'pending' | 'approved' | 'generated' | 'published';
   article_id?: string;
+  source?: 'manual' | 'gsc_auto' | 'ai_suggested';
+  gsc_impressions?: number | null;
+  gsc_position?: number | null;
 }
 
 interface KeywordTableProps {
@@ -27,6 +31,7 @@ interface KeywordTableProps {
 }
 
 export const KeywordTable: React.FC<KeywordTableProps> = ({ keywords, onApprove, onDelete, onViewArticle }) => {
+  const t = useTranslations('Dashboard.keywords');
   if (keywords.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center p-12 bg-[#111111]/80 backdrop-blur-xl rounded-2xl border border-[#222222] min-h-[300px]">
@@ -68,7 +73,7 @@ export const KeywordTable: React.FC<KeywordTableProps> = ({ keywords, onApprove,
             <div className="absolute -inset-px bg-gradient-to-br from-[#FB3640]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl pointer-events-none" />
 
             {/* Sarlavha qismi */}
-            <div className="flex justify-between items-start mb-6 z-10">
+            <div className="flex justify-between items-start mb-3 z-10">
               <h3 className="font-bold text-lg text-white max-w-[70%] leading-tight truncate" title={kw.keyword}>
                 {kw.keyword}
               </h3>
@@ -76,6 +81,31 @@ export const KeywordTable: React.FC<KeywordTableProps> = ({ keywords, onApprove,
                 {kw.language}
               </span>
             </div>
+
+            {/* Source badge */}
+            {kw.source && kw.source !== 'manual' && (
+              <div
+                className="mb-4 z-10"
+                title={
+                  kw.source === 'gsc_auto' && kw.gsc_impressions != null && kw.gsc_position != null
+                    ? t('gscTooltip', {
+                        impressions: kw.gsc_impressions,
+                        position: kw.gsc_position.toFixed(1),
+                      })
+                    : undefined
+                }
+              >
+                {kw.source === 'gsc_auto' ? (
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+                    {t('sourceGscAuto')}
+                  </span>
+                ) : (
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-500/15 text-blue-400 border border-blue-500/30">
+                    {t('sourceAiSuggested')}
+                  </span>
+                )}
+              </div>
+            )}
 
             {/* Statistika */}
             <div className="space-y-4 mb-6 z-10 flex-grow">

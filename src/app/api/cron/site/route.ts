@@ -118,8 +118,9 @@ async function processOneSite(siteId: string): Promise<{ status: string; reason?
     }
   };
 
-  // ── 4. Tasdiqlangan keyword ───────────────────────────────────────────────
-  const { data: keywords } = await db
+  // ── 4. Tasdiqlangan keyword (safety net: GSC auto-discovery if empty) ──────
+  let keyword: (typeof existing extends (infer T)[] ? T : never) | undefined;
+  const { data: existing } = await db
     .from('keywords')
     .select('*')
     .eq('site_id', siteId)
@@ -127,12 +128,44 @@ async function processOneSite(siteId: string): Promise<{ status: string; reason?
     .order('created_at', { ascending: true })
     .limit(1);
 
-  if (!keywords || keywords.length === 0) {
-    await refundCredit();
-    await updateRun({ status: 'failed', error: "Kalit so'z topilmadi", completed_at: new Date().toISOString() });
-    return { status: 'skipped', reason: "Tasdiqlangan kalit so'z topilmadi." };
+  if (existing && existing.length > 0) {
+    keyword = existing[0];
+  } else {
+    // Safety net: GSC dan bitta yangi keyword olishga urinish
+    console.log(`[Worker] Keyword bo'sh — GSC dan sinash: site=${siteId}`);
+    try {
+      const { syncGscKeywordsForSite } = await import('@/lib/API/Services/gsc/discoverKeywords');
+      const result = await syncGscKeywordsForSite(siteId, 1);
+      if (result.added > 0) {
+        const { data: fresh } = await db
+          .from('keywords')
+          .select('*')
+          .eq('site_id', siteId)
+          .in('status', ['approved', 'pending'])
+          .order('created_at', { ascending: false })
+          .limit(1);
+        if (fresh && fresh.length > 0) {
+          keyword = fresh[0];
+          console.log(`[Worker] GSC keyword avto-qo'shildi: "${keyword.keyword}"`);
+        }
+      } else {
+        console.log('[Worker] GSC discovery natijasiz', result);
+      }
+    } catch (e) {
+      console.warn('[Worker] GSC auto-discovery xato (kritik emas):', e);
+    }
   }
-  const keyword = keywords[0];
+
+  if (!keyword) {
+    await refundCredit();
+    await updateRun({
+      status: 'failed',
+      error: "Kalit so'z topilmadi (GSC ham bo'sh)",
+      completed_at: new Date().toISOString(),
+    });
+    return { status: 'skipped', reason: "Kalit so'z topilmadi va GSC dan ham olib bo'lmadi." };
+  }
+
   await updateRun({ keyword_id: keyword.id });
 
   try {

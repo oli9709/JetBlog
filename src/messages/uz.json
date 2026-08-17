@@ -564,6 +564,12 @@
       "saveBtn": "Brend DNK ni saqlash",
       "businessDescHint": "Sun'iy intellekt biznesingiz nima haqida ekanligini bilishi kerak.",
       "businessDescPlaceholder": "Biznesingiz haqida yozing. Masalan: Biz Toshkentdagi zamonaviy stomatologik klinika..."
+    },
+    "keywords": {
+      "sourceManual": "Qo'lda",
+      "sourceGscAuto": "GSC (avto)",
+      "sourceAiSuggested": "AI taklif",
+      "gscTooltip": "GSC: {impressions} impressions · position {position}"
     }
   }
 }

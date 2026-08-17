@@ -564,6 +564,12 @@
       "saveBtn": "Save brand DNA",
       "businessDescHint": "The AI needs to know what your business is about.",
       "businessDescPlaceholder": "Describe your business. e.g., We're a modern dental clinic in Tashkent..."
+    },
+    "keywords": {
+      "sourceManual": "Manual",
+      "sourceGscAuto": "GSC (auto)",
+      "sourceAiSuggested": "AI suggested",
+      "gscTooltip": "GSC: {impressions} impressions · position {position}"
     }
   }
 }
