@@ -1,4 +1,5 @@
 import { adminServiceClient } from '@/lib/API/Services/admin/guard';
+import { GscSyncButton } from './_components/GscSyncButton';
 
 export const dynamic = 'force-dynamic';
 
@@ -152,6 +153,9 @@ export default async function AdminOverviewPage() {
         <MetricCard label="MRR (est.)" value={`$${metrics.mrrUsd.toFixed(2)}`} accent="text-green-400" />
         <MetricCard label="Payments this month" value={metrics.paymentsThisMonth} accent="text-emerald-300" />
       </div>
+
+      {/* Manual actions */}
+      <GscSyncButton />
 
       {/* Recent failures */}
       <section>
