@@ -18,7 +18,9 @@ interface GSCQueryRow {
   position: number;
 }
 
-const SEARCH_CONSOLE_API = 'https://searchconsole.googleapis.com/v1/sites';
+// NOTE: We use googleapis.com/webmasters/v3 (same as gsc/fetch.ts) because
+// searchconsole.googleapis.com/v1 returns 404 HTML on this project's tokens.
+const SEARCH_CONSOLE_API = 'https://www.googleapis.com/webmasters/v3/sites';
 
 function svc() {
   return createClient(
