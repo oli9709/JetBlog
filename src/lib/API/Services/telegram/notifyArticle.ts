@@ -41,10 +41,10 @@ export async function notifyArticlePublished(
   const { supabase, siteId, articleId } = params;
 
   try {
-    // 1. Sayt: telegram_chat_id va URL
+    // 1. Sayt: telegram_chat_id + URL + optional public_url override
     const { data: site, error: siteErr } = await supabase
       .from('sites')
-      .select('id, url, telegram_chat_id')
+      .select('id, url, public_url, telegram_chat_id')
       .eq('id', siteId)
       .single();
 
@@ -83,20 +83,37 @@ export async function notifyArticlePublished(
 
     // 3. Article URL — published_url (canonical) → wp_post_id fallback → site.url
     const cleanSiteUrl = (site.url ?? '').replace(/\/+$/, '');
+    const cleanPublicUrl = (site.public_url ?? '').replace(/\/+$/, '');
 
     // Shared normalize — full URL / relative path / bo'sh holatlarini boshqaradi
     const normalized = normalizeArticleUrl(article.published_url, site.url);
-    const articleUrl =
+    let articleUrl =
       normalized ||
       (article.wp_post_id && cleanSiteUrl
         ? `${cleanSiteUrl}/?p=${article.wp_post_id}`
         : cleanSiteUrl);
+
+    // Public URL override — agar receiver backend domenda javob qaytargan bo'lsa
+    // (masalan .onrender.com), lekin haqiqiy public site boshqa domenda bo'lsa,
+    // origin qismini almashtiramiz. Path va query saqlanadi.
+    if (cleanPublicUrl && articleUrl) {
+      try {
+        const publicOrigin = new URL(cleanPublicUrl).origin;
+        const currentUrl = new URL(articleUrl);
+        if (currentUrl.origin !== publicOrigin) {
+          articleUrl = publicOrigin + currentUrl.pathname + currentUrl.search + currentUrl.hash;
+        }
+      } catch {
+        // Malformed URL — public_url'ni ishlatmasdan, asl URL bilan davom etamiz
+      }
+    }
 
     console.info('[notify/telegram] resolved article URL', {
       siteId,
       articleId,
       publishedUrl: article.published_url,
       siteUrl: cleanSiteUrl,
+      publicUrl: cleanPublicUrl || null,
       finalUrl: articleUrl,
     });
 
